@@ -17,10 +17,10 @@
 + cá có point max
 
 # Tạo ra 1 cái boom:
-+ Vị trí xuất hiện là random ( nhưng vị trí xuất hiện 3/5 center)
++ Vị trí xuất hiện là từ trên xuống dưới random ( nhưng vị trí xuất hiện 3/5 center)
 + Nếu ăn cá sẽ chet
-Tạo ra kim cương:
-+ vị trí xuất hiện là random
+# Tạo ra kim cương:
++ vị trí xuất hiện là từ trên xuống dưới random
 + Nếu ăn sẽ được sẽ thêm .. điểm
 
 # Chức năng :
