@@ -1,0 +1,1 @@
+print("thuan dep trai lam dai ca cua trung, vu va lam")
