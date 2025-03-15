@@ -14,11 +14,11 @@ display.addshape("car.gif")
 class Player(Turtle):  
     def __init__(self):  
         super().__init__()  
-        self.shape("car.gif") 
+        self.shape("car.gif")  # Gán ảnh
         self.penup()
         self.goto(0, -250)  
         self.speed = 10
-        self.direction = "stop" 
+        self.direction = "stop"  # Hướng di chuyển ban đầu
 
     def move(self):
         if self.direction == "up":
@@ -30,7 +30,7 @@ class Player(Turtle):
         elif self.direction == "right":
             self.goto(self.xcor() + self.speed, self.ycor())
 
-        display.ontimer(self.move, 50)
+        display.ontimer(self.move, 50)  # Cập nhật liên tục mỗi 50ms
 
     def move_up(self):
         self.direction = "up"
@@ -51,7 +51,7 @@ class Vehicle:
     def create_car(self):
         if randint(1, 8) == 5:
             carr = Turtle()
-            carr.shape("car.gif")  
+            carr.shape("car.gif")  # Gán ảnh
             carr.penup()
             toado_y = randint(-220, 220)
             carr.goto(200, toado_y)
@@ -61,15 +61,34 @@ class Vehicle:
         for x in self.list_car:
             x.backward(3)
 
+class VehicleL:
+    def __init__(self):
+        self.list_car = []
+
+    def create_car(self):
+        if randint(1, 8) == 5:
+            carr = Turtle()
+            carr.shape("car.gif")  # Gán ảnh
+            carr.penup()
+            toado_y = randint(-220, 220)
+            carr.goto(-200, toado_y)
+            self.list_car.append(carr)
+
+    def move_cars(self):
+        for x in self.list_car:
+            x.forward(3)
+# Khởi tạo nhân vật và xe
 player = Player()
 xe = Vehicle()
-
+xe2= VehicleL()
+# Lắng nghe phím bấm
 display.listen()
 display.onkey(player.move_up, "Up")
 display.onkey(player.move_down, "Down")
 display.onkey(player.move_left, "Left")
 display.onkey(player.move_right, "Right")
 
+# Bắt đầu di chuyển
 player.move()
 
 # Vòng lặp chính
@@ -79,5 +98,7 @@ while running:
     display.update()
     xe.create_car()
     xe.move_cars()
+    xe2.create_car()
+    xe2.move_cars()
 
 display.exitonclick()
