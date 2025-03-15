@@ -2,6 +2,7 @@
 # Tạo ra 1 con cá main:
 + Cá có 2 hình lấy trong Folder trung gửi
 + Cá di chuyển được bằng phím up dow left right (di chuyển là khi đè phím sẽ phải di chuyển sao cho mượt)
++ Cá di chuyển right hoặc left sẽ chuyển đổi hình ảnh
 + Cá không thể di chuyển ra ngoài tọa độ của màn hình được
 + biến point lưu điểm 
 + Cá ở 1 mức điểm nào đó sẽ được phóng 
