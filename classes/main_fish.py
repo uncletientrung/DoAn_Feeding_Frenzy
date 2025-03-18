@@ -1,40 +1,83 @@
 import pygame
+import sys
+import pygame.time
 from settings import *
 
 class MainFish:
     def __init__(self, x, y):
-        self.image_right = pygame.image.load(IMAGE_PATH + "sharkleft1.png")
-        self.image_left = pygame.image.load(IMAGE_PATH + "shark1.png")
-        # Resize ảnh cá địch
-        new_size = (SCREEN_WIDTH // 15, SCREEN_HEIGHT // 15)  
-        self.image_right = pygame.transform.scale(self.image_right, new_size)
-        self.image_left = pygame.transform.scale(self.image_left, new_size)
+        self.image_right = pygame.image.load(IMAGE_PATH + "Fishright11.png")
+        self.image_left = pygame.image.load(IMAGE_PATH + "Fishleft11.png")
+        
+        # ✅ Lưu kích thước gốc của cá
+        self.base_width, self.base_height = self.image_right.get_size()
+
+        # ✅ Resize ảnh ban đầu theo màn hình
+        base_size = SCREEN_WIDTH // 15  
+        self.image_right = pygame.transform.scale(self.image_right, (base_size, base_size))
+        self.image_left = pygame.transform.scale(self.image_left, (base_size, base_size))
+        
         self.image = self.image_right  
         self.x, self.y = x, y
         self.width, self.height = self.image.get_size()
         self.speed = PLAYER_SPEED
-        self.size = 1  # Kích thước cá chính (tăng khi ăn)
+        self.size = 1  
+        self.eat_count = 0  
+        self.level = 0  
+        self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eating.wav")
+        self.rect = self.image.get_rect(topleft=(self.x, self.y)) 
 
-    # def check_collision(self, enemies):
-    #     for enemy in enemies:
-    #         if (self.x < enemy.x + enemy.width and
-    #             self.x + self.width > enemy.x and
-    #             self.y < enemy.y + enemy.height and
-    #             self.y + self.height > enemy.y):
-                
-    #             if self.size > enemy.size:  # Kiểm tra cá chính có lớn hơn không
-    #                 enemy.reset_position()  # Cá địch xuất hiện lại
-    #                 self.grow()
+    def check_collision(self, enemies):
+        player_mask = pygame.mask.from_surface(self.image)  
+        player_offset = (self.x, self.y)
 
-    # def grow(self):
-    #     """Làm cá chính to lên"""
-    #     self.size += 1
-    #     self.width += 10  # Tăng kích thước lên 10px
-    #     self.height += 10
-    #     self.image_right = pygame.transform.scale(self.image_right, (self.width, self.height))
-    #     self.image_left = pygame.transform.scale(self.image_left, (self.width, self.height))
-    #     self.image = self.image_right  # Giữ hướng ban đầu
+        for enemy in enemies[:]:  
+            enemy_mask = pygame.mask.from_surface(enemy.image)  
+            enemy_offset = (enemy.x - self.x, enemy.y - self.y) 
 
+            if player_mask.overlap(enemy_mask, enemy_offset): 
+                if self.level >= enemy.size - 1:
+                    self.eat_fish(enemy)
+                    enemies.remove(enemy)
+                elif self.level < enemy.size:
+                    print(f" Bạn va chạm với cá lớn hơn! Player Level: {self.level} - Enemy Level: {enemy.size}")
+                    self.game_over()
+                else:
+                    print(f" Cá cùng cấp, không thể ăn!")
+
+
+    def grow(self, enemy_level):
+        """Làm cá chính to lên khi ăn cá nhỏ hơn"""
+        self.size += 0.1 * (1 + enemy_level * 0.1)  # Tăng kích thước nhanh hơn khi ăn cá lớn
+        self.eat_count += 1  # Mỗi lần ăn, tăng bộ đếm
+
+        if self.eat_count >= 8:  # Mỗi 8 lần ăn sẽ lên level
+            self.level += 1
+            pygame.mixer.Sound.play(sound_level_up)
+            self.eat_count = 0
+            print(f"🎉 Level Up! Current Level: {self.level}")
+
+        # Tính toán kích thước mới
+        base_size = SCREEN_WIDTH // 15
+        new_size = int(base_size * (1 + self.size * 0.05))
+        max_size = SCREEN_WIDTH // 3  # Giới hạn kích thước tối đa
+        new_size = min(new_size, max_size)
+
+        # Load lại hình ảnh để cập nhật kích thước
+        self.image_right = pygame.image.load(IMAGE_PATH + "Fishright11.png")
+        self.image_left = pygame.image.load(IMAGE_PATH + "Fishleft11.png")
+        self.image_right = pygame.transform.scale(self.image_right, (new_size, new_size))
+        self.image_left = pygame.transform.scale(self.image_left, (new_size, new_size))
+        
+        
+        if self.image == self.image_right:
+            self.image = self.image_right
+        else:
+            self.image = self.image_left
+            
+       
+        self.width, self.height = new_size, new_size
+        global enemy_fishes 
+        enemy_fishes = [] 
 
     def move(self, keys):
         """Di chuyển cá chính bằng phím mũi tên"""
@@ -48,6 +91,39 @@ class MainFish:
             self.y -= self.speed
         if keys[pygame.K_DOWN] and self.y < SCREEN_HEIGHT - self.height:
             self.y += self.speed
+        self.rect.topleft = (self.x, self.y)
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
+
+    def game_over(self):
+        pygame.mixer.Sound.play(sound_death)
+        pygame.time.delay(600)
+        pygame.mixer.Sound.play(sound_game_over)  
+        print("💀 Game Over! Bạn đã bị ăn!")
+        pygame.time.delay(3000)  
+        pygame.quit()
+        sys.exit()
+
+
+    def restart_game(self):
+        """Reset cá chính về trạng thái ban đầu"""
+        self.x, self.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        self.level = 0
+        self.size = 1
+        self.eat_count = 0
+
+        base_size = SCREEN_WIDTH // 15
+        self.image_right = pygame.image.load(IMAGE_PATH + "Fishright11.png")
+        self.image_left = pygame.image.load(IMAGE_PATH + "Fishleft11.png")
+        self.image_right = pygame.transform.scale(self.image_right, (base_size, base_size))
+        self.image_left = pygame.transform.scale(self.image_left, (base_size, base_size))
+        self.image = self.image_right  
+
+
+    def eat_fish(self, enemy):
+        """Xử lý khi cá chính ăn cá nhỏ hơn"""
+        self.eat_sound.play()
+        self.grow(enemy.fish_level) 
+        print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
+
