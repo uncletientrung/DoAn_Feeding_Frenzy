@@ -23,7 +23,7 @@ class MainFish:
         self.size = 1  
         self.eat_count = 0  
         self.level = 1  
-        self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eating.wav")
+        self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y)) 
 
     def check_collision(self, enemies):
@@ -58,7 +58,7 @@ class MainFish:
 
         # Tính toán kích thước mới
         base_size = SCREEN_WIDTH // 15
-        new_size = int(base_size * (1 + self.size * 0.05))
+        new_size = int(base_size * (1 + self.size * 0.07)) #luc dau la 0.05
         max_size = SCREEN_WIDTH // 3  # Giới hạn kích thước tối đa
         new_size = min(new_size, max_size)
 

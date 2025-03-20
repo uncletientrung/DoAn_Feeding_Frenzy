@@ -33,3 +33,5 @@
 # AI siêu cấp
 + sử dụng ngón trỏ để điều khiển cá
 + yêu cầu sài python 3.10.x
++ sử dụng vòng lặp while trong game.py , chonj1 trong 2 vòng lặp để chơi camera hoặc phím
++ nếu có bug thì lên chatgpt tải thư viện OPEN CV và ... về

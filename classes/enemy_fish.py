@@ -21,7 +21,7 @@ class EnemyFish:
 
       
         base_size = SCREEN_WIDTH // 15  # Kích thước mặc định
-        scale_factor = 1 + (self.size - 1) * 0.2  # Tăng kích thước theo level
+        scale_factor = 1 + (self.size - 1) * 0.1  # Tăng kích thước theo level luc dau la 0.2
         new_size = (int(base_size * scale_factor), int(base_size * scale_factor))
 
         self.image_right = pygame.transform.scale(self.image_right, new_size)
@@ -85,7 +85,7 @@ class EnemyFish:
 
         
         base_size = SCREEN_WIDTH // 15  
-        scale_factor = 1 + (self.size - 1) * 0.2  
+        scale_factor = 1 + (self.size - 1) * 0.1 #luc dau la 0.2  
         new_size = (int(base_size * scale_factor), int(base_size * scale_factor))
 
         self.image_right = pygame.transform.scale(self.image_right, new_size)
