@@ -29,3 +29,7 @@
 
 # Thêm background
 # Thêm Âm thanh
+
+# AI siêu cấp
++ sử dụng ngón trỏ để điều khiển cá
++ yêu cầu sài python 3.10.x

@@ -39,6 +39,8 @@ class EnemyFish:
         self.wave_speed = random.uniform(0.05, 0.1)  
         self.wave_offset = random.uniform(0, math.pi * 2)  
 
+    
+
     def move(self):
         """Di chuyển cá địch với hiệu ứng nhấp nhô"""
         self.x += self.speed
@@ -52,6 +54,8 @@ class EnemyFish:
 
         if self.x < -self.width or self.x > SCREEN_WIDTH:
             self.reset_position()
+
+    
 
     def draw(self, screen):
         """Vẽ cá địch lên màn hình"""
@@ -87,4 +91,8 @@ class EnemyFish:
         self.image_right = pygame.transform.scale(self.image_right, new_size)
         self.image_left = pygame.transform.scale(self.image_left, new_size)
         self.image = self.image_left if self.speed < 0 else self.image_right
+
+
+    
+
 

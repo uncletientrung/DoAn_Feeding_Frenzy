@@ -22,7 +22,7 @@ class MainFish:
         self.speed = PLAYER_SPEED
         self.size = 1  
         self.eat_count = 0  
-        self.level = 0  
+        self.level = 1  
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eating.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y)) 
 
@@ -35,7 +35,7 @@ class MainFish:
             enemy_offset = (enemy.x - self.x, enemy.y - self.y) 
 
             if player_mask.overlap(enemy_mask, enemy_offset): 
-                if self.level >= enemy.size - 1:
+                if self.level >= enemy.size:
                     self.eat_fish(enemy)
                     enemies.remove(enemy)
                 elif self.level < enemy.size:
@@ -79,7 +79,7 @@ class MainFish:
         global enemy_fishes 
         enemy_fishes = [] 
 
-    def move(self, keys):
+    def move1(self, keys):
         """Di chuyển cá chính bằng phím mũi tên"""
         if keys[pygame.K_LEFT] and self.x > 0:
             self.x -= self.speed
@@ -92,6 +92,26 @@ class MainFish:
         if keys[pygame.K_DOWN] and self.y < SCREEN_HEIGHT - self.height:
             self.y += self.speed
         self.rect.topleft = (self.x, self.y)
+
+    #move tich hop ai va phim
+    def move(self, dx, dy):
+        """Di chuyển cá chính bằng AI hoặc phím"""
+        if dx < 0:
+            self.image = self.image_left  # Quay trái
+        elif dx > 0:
+            self.image = self.image_right  # Quay phải
+
+        self.x += dx
+        self.y += dy
+
+        # Giới hạn phạm vi di chuyển trong màn hình
+        self.x = max(0, min(SCREEN_WIDTH - self.width, self.x))
+        self.y = max(0, min(SCREEN_HEIGHT - self.height, self.y))
+
+        self.rect.topleft = (self.x, self.y)
+
+
+        
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
