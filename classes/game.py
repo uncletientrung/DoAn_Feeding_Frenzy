@@ -9,7 +9,7 @@ from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
 
 
-os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
+os.environ['SDL_VIDEO_WINDOW_POS'] = "50,50"
 
 
 pygame.init()
@@ -69,7 +69,7 @@ mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7)
 mp_draw = mp.solutions.drawing_utils
 cap = cv2.VideoCapture(0)
-cap.set(cv2.CAP_PROP_FPS, 60)
+cap.set(cv2.CAP_PROP_FPS, 40)
 
 
 
@@ -81,117 +81,35 @@ last_bubble_time = time.time() # Thời gian để spawn cá mới
 
 
 # vong lap while dieu khien bang phim
-while running:
-    current_time = time.time()
-    if current_time - last_bubble_time >= 7:  # Mỗi 7 giây
-        sound_bubble.play()
-        last_bubble_time = current_time
-    screen.blit(background, (0, 0))  # Vẽ background
-    keys = pygame.key.get_pressed()
-
-    player.move1(keys)
-    player.check_collision(enemy_fishes)  # Kiểm tra va chạm với cá địch
-    player.draw(screen)
-    draw_fish_level(screen, player)
-
-   
-    if player.eat_count == 0:  
-        
-        for _ in range(2):  
-            spawn_enemy()
-
-    
-    if pygame.time.get_ticks() - spawn_timer > 4000: 
-        spawn_enemy()
-        spawn_timer = pygame.time.get_ticks()  
-
-    
-    for enemy in enemy_fishes:
-        enemy.move()  
-        enemy.draw(screen)
-        draw_enemy_level(screen, enemy)
-
-    pygame.display.update()
-    clock.tick(FPS)
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-
-#vong lap while dieu khien bang tay
 # while running:
 #     current_time = time.time()
-#     if current_time - last_bubble_time >= 7:
+#     if current_time - last_bubble_time >= 7:  # Mỗi 7 giây
 #         sound_bubble.play()
 #         last_bubble_time = current_time
+#     screen.blit(background, (0, 0))  # Vẽ background
+#     keys = pygame.key.get_pressed()
 
-#     screen.blit(background, (0, 0))
-
-#     detected_tay = False  # Mặc định là không thấy tay
-#     ret, frame = cap.read()
-    
-#     if ret:
-#         frame = cv2.flip(frame, 1)
-#         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#         result = hands.process(rgb_frame)
-        
-#         if result.multi_hand_landmarks:
-#             detected_tay = True  # Khi thấy tay, bật cờ này
-#             for hand_landmarks in result.multi_hand_landmarks:
-#                 x_pos = hand_landmarks.landmark[8].x  # Ngón trỏ
-#                 y_pos = hand_landmarks.landmark[8].y  
-                
-#                 new_x = int(x_pos * SCREEN_WIDTH)
-#                 new_y = int(y_pos * SCREEN_HEIGHT)
-
-#                 # Cập nhật hướng di chuyển
-#                 if new_x > player.x:  
-#                     player.image = player.image_right  # Quay phải
-#                 elif new_x < player.x:  
-#                     player.image = player.image_left  # Quay trái
-                
-#                 player.x, player.y = new_x, new_y
-#                 player.rect.topleft = (player.x, player.y)
-
-#                 mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-# # chinh lai vi tri cua camera chut xiu
-#         cv2.namedWindow("Hand Tracking", cv2.WINDOW_NORMAL)
-#         cv2.moveWindow("Hand Tracking", 1000, 100)
-#         cv2.imshow("Hand Tracking", frame)
-
-
-
-#         if cv2.waitKey(1) & 0xFF == ord('q'):
-#             running = False
-
-#     # Nếu không thấy tay, dùng phím để điều khiển
-#     if detected_tay:
-#         player.move(0, 0)
-#     else:      
-#         keys = pygame.key.get_pressed()  # Lấy trạng thái phím
-#         player.move1(keys)  # Di chuyển bằng phím
-
-#     # Kiểm tra va chạm
-#     player.check_collision(enemy_fishes)
+#     player.move1(keys)
+#     player.check_collision(enemy_fishes)  # Kiểm tra va chạm với cá địch
 #     player.draw(screen)
 #     draw_fish_level(screen, player)
 
-
-#     if player.eat_count == 0:
-#         for _ in range(2):
+   
+#     if player.eat_count == 0:  
+        
+#         for _ in range(2):  
 #             spawn_enemy()
 
-#     if pygame.time.get_ticks() - spawn_timer > 4000:
+    
+#     if pygame.time.get_ticks() - spawn_timer > 4000: 
 #         spawn_enemy()
-#         spawn_timer = pygame.time.get_ticks()
+#         spawn_timer = pygame.time.get_ticks()  
 
+    
 #     for enemy in enemy_fishes:
-#         enemy.move()
+#         enemy.move()  
 #         enemy.draw(screen)
 #         draw_enemy_level(screen, enemy)
-
 
 #     pygame.display.update()
 #     clock.tick(FPS)
@@ -200,7 +118,103 @@ while running:
 #         if event.type == pygame.QUIT:
 #             running = False
 
-# cap.release()
-# cv2.destroyAllWindows()
-# pygame.quit()
+
+#vong lap while dieu khien bang tay
+
+positions = []  # Danh sách lưu vị trí trung bình
+BUFFER_SIZE = 5
+while running:
+    current_time = time.time()
+    if current_time - last_bubble_time >= 7:
+        sound_bubble.play()
+        last_bubble_time = current_time
+
+    screen.blit(background, (0, 0))
+
+    detected_tay = False  # Mặc định là không thấy tay
+    ret, frame = cap.read()
+    
+    if ret:
+        frame = cv2.flip(frame, 1)
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result = hands.process(rgb_frame)
+        
+        if result.multi_hand_landmarks:
+            detected_tay = True
+            for hand_landmarks in result.multi_hand_landmarks:
+                x_pos = hand_landmarks.landmark[8].x  
+                y_pos = hand_landmarks.landmark[8].y  
+
+                new_x = int(x_pos * SCREEN_WIDTH)
+                new_y = int(y_pos * SCREEN_HEIGHT)
+
+                # Thêm vị trí vào bộ nhớ đệm
+                positions.append((new_x, new_y))
+                if len(positions) > BUFFER_SIZE:
+                    positions.pop(0)  # Giữ lại BUFFER_SIZE phần tử gần nhất
+
+                # Lấy trung bình để làm mượt di chuyển
+                avg_x = int(sum(p[0] for p in positions) / len(positions))
+                avg_y = int(sum(p[1] for p in positions) / len(positions))
+
+                # Chỉ đổi hướng khi di chuyển đủ xa
+                if abs(avg_x - last_x) > SCREEN_WIDTH * 0.05:  
+                    if avg_x > player.x:
+                        player.image = player.image_right
+                    else:
+                        player.image = player.image_left
+                    last_x = avg_x  
+
+                player.x, player.y = avg_x, avg_y
+                player.rect.topleft = (player.x, player.y)
+
+                mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+# chinh lai vi tri cua camera chut xiu
+        cv2.namedWindow("Hand Tracking", cv2.WINDOW_NORMAL)
+        cv2.moveWindow("Hand Tracking", 1000, 100)
+        cv2.imshow("Hand Tracking", frame)
+
+
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            running = False
+
+    # Nếu không thấy tay, dùng phím để điều khiển, chức năng này vẫn ch chạy được, ai thấy fix dùm
+    if detected_tay:
+        player.move(0, 0)
+    else:      
+        keys = pygame.key.get_pressed()  # Lấy trạng thái phím
+        player.move1(keys)  # Di chuyển bằng phím
+
+    # Kiểm tra va chạm
+    player.check_collision(enemy_fishes)
+    player.draw(screen)
+    draw_fish_level(screen, player)
+
+
+    if player.eat_count == 0:
+        for _ in range(2):
+            spawn_enemy()
+
+    if pygame.time.get_ticks() - spawn_timer > 4000:
+        spawn_enemy()
+        spawn_timer = pygame.time.get_ticks()
+
+    for enemy in enemy_fishes:
+        enemy.move()
+        enemy.draw(screen)
+        draw_enemy_level(screen, enemy)
+
+
+    pygame.display.update()
+    clock.tick(FPS)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+cap.release()
+cv2.destroyAllWindows()
+pygame.quit()
 

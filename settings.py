@@ -30,6 +30,6 @@ ENEMY_FISH_TYPES = [
     ("Fishright7.png", "Fishleft7.png", 17, 14, 99),   # Loại 8: xuất hiện từ level 8-14
     ("Fishright8.png", "Fishleft8.png", 19, 16, 99),   # Loại 9: xuất hiện từ level 9-15
     ("Fishright9.png", "Fishleft9.png", 21, 18, 99), # Loại 10: xuất hiện từ level 10+
-    ("sharkleft1.png", "shark1.png", 30, 25, 99)     # Cá mập: xuất hiện từ level 14+
+    ("sharkleft1.png", "shark1.png", 0, 1, 99)     # Cá mập: xuất hiện từ level 14+
 ]
 
