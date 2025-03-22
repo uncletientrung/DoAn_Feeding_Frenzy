@@ -120,7 +120,7 @@ last_bubble_time = time.time() # Thời gian để spawn cá mới
 
 
 #vong lap while dieu khien bang tay
-
+last_x=0;
 positions = []  # Danh sách lưu vị trí trung bình
 BUFFER_SIZE = 5
 while running:
