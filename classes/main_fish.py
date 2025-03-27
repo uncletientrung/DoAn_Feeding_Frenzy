@@ -2,6 +2,7 @@ import pygame
 import sys
 import pygame.time
 from settings import *
+import classes.bomb
 
 class MainFish:
     def __init__(self, x, y):
@@ -22,7 +23,7 @@ class MainFish:
         self.speed = PLAYER_SPEED
         self.size = 1  
         self.eat_count = 0  
-        self.level = 1  
+        self.level = 8  
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y)) 
 
@@ -146,4 +147,7 @@ class MainFish:
         self.eat_sound.play()
         self.grow(enemy.fish_level) 
         print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
+
+    
+    
 
