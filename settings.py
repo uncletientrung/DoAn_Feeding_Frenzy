@@ -13,10 +13,11 @@ PLAYER_SPEED = 5
 IMAGE_PATH = "assets/images/"
 SOUND_PATH = "assets/sounds/"
 sound_game_over = pygame.mixer.Sound(SOUND_PATH + "gameover.wav")
+sound_game_over2= pygame.mixer.Sound(SOUND_PATH + "GameOver2.wav")
 sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
 sound_level_up = pygame.mixer.Sound(SOUND_PATH + "levelUp.wav")
 sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")
-sound_boom=pygame.mixer.Sound(SOUND_PATH+"soundboom.mp3")
+sound_boom=pygame.mixer.Sound(SOUND_PATH+"soundboom.wav")
 
 ENEMY_FISH_TYPES = [
     # (ảnh nhỏ, ảnh to, size, min_level_required, max_level_appear)

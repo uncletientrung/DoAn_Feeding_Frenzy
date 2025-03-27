@@ -27,7 +27,7 @@ class Boom:
         if self.image:
             screen.blit(self.image,(self.x,self.y))
 
-    def remove_boom(self): # Xóa boom sau va chạm
+    def remove_boom(self): # Sau va chạm Xóa boom trong x thời gian
         if self.exploded is True and pygame.time.get_ticks()-self.time >100:
             return True
         return False

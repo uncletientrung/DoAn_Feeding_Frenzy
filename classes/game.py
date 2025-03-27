@@ -8,6 +8,7 @@ from settings import *
 from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
 from classes.bomb import Boom
+from classes.bonuslv import BonusLv
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
 
@@ -46,7 +47,10 @@ player = MainFish(400, 300)
 enemy_fishes = []  
 MAX_ENEMIES = 10
 list_boom=[]
-MAX_BOOM=2   
+MAX_BOOM=4
+list_bonus=[]
+MAX_BONUS=2   
+
 
 def spawn_enemy():
     """Hàm spawn cá theo level hiện tại của người chơi"""
@@ -70,7 +74,11 @@ def spam_boom():
         x_position = random.randint(100, SCREEN_WIDTH-100)
         new_boom=Boom(x_position,-30)
         list_boom.append(new_boom)
-
+def create_bonus():
+    if len(list_bonus)<MAX_BONUS:
+        x_position = random.randint(100, SCREEN_WIDTH-100)
+        new_bonus=BonusLv(x_position,-30)
+        list_bonus.append(new_bonus)
 
 running = True
 clock = pygame.time.Clock()
@@ -102,16 +110,26 @@ while running:
     if pygame.time.get_ticks() - spawn_timer > 4000: 
         spawn_enemy()
         spawn_timer = pygame.time.get_ticks()  
-
-    
+ 
     for enemy in enemy_fishes:
         enemy.move()  
         enemy.draw(screen)
         draw_enemy_level(screen, enemy)
+    # Sinh ra Bonus khi random đúng số
+    if random.randint(1,100)==3:
+        create_bonus()
+    for bonus in list_bonus[:]:
+        bonus:BonusLv
+        bonus.draw_bonus(screen)
+        bonus.move_bonus()
+        if bonus.check_collision_main(player):
+            player.level+=1
+            list_bonus.remove(bonus)
 
-    # Hàm xin ra boom ở cấp 7
+
+    # Hàm sinh ra boom ở cấp 7
     if player.level >=7:
-        if pygame.time.get_ticks() - spam_boom_timer >1000:
+        if pygame.time.get_ticks() - spam_boom_timer >15000:
             spam_boom()
             spam_boom_timer=pygame.time.get_ticks()
     

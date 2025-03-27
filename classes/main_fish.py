@@ -111,16 +111,13 @@ class MainFish:
 
         self.rect.topleft = (self.x, self.y)
 
-
-        
-
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
     def game_over(self):
         pygame.mixer.Sound.play(sound_death)
         pygame.time.delay(600)
-        pygame.mixer.Sound.play(sound_game_over)  
+        pygame.mixer.Sound.play(sound_game_over2)  
         print("💀 Game Over! Bạn đã bị ăn!")
         pygame.time.delay(3000)  
         pygame.quit()
