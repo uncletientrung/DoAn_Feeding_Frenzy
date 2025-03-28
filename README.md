@@ -16,7 +16,7 @@
 + vị trí là random ( trước khi xuất hiện có cảnh báo)
 + cá có point max
 
--[x]# Tạo ra 1 cái boom:
+# Tạo ra 1 cái boom:
 + Vị trí xuất hiện là từ trên xuống dưới random ( nhưng vị trí xuất hiện 3/5 center)
 + Nếu ăn cá sẽ chet
 # Tạo ra kim cương:
