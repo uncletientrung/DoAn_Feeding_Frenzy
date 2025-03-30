@@ -21,7 +21,6 @@ sound_boom=pygame.mixer.Sound(SOUND_PATH+"soundboom.wav")
 
 ENEMY_FISH_TYPES = [
     # (ảnh nhỏ, ảnh to, size, min_level_required, max_level_appear)
-    ("kimcuong.png", "kimcuong.png", 1, 0, 10),
     ("Fishright10.png", "Fishleft10.png", 1, 0, 10),  # Loại 1: xuất hiện từ level 0-7
     ("Fishright2.png", "Fishleft2.png", 2, 0, 11),    # Loại 2: xuất hiện từ level 0-8
     ("Fishright1.png", "Fishleft1.png", 5, 0, 15),    # Loại 3: xuất hiện từ level 0-9

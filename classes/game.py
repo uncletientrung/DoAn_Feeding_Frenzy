@@ -9,6 +9,7 @@ from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
 from classes.bomb import Boom
 from classes.bonuslv import BonusLv
+from classes.boss_fish import BossFish
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
 
@@ -47,9 +48,11 @@ player = MainFish(400, 300)
 enemy_fishes = []  
 MAX_ENEMIES = 10
 list_boom=[]
-MAX_BOOM=4
+MAX_BOOM=50
 list_bonus=[]
-MAX_BONUS=2   
+MAX_BONUS=1
+list_boss=[]
+MAX_BOSS=10
 
 
 def spawn_enemy():
@@ -69,7 +72,7 @@ def spawn_enemy():
 
         enemy_fishes.append(new_enemy)
 
-def spam_boom():
+def spawn_boom():
     if len(list_boom)<MAX_BOOM:
         x_position = random.randint(100, SCREEN_WIDTH-100)
         new_boom=Boom(x_position,-30)
@@ -79,14 +82,19 @@ def create_bonus():
         x_position = random.randint(100, SCREEN_WIDTH-100)
         new_bonus=BonusLv(x_position,-30)
         list_bonus.append(new_bonus)
+def create_boss():
+    if len(list_boss)<MAX_BOSS:
+        x_position=random.choice([-50,SCREEN_WIDTH])
+        y_position=random.randint(50,SCREEN_HEIGHT-50)
+        new_BossFish=BossFish(x_position,y_position)
+        list_boss.append(new_BossFish)
+        
 
 running = True
 clock = pygame.time.Clock()
 spawn_timer = 0
 last_bubble_time = time.time() # Thời gian để spawn cá mới
-spam_boom_timer=0
-time_boom_gameover=0
-
+spawn_boom_timer=0
 
 
 # vong lap while dieu khien bang phim
@@ -105,43 +113,59 @@ while running:
     if player.eat_count == 0:  
         for _ in range(2):  
             spawn_enemy()
-
     
     if pygame.time.get_ticks() - spawn_timer > 4000: 
         spawn_enemy()
         spawn_timer = pygame.time.get_ticks()  
- 
+    # Hàm vẽ cá và vẽ lv trên đầu cá enemy
     for enemy in enemy_fishes:
         enemy.move()  
         enemy.draw(screen)
         draw_enemy_level(screen, enemy)
     # Sinh ra Bonus khi random đúng số
-    if random.randint(1,100)==3:
+    if random.randint(1,50)==3 and player.level >=7:
         create_bonus()
     for bonus in list_bonus[:]:
         bonus:BonusLv
         bonus.draw_bonus(screen)
         bonus.move_bonus()
         if bonus.check_collision_main(player):
-            player.level+=1
             list_bonus.remove(bonus)
 
 
     # Hàm sinh ra boom ở cấp 7
     if player.level >=7:
-        if pygame.time.get_ticks() - spam_boom_timer >15000:
-            spam_boom()
-            spam_boom_timer=pygame.time.get_ticks()
-    
+        if pygame.time.get_ticks() - spawn_boom_timer >1000:
+            spawn_boom()
+            spawn_boom_timer=pygame.time.get_ticks()
+
+    # Hàm sinh ra cá boss
+    if player.level > 7 and random.randint(1,100)==3:
+        create_boss()
+    for boss in list_boss[:]:
+        boss:BossFish
+        boss.draw(screen)
+        boss.move_boss()
+        if boss.remove_boss():
+            list_boss.remove(boss)
+        if boss.check_collision_mainfish(player):# Kiểm tra va chạm cá chính với boss
+            player.game_over()
+        boss.check_colistion_enemy(enemy_fishes) # Kiểm tra boss va chạm cá enemy
+
+            
     # Kiểm tra va chạm bom với cá chính, cá enemy
     for b in list_boom[:]:
         b:Boom
         b.draw(screen) # Vẽ bom
         b.move_boom()  # Cho bom di chuyển
         b.kick_enemy(enemy_fishes) # kiểm tra va chạm list boom với list cá enemy
+        b.kick_boss(list_boss)
         
         if b.kick_mainfish(player):
-            player.game_over()
+            if b.changed_when_mainkick():
+                # player.game_over()
+                print(b.time_create)
+                print(b.time_cham_Xoa)
         if b.remove_boom():
             list_boom.remove(b)
 

@@ -3,6 +3,7 @@ import time
 from settings import *
 from classes.enemy_fish import *
 from classes.main_fish import *
+from classes.boss_fish import *
 
 
 class Boom:
@@ -14,7 +15,9 @@ class Boom:
         self.image=pygame.transform.scale(self.image,(self.base_size,self.base_size))
         self.speed=4
         self.exploded = False  # trạng thái bom nổ
-        self.time=0         # Thời gian để xóa bom
+        self.time_create=0         # Thời gian để xóa bom
+        self.time_cham_Xoa=0
+        self.time=0
 
     
     def move_boom(self):
@@ -51,12 +54,31 @@ class Boom:
         if boom_mask.overlap(player_mask,player_offset):
             sound_boom.play()
             if not self.exploded:
-                self.change_when_kick()  # Gọi hàm explode() thay vì thay đổi ảnh trực tiếp
+                self.change_when_kick() 
                 self.exploded = True
-                self.explosion_time = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới thua game
+                self.time_cham_Xoa = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới thua game
             return True
         return False
-
+    def kick_boss(self,list_boom): # hàm kiểm tra va chạm với cá enemy
+        boom_mask=pygame.mask.from_surface(self.image)
+        for boss in list_boom[:]:
+            boss:BossFish # Python ngu nên không nhận dạng được enemy là EnemyFish nên gán
+            if boss.speed>0:
+                boss_mask=pygame.mask.from_surface(BossFish.frames_right[boss.frames_index])
+            else:
+                boss_mask=pygame.mask.from_surface(BossFish.frames_right[boss.frames_index])
+            boss_offset=(boss.x-self.x, boss.y-self.y)
+            if boom_mask.overlap(boss_mask,boss_offset):
+                list_boom.remove(boss)
+                sound_boom.play()
+                self.change_when_kick()
+                self.exploded = True
+                self.time = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới xóa boom
+    def changed_when_mainkick(self): # Hàm kiểm tra sau 2 giây đ
+        self.time_cham_Xoa+=self.time_create//2.1
+        if self.time_cham_Xoa > self.time_create:
+            return True
+        return False
                 
 
     
