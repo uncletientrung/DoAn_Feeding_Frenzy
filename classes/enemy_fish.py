@@ -20,7 +20,7 @@ class EnemyFish:
         self.image_left = pygame.image.load(IMAGE_PATH + fish_left)
 
       
-        base_size = SCREEN_WIDTH // 15  # Kích thước mặc định
+        base_size = SCREEN_WIDTH // 28  # Kích thước mặc định
         scale_factor = 1 + (self.size - 1) * 0.1  # Tăng kích thước theo level luc dau la 0.2
         new_size = (int(base_size * scale_factor), int(base_size * scale_factor))
 
@@ -35,7 +35,7 @@ class EnemyFish:
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
 
         
-        self.wave_amplitude = random.uniform(0.5, 0.5)  
+        self.wave_amplitude = random.uniform(0.5, 0.75)  #Tọa độ ban đầu là (0.5, 0.5) 
         self.wave_speed = random.uniform(0.05, 0.1)  
         self.wave_offset = random.uniform(0, math.pi * 2)  
 
@@ -68,7 +68,7 @@ class EnemyFish:
         self.speed = random.choice([-3, 3])  
 
         
-        self.wave_amplitude = random.uniform(0.5, 0.5)
+        self.wave_amplitude = random.uniform(0.5, 0.75)  #Tọa độ ban đầu là (0.5, 0.5) 
         self.wave_speed = random.uniform(0.05, 0.1)
         self.wave_offset = random.uniform(0, math.pi * 2)
 
@@ -84,7 +84,7 @@ class EnemyFish:
         self.image_left = pygame.image.load(IMAGE_PATH + fish_left)
 
         
-        base_size = SCREEN_WIDTH // 15  
+        base_size = SCREEN_WIDTH // 28  
         scale_factor = 1 + (self.size - 1) * 0.1 #luc dau la 0.2  
         new_size = (int(base_size * scale_factor), int(base_size * scale_factor))
 

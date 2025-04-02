@@ -11,7 +11,7 @@ class Boom:
         self.x=x
         self.y=y
         self.image=pygame.image.load(IMAGE_PATH+"boom.png")
-        self.base_size=SCREEN_WIDTH//7
+        self.base_size=SCREEN_WIDTH//9
         self.image=pygame.transform.scale(self.image,(self.base_size,self.base_size))
         self.speed=4
         self.exploded = False  # trạng thái bom nổ
@@ -21,7 +21,7 @@ class Boom:
 
     
     def move_boom(self):
-        if self.y <600:
+        if self.y <570:
             self.y+=self.speed
     def change_when_kick(self): # Đổi hình ảnh sau khi chạm cá
             new_image = pygame.image.load(IMAGE_PATH + "kick_boom.png")
@@ -37,7 +37,7 @@ class Boom:
     def kick_enemy(self,enemies): # hàm kiểm tra va chạm với cá enemy
         boom_mask=pygame.mask.from_surface(self.image)
         for enemy in enemies[:]:
-            enemy:EnemyFish # Python ngu nên không nhận dạng được enemy là EnemyFish nên gán
+            enemy:EnemyFish # Python không nhận dạng được enemy là EnemyFish nên gán
             enemy_mask=pygame.mask.from_surface(enemy.image)
             enemy_offset=(enemy.x-self.x, enemy.y-self.y)
             if boom_mask.overlap(enemy_mask,enemy_offset):

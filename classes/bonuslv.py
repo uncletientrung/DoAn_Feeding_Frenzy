@@ -8,13 +8,13 @@ class BonusLv:
         self.x=x
         self.y=y
         self.image=pygame.image.load(IMAGE_PATH+"kimcuong.png")
-        self.size_base=SCREEN_WIDTH//20
+        self.size_base=SCREEN_WIDTH//25
         self.image=pygame.transform.scale(self.image,(self.size_base,self.size_base))
         self.sound=pygame.mixer.Sound(SOUND_PATH+"bonus1.wav")
         self.speed=4
     
     def move_bonus(self):
-        if self.y<600:
+        if self.y<590:
             self.y+=self.speed
     def draw_bonus(self,screen):
         screen.blit(self.image,(self.x,self.y))

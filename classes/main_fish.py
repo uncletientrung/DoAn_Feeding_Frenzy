@@ -13,7 +13,7 @@ class MainFish:
         self.base_width, self.base_height = self.image_right.get_size()
 
         # ✅ Resize ảnh ban đầu theo màn hình
-        base_size = SCREEN_WIDTH // 15  
+        base_size = SCREEN_WIDTH // 25  
         self.image_right = pygame.transform.scale(self.image_right, (base_size, base_size))
         self.image_left = pygame.transform.scale(self.image_left, (base_size, base_size))
         
@@ -22,14 +22,14 @@ class MainFish:
         self.width, self.height = self.image.get_size()
         self.speed = PLAYER_SPEED
         self.size = 1  
+        self.size_old=1
         self.eat_count = 0  
-        self.level = 8  
+        self.level = 1  
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y)) 
 
     def check_collision(self, enemies):
         player_mask = pygame.mask.from_surface(self.image)  
-        player_offset = (self.x, self.y)
 
         for enemy in enemies[:]:  
             enemy_mask = pygame.mask.from_surface(enemy.image)  
@@ -49,16 +49,20 @@ class MainFish:
     def grow(self, enemy_level):
         """Làm cá chính to lên khi ăn cá nhỏ hơn"""
         self.size += 0.1 * (1 + enemy_level * 0.1)  # Tăng kích thước nhanh hơn khi ăn cá lớn
-        self.eat_count += 1  # Mỗi lần ăn, tăng bộ đếm
-
-        if self.eat_count >= 8:  # Mỗi 8 lần ăn sẽ lên level
+        # self.eat_count += 1  # Mỗi lần ăn, tăng bộ đếm
+        #level_up_threshold = 1.0 + self.level * 0.5   # Ngưỡng lên cấp tăng dần
+        if self.size>=self.size_old+1:
+            self.size_old=int(self.size)
             self.level += 1
             pygame.mixer.Sound.play(sound_level_up)
-            self.eat_count = 0
-            print(f"🎉 Level Up! Current Level: {self.level}")
+        # if self.eat_count >= 8:  # Mỗi 8 lần ăn sẽ lên level
+        #     self.level += 1
+        #     pygame.mixer.Sound.play(sound_level_up)
+        #     self.eat_count = 0
+        #     print(f"🎉 Level Up! Current Level: {self.level}")
 
         # Tính toán kích thước mới
-        base_size = SCREEN_WIDTH // 15
+        base_size = SCREEN_WIDTH // 25
         new_size = int(base_size * (1 + self.size * 0.07)) #luc dau la 0.05
         max_size = SCREEN_WIDTH // 3  # Giới hạn kích thước tối đa
         new_size = min(new_size, max_size)
@@ -69,11 +73,6 @@ class MainFish:
         self.image_right = pygame.transform.scale(self.image_right, (new_size, new_size))
         self.image_left = pygame.transform.scale(self.image_left, (new_size, new_size))
         
-        
-        if self.image == self.image_right:
-            self.image = self.image_right
-        else:
-            self.image = self.image_left
             
        
         self.width, self.height = new_size, new_size
@@ -131,7 +130,7 @@ class MainFish:
         self.size = 1
         self.eat_count = 0
 
-        base_size = SCREEN_WIDTH // 15
+        base_size = SCREEN_WIDTH // 25
         self.image_right = pygame.image.load(IMAGE_PATH + "Fishright11.png")
         self.image_left = pygame.image.load(IMAGE_PATH + "Fishleft11.png")
         self.image_right = pygame.transform.scale(self.image_right, (base_size, base_size))

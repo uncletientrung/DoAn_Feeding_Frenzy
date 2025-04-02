@@ -52,7 +52,7 @@ MAX_BOOM=50
 list_bonus=[]
 MAX_BONUS=1
 list_boss=[]
-MAX_BOSS=10
+MAX_BOSS=4
 
 
 def spawn_enemy():
@@ -114,7 +114,7 @@ while running:
         for _ in range(2):  
             spawn_enemy()
     
-    if pygame.time.get_ticks() - spawn_timer > 4000: 
+    if pygame.time.get_ticks() - spawn_timer > 2000: 
         spawn_enemy()
         spawn_timer = pygame.time.get_ticks()  
     # Hàm vẽ cá và vẽ lv trên đầu cá enemy
@@ -123,7 +123,7 @@ while running:
         enemy.draw(screen)
         draw_enemy_level(screen, enemy)
     # Sinh ra Bonus khi random đúng số
-    if random.randint(1,50)==3 and player.level >=7:
+    if random.randint(1,2000)==3 and player.level >=7:
         create_bonus()
     for bonus in list_bonus[:]:
         bonus:BonusLv
@@ -132,15 +132,16 @@ while running:
         if bonus.check_collision_main(player):
             list_bonus.remove(bonus)
 
-
+    print(player.size)
+    print(player.base_height)
     # Hàm sinh ra boom ở cấp 7
     if player.level >=7:
-        if pygame.time.get_ticks() - spawn_boom_timer >1000:
+        if pygame.time.get_ticks() - spawn_boom_timer >20000:
             spawn_boom()
             spawn_boom_timer=pygame.time.get_ticks()
 
     # Hàm sinh ra cá boss
-    if player.level > 7 and random.randint(1,100)==3:
+    if player.level > 7 and random.randint(1,1500)==3:
         create_boss()
     for boss in list_boss[:]:
         boss:BossFish

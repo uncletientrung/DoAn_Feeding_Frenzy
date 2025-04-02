@@ -12,8 +12,8 @@ def load_gif(path, size):
 
 class BossFish:
     # Lưu cache ảnh GIF để không load lại nhiều lần
-    frames_right = load_gif(IMAGE_PATH + "shark.gif", (SCREEN_WIDTH // 10 + 150, SCREEN_WIDTH // 10 + 50))
-    frames_left = load_gif(IMAGE_PATH + "sharkleft.gif", (SCREEN_WIDTH // 10 + 150, SCREEN_WIDTH // 10 + 50))
+    frames_right = load_gif(IMAGE_PATH + "shark.gif", (SCREEN_WIDTH // 12 + 150, SCREEN_WIDTH // 12 + 50))
+    frames_left = load_gif(IMAGE_PATH + "sharkleft.gif", (SCREEN_WIDTH // 12 + 150, SCREEN_WIDTH // 12 + 50))
 
     def __init__(self, x, y):
         self.x = x
@@ -64,18 +64,7 @@ class BossFish:
             if boss_mask.overlap(enemy_mask, enemy_offset): 
                 enemies.remove(enemy)
 
-    # def check_colistion_boom(self,booms):
-    #     if self.speed > 0:
-    #         boss_mask = pygame.mask.from_surface(BossFish.frames_right[self.frames_index].convert_alpha())
-    #     else:                     # Convert_alpha chính xác hơn tạo hình của cá, tránh tạo mask hình vuông
-    #         boss_mask = pygame.mask.from_surface(BossFish.frames_left[self.frames_index].convert_alpha())
-    #     for boom in booms[:]:  
-    #         boom_mask = pygame.mask.from_surface(boom.image)  
-    #         boom_offset = (int(boom.x - self.x),int(boom.y - self.y)) 
-    #         if boss_mask.overlap(boom_mask,boom_offset):
-    #             boom.change_when_kick()
-    #             return boom
-    #     return None
+
 
 
 

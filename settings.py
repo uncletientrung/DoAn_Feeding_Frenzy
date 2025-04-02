@@ -3,8 +3,8 @@ import pygame
 import time
 pygame.mixer.init()
 
-SCREEN_WIDTH = 900
-SCREEN_HEIGHT = 700
+SCREEN_WIDTH = 1100
+SCREEN_HEIGHT = 680
 
 FPS = 60
 
