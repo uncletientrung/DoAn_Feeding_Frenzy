@@ -2,7 +2,7 @@ import pygame
 import sys
 import pygame.time
 from settings import *
-import classes.bomb
+import classes.ScoreBar
 
 class MainFish:
     def __init__(self, x, y):
@@ -16,7 +16,7 @@ class MainFish:
         base_size = SCREEN_WIDTH // 25  
         self.image_right = pygame.transform.scale(self.image_right, (base_size, base_size))
         self.image_left = pygame.transform.scale(self.image_left, (base_size, base_size))
-        
+        self.score=0
         self.image = self.image_right  
         self.x, self.y = x, y
         self.width, self.height = self.image.get_size()
@@ -38,6 +38,7 @@ class MainFish:
             if player_mask.overlap(enemy_mask, enemy_offset): 
                 if self.level >= enemy.size:
                     self.eat_fish(enemy)
+                    self.score+=enemy.score_enemy
                     enemies.remove(enemy)
                 elif self.level < enemy.size:
                     print(f" Bạn va chạm với cá lớn hơn! Player Level: {self.level} - Enemy Level: {enemy.size}")
@@ -49,17 +50,11 @@ class MainFish:
     def grow(self, enemy_level):
         """Làm cá chính to lên khi ăn cá nhỏ hơn"""
         self.size += 0.1 * (1 + enemy_level * 0.1)  # Tăng kích thước nhanh hơn khi ăn cá lớn
-        # self.eat_count += 1  # Mỗi lần ăn, tăng bộ đếm
-        #level_up_threshold = 1.0 + self.level * 0.5   # Ngưỡng lên cấp tăng dần
         if self.size>=self.size_old+1:
-            self.size_old=int(self.size)
+            self.size_old=int(self.size)+ self.size*0.1# Ngưỡng lên cấp tăng dần
             self.level += 1
             pygame.mixer.Sound.play(sound_level_up)
-        # if self.eat_count >= 8:  # Mỗi 8 lần ăn sẽ lên level
-        #     self.level += 1
-        #     pygame.mixer.Sound.play(sound_level_up)
-        #     self.eat_count = 0
-        #     print(f"🎉 Level Up! Current Level: {self.level}")
+
 
         # Tính toán kích thước mới
         base_size = SCREEN_WIDTH // 25
@@ -141,6 +136,7 @@ class MainFish:
     def eat_fish(self, enemy):
         """Xử lý khi cá chính ăn cá nhỏ hơn"""
         self.eat_sound.play()
+
         self.grow(enemy.fish_level) 
         print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
 

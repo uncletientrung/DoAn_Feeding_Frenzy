@@ -14,8 +14,8 @@ class EnemyFish:
         if not valid_fish:  # Nếu không có cá phù hợp, lấy các loại cao nhất
             valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= self.player_level]
     
-        fish_right, fish_left, self.size, self.fish_level, _ = random.choice(valid_fish)
-
+        fish_right, fish_left, self.size, self.fish_level, _,self.score_enemy = random.choice(valid_fish)
+        
         self.image_right = pygame.image.load(IMAGE_PATH + fish_right)
         self.image_left = pygame.image.load(IMAGE_PATH + fish_left)
 
@@ -78,7 +78,7 @@ class EnemyFish:
         if not valid_fish:  
             valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= self.player_level]
 
-        fish_right, fish_left, self.size, self.fish_level, _ = random.choice(valid_fish)
+        fish_right, fish_left, self.size, self.fish_level, _ ,self.score_enemy= random.choice(valid_fish)
 
         self.image_right = pygame.image.load(IMAGE_PATH + fish_right)
         self.image_left = pygame.image.load(IMAGE_PATH + fish_left)

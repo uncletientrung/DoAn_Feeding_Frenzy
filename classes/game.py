@@ -10,6 +10,7 @@ from classes.enemy_fish import EnemyFish
 from classes.bomb import Boom
 from classes.bonuslv import BonusLv
 from classes.boss_fish import BossFish
+from classes.ScoreBar import ScoreBar
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
 
@@ -44,6 +45,7 @@ pygame.mixer.music.load(SOUND_PATH + "feeding-frenzy.wav")
 
 # Tạo cá chính
 player = MainFish(400, 300)
+scoreBar= ScoreBar()
 
 enemy_fishes = []  
 MAX_ENEMIES = 10
@@ -67,7 +69,7 @@ def spawn_enemy():
         if not valid_fish: 
             valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level]
 
-        fish_right, fish_left, size, fish_level, _ = random.choice(valid_fish)
+        fish_right, fish_left, size, fish_level, _,score = random.choice(valid_fish)
         new_enemy = EnemyFish(x_position, y_position, player.level)
 
         enemy_fishes.append(new_enemy)
@@ -110,6 +112,9 @@ while running:
     player.draw(screen)
     draw_fish_level(screen, player)
 
+    # Vẽ bảng Score
+    scoreBar.draw(screen,player)
+
     if player.eat_count == 0:  
         for _ in range(2):  
             spawn_enemy()
@@ -132,8 +137,7 @@ while running:
         if bonus.check_collision_main(player):
             list_bonus.remove(bonus)
 
-    print(player.size)
-    print(player.base_height)
+
     # Hàm sinh ra boom ở cấp 7
     if player.level >=7:
         if pygame.time.get_ticks() - spawn_boom_timer >20000:
@@ -169,6 +173,7 @@ while running:
                 print(b.time_cham_Xoa)
         if b.remove_boom():
             list_boom.remove(b)
+
 
     pygame.display.update()
     clock.tick(FPS)
