@@ -4,6 +4,7 @@ import cv2
 # import mediapipe as mp
 import numpy as np
 import os
+import time
 from settings import *
 from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
@@ -57,23 +58,32 @@ list_boss=[]
 MAX_BOSS=4
 
 
+thoi_gian_cuoi_cung_spawn = 0  # Lưu thời gian lần cuối spawn cá
+thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Giãn cách spawn cá (1 - 2.5 giây)
+
 def spawn_enemy():
-    """Hàm spawn cá theo level hiện tại của người chơi"""
+    """Hàm spawn cá địch theo level của người chơi, có thời gian giãn cách"""
+    global thoi_gian_cuoi_cung_spawn, thoi_gian_cho_doi_spawn
+    
+    current_time = pygame.time.get_ticks()  # Lấy thời gian hiện tại
+
+    if current_time - thoi_gian_cuoi_cung_spawn < thoi_gian_cho_doi_spawn:
+        return  # Nếu chưa đủ thời gian thì không spawn
+
     if len(enemy_fishes) < MAX_ENEMIES:
         x_position = random.choice([-50, SCREEN_WIDTH])
         y_position = random.randint(50, SCREEN_HEIGHT - 50)
 
-        
-        valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level and fish[4] > player.level]
+        # Kiểm tra khoảng cách để tránh spawn cá dính chùm
+        for enemy in enemy_fishes:
+            if abs(enemy.y - y_position) < 50:  # Nếu cá quá gần nhau (50px), chọn lại vị trí
+                y_position = random.randint(50, SCREEN_HEIGHT - 50)
 
-        if not valid_fish: 
-            valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level]
-
-        fish_right, fish_left, size, fish_level, _,score = random.choice(valid_fish)
         new_enemy = EnemyFish(x_position, y_position, player.level)
-
         enemy_fishes.append(new_enemy)
 
+        thoi_gian_cuoi_cung_spawn = current_time  # Cập nhật thời gian spawn cá
+        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn ngẫu nhiên
 def spawn_boom():
     if len(list_boom)<MAX_BOOM:
         x_position = random.randint(100, SCREEN_WIDTH-100)
@@ -124,7 +134,7 @@ while running:
         spawn_timer = pygame.time.get_ticks()  
     # Hàm vẽ cá và vẽ lv trên đầu cá enemy
     for enemy in enemy_fishes:
-        enemy.move()  
+        enemy.move(player)
         enemy.draw(screen)
         draw_enemy_level(screen, enemy)
     # Sinh ra Bonus khi random đúng số
