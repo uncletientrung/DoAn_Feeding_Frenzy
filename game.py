@@ -56,24 +56,37 @@ MAX_BONUS=1
 list_boss=[]
 MAX_BOSS=4
 
+thoi_gian_cuoi_cung_spawn = 0  # Lưu thời gian lần cuối spawn cá
+thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Giãn cách spawn cá (1 - 2.5 giây)
 
 def spawn_enemy():
-    """Hàm spawn cá theo level hiện tại của người chơi"""
+    """Hàm spawn cá địch theo level người chơi, có sự đa dạng và độ khó tăng dần"""
+    global thoi_gian_cuoi_cung_spawn, thoi_gian_cho_doi_spawn
+    
+    current_time = pygame.time.get_ticks()
+    if current_time - thoi_gian_cuoi_cung_spawn < thoi_gian_cho_doi_spawn:
+        return
+
     if len(enemy_fishes) < MAX_ENEMIES:
         x_position = random.choice([-50, SCREEN_WIDTH])
         y_position = random.randint(50, SCREEN_HEIGHT - 50)
 
-        
-        valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level and fish[4] > player.level]
+        # Chọn cá phù hợp với level hiện tại
+        available_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level <= fish[4]]
 
-        if not valid_fish: 
-            valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level]
+        # Thỉnh thoảng spawn cá vượt tầm để đe dọa
+        if random.randint(1, 500) <= 10:  # 10% tỉ lệ spawn cá khó
+            strong_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] > player.level]
+            if strong_fish:
+                available_fish.append(random.choice(strong_fish))
 
-        fish_right, fish_left, size, fish_level, _,score = random.choice(valid_fish)
-        new_enemy = EnemyFish(x_position, y_position, player.level)
+        if available_fish:
+            fish_type = random.choice(available_fish)
+            new_enemy = EnemyFish(x_position, y_position, fish_type[2])
+            enemy_fishes.append(new_enemy)
 
-        enemy_fishes.append(new_enemy)
-
+        thoi_gian_cuoi_cung_spawn = current_time
+        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn
 def spawn_boom():
     if len(list_boom)<MAX_BOOM:
         x_position = random.randint(100, SCREEN_WIDTH-100)

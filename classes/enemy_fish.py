@@ -38,7 +38,7 @@ class EnemyFish:
         self.wave_amplitude = random.uniform(0.5, 0.75)  #Tọa độ ban đầu là (0.5, 0.5) 
         self.wave_speed = random.uniform(0.05, 0.1)  
         self.wave_offset = random.uniform(0, math.pi * 2)  
-        self.khoangcach_quaydau_bo_chay=90;# cá địch thấy cá main bự hơn, và cách nó 150px thì nó sẽ quay đầu lại
+        self.khoangcach_quaydau_bo_chay=50;# cá địch thấy cá main bự hơn, và cách nó 150px thì nó sẽ quay đầu lại
 
     
 
