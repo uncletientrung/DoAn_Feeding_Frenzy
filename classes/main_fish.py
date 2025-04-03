@@ -9,10 +9,10 @@ class MainFish:
         self.image_right = pygame.image.load(IMAGE_PATH + "Fishright11.png")
         self.image_left = pygame.image.load(IMAGE_PATH + "Fishleft11.png")
         
-        # ✅ Lưu kích thước gốc của cá
+        #  Lưu kích thước gốc của cá
         self.base_width, self.base_height = self.image_right.get_size()
 
-        # ✅ Resize ảnh ban đầu theo màn hình
+        #  Resize ảnh ban đầu theo màn hình
         base_size = SCREEN_WIDTH // 25  
         self.image_right = pygame.transform.scale(self.image_right, (base_size, base_size))
         self.image_left = pygame.transform.scale(self.image_left, (base_size, base_size))
@@ -24,7 +24,7 @@ class MainFish:
         self.size = 1  
         self.size_old=1
         self.eat_count = 0  
-        self.level = 1  
+        self.level = 7  
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y)) 
 

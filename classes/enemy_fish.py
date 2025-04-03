@@ -38,23 +38,10 @@ class EnemyFish:
         self.wave_amplitude = random.uniform(0.5, 0.75)  #Tọa độ ban đầu là (0.5, 0.5) 
         self.wave_speed = random.uniform(0.05, 0.1)  
         self.wave_offset = random.uniform(0, math.pi * 2)  
-        self.khoangcach_quaydau_bo_chay=150;# cá địch thấy cá main bự hơn, và cách nó 150px thì nó sẽ quay đầu lại
+        self.khoangcach_quaydau_bo_chay=90;# cá địch thấy cá main bự hơn, và cách nó 150px thì nó sẽ quay đầu lại
 
     
 
-    # def move(self):
-    #     """Di chuyển cá địch với hiệu ứng nhấp nhô"""
-    #     self.x += self.speed
-    #     self.y += self.wave_amplitude * math.sin(self.wave_offset)
-    #     self.wave_offset += self.wave_speed  
-    #     self.rect.topleft = (self.x, self.y)
-    #     if self.speed < 0:
-    #         self.image = self.image_left
-    #     else:
-    #         self.image = self.image_right
-
-    #     if self.x < -self.width or self.x > SCREEN_WIDTH:
-    #         self.reset_position()
     def move(self, player):
             """Di chuyển cá địch và kiểm tra nếu cần bỏ chạy"""
             # Tính khoảng cách giữa cá địch và người chơi
@@ -63,9 +50,9 @@ class EnemyFish:
             # Nếu cá địch yếu hơn và người chơi lại gần, nó sẽ quay đầu bỏ chạy
             if self.size < player.level and distance < self.khoangcach_quaydau_bo_chay:
                 if player.x < self.x:
-                    self.speed = abs(self.speed)  # Nếu người chơi bên trái → chạy qua phải
+                    self.speed = abs(self.speed)  # Nếu người chơi bên trái nó chạy qua phải
                 else:
-                    self.speed = -abs(self.speed)  # Nếu người chơi bên phải → chạy qua trái
+                    self.speed = -abs(self.speed)  # Nếu người chơi bên phải thì nó chạy qua trái
 
             # Cập nhật vị trí di chuyển
             self.x += self.speed
@@ -89,7 +76,8 @@ class EnemyFish:
         """Reset cá và chọn cá phù hợp với level hiện tại"""
         self.x = random.choice([-self.width, SCREEN_WIDTH])  
         self.y = random.randint(50, SCREEN_HEIGHT - 50)
-        self.speed = random.choice([-3, 3])  
+        self.speed = random.choice([-1, 1]) * random.uniform(2.5, 4.5)  
+  
 
         
         self.wave_amplitude = random.uniform(0.5, 0.75)  #Tọa độ ban đầu là (0.5, 0.5) 

@@ -62,28 +62,34 @@ thoi_gian_cuoi_cung_spawn = 0  # Lưu thời gian lần cuối spawn cá
 thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Giãn cách spawn cá (1 - 2.5 giây)
 
 def spawn_enemy():
-    """Hàm spawn cá địch theo level của người chơi, có thời gian giãn cách"""
+    """Hàm spawn cá địch theo level người chơi, có sự đa dạng và độ khó tăng dần"""
     global thoi_gian_cuoi_cung_spawn, thoi_gian_cho_doi_spawn
     
-    current_time = pygame.time.get_ticks()  # Lấy thời gian hiện tại
-
+    current_time = pygame.time.get_ticks()
     if current_time - thoi_gian_cuoi_cung_spawn < thoi_gian_cho_doi_spawn:
-        return  # Nếu chưa đủ thời gian thì không spawn
+        return
 
     if len(enemy_fishes) < MAX_ENEMIES:
         x_position = random.choice([-50, SCREEN_WIDTH])
         y_position = random.randint(50, SCREEN_HEIGHT - 50)
 
-        # Kiểm tra khoảng cách để tránh spawn cá dính chùm
-        for enemy in enemy_fishes:
-            if abs(enemy.y - y_position) < 50:  # Nếu cá quá gần nhau (50px), chọn lại vị trí
-                y_position = random.randint(50, SCREEN_HEIGHT - 50)
+        # Chọn cá phù hợp với level hiện tại
+        available_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level <= fish[4]]
 
-        new_enemy = EnemyFish(x_position, y_position, player.level)
-        enemy_fishes.append(new_enemy)
+        # Thỉnh thoảng spawn cá vượt tầm để đe dọa
+        if random.randint(1, 500) <= 10:  # 10% tỉ lệ spawn cá khó
+            strong_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] > player.level]
+            if strong_fish:
+                available_fish.append(random.choice(strong_fish))
 
-        thoi_gian_cuoi_cung_spawn = current_time  # Cập nhật thời gian spawn cá
-        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn ngẫu nhiên
+        if available_fish:
+            fish_type = random.choice(available_fish)
+            new_enemy = EnemyFish(x_position, y_position, fish_type[2])
+            enemy_fishes.append(new_enemy)
+
+        thoi_gian_cuoi_cung_spawn = current_time
+        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn
+
 def spawn_boom():
     if len(list_boom)<MAX_BOOM:
         x_position = random.randint(100, SCREEN_WIDTH-100)
