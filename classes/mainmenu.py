@@ -2,7 +2,6 @@ import pygame
 import sys
 import cv2
 import numpy as np
-#from settings import *
 from pygame.locals import *
 
 pygame.init()
@@ -35,16 +34,21 @@ class ImageButton:
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
             
-        surface.blit(self.image, self.rect)
+        surface.blit(self.image, (self.rect.x, self.rect.y))
         return action
 
 class MainMenu:
     def __init__(self):
         self.top_left_btn = ImageButton(0, 0, "assets/buttons/Exit.png")
-        self.top_right_btn = ImageButton(SCREEN_WIDTH-100 + 24, 0, "assets/buttons/Pause.png")  
         self.bottom_left_btn = ImageButton(0, SCREEN_HEIGHT-100 + 50, "assets/buttons/Info.png")  
-        self.bottom_right_btn = ImageButton(SCREEN_WIDTH-100 +24, SCREEN_HEIGHT-100 + 50, "assets/buttons/Sound-None.png")  
-        self.bottom_right2_btn = ImageButton(SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, "assets/buttons/Music-On.png")
+
+        self.sound_on = True  # Ban đầu âm thanh bật
+        self.music_on = True  
+
+        self.bottom_right_btn = ImageButton(SCREEN_WIDTH-100 +24, SCREEN_HEIGHT-100 + 50, 
+                                          "assets/buttons/Sound-Two.png" if self.sound_on else "assets/buttons/Sound-None.png")
+        self.bottom_right2_btn = ImageButton(SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, 
+                                           "assets/buttons/Music-Off.png" if not self.music_on else "assets/buttons/Music-On.png")
         
         self.play_btn_width = 200
         self.play_btn_height = 200
@@ -54,6 +58,8 @@ class MainMenu:
             "assets/buttons/Play.png", 
             scale=1.5
         )
+
+        self.back_btn = ImageButton(0, 0, "assets/buttons/Home.png", scale=1.0)
 
         try:
             self.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
@@ -70,15 +76,38 @@ class MainMenu:
 
         try:
             self.title_font = pygame.font.Font("assets/fonts/arial.ttf", 72)
+            self.info_font = pygame.font.Font("assets/fonts/DejaVuSans.ttf", 36)
+            self.score_font = pygame.font.Font("assets/fonts/DejaVuSans.ttf", 36)  # Font cho điểm số
         except:
             self.title_font = pygame.font.SysFont("comicsansms", 72, bold=True)
+            self.info_font = pygame.font.SysFont("comicsansms", 36)
+            self.score_font = pygame.font.SysFont("comicsansms", 36)
 
         self.title_text = self.title_font.render("FISH EAT FISH", True, (255, 215, 0))
         self.title_shadow = self.title_font.render("FISH EAT FISH", True, (139, 0, 0))
 
-        self.info_font = pygame.font.SysFont("comicsansms", 48)
-        self.info_text = self.info_font.render("Hello thang lon", True, (255, 255, 255))
-        self.show_info = False
+        YELLOW_COLOR = (255, 215, 0)  # Màu vàng
+
+        self.info_texts = [
+            self.info_font.render("Thanh vien nhom:", True, YELLOW_COLOR),
+            self.info_font.render("Nguyen Tien Trung", True, YELLOW_COLOR),
+            self.info_font.render("Nguyen Minh Thuan", True, YELLOW_COLOR),
+            self.info_font.render("Nguyen Phuoc Hoa Lam", True, YELLOW_COLOR),
+            self.info_font.render("Phan Hoang Vu", True, YELLOW_COLOR),
+            self.info_font.render("Giao vien huong dan: Ths Le Tan Long", True, YELLOW_COLOR),
+            self.info_font.render("Thong tin game:", True, YELLOW_COLOR),
+            self.info_font.render("Ca lon nuot ca be la mot tro choi kinh dien", True, YELLOW_COLOR),
+            self.info_font.render("noi cac con ca nho hon bi cac con ca lon hon an.", True, YELLOW_COLOR),
+            self.info_font.render("Nguoi choi dieu khien ca cua minh de lon manh va song sot.", True, YELLOW_COLOR)
+        ]
+        
+        # Khởi tạo top score ban đầu là 0
+        self.top_score = 0
+        
+        # Tạo văn bản cho top score
+        self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, YELLOW_COLOR)
+        
+        self.is_info_mode = False
         
         self.clock = pygame.time.Clock()
         self.running = True
@@ -97,7 +126,7 @@ class MainMenu:
         
         if hasattr(self, 'cap') and self.cap is not None:
             self.success, self.video_frame = self.cap.read()
-            if not self.success:  # Nếu hết video, phát lại từ đầu
+            if not self.success:
                 self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
                 self.success, self.video_frame = self.cap.read()
         
@@ -117,26 +146,31 @@ class MainMenu:
         else:
             screen.fill((0, 50, 100))
 
-        title_x = (SCREEN_WIDTH - self.title_text.get_width()) // 2 + 30
-        title_y = (SCREEN_HEIGHT - self.play_btn_height) // 2 - 150
-        
-        screen.blit(self.title_shadow, (title_x + 5, title_y + 5))
-        screen.blit(self.title_text, (title_x, title_y))
-        
-        if self.bottom_left_btn.draw(screen):
-            self.show_info = not self.show_info  # Toggle hiển thị thông tin
+        if not self.is_info_mode:  # Giao diện Main Menu
+            title_x = (SCREEN_WIDTH - self.title_text.get_width()) // 2 + 30
+            title_y = (SCREEN_HEIGHT - self.play_btn_height) // 2 - 150
             
-        if self.show_info:
-            info_x = (SCREEN_WIDTH - self.info_text.get_width()) // 2
-            info_y = (SCREEN_HEIGHT - self.info_text.get_height()) // 2
-            pygame.draw.rect(screen, (0, 0, 0, 128), (info_x-20, info_y-20, self.info_text.get_width()+40, self.info_text.get_height()+40))
-            screen.blit(self.info_text, (info_x, info_y))
-        
-        self.top_left_btn.draw(screen)
-        self.top_right_btn.draw(screen)
-        self.bottom_right_btn.draw(screen)
-        self.bottom_right2_btn.draw(screen)
-        self.play_btn.draw(screen)
+            screen.blit(self.title_shadow, (title_x + 5, title_y + 5))
+            screen.blit(self.title_text, (title_x, title_y))
+            
+            self.top_left_btn.draw(screen)
+            self.bottom_left_btn.draw(screen)
+            self.bottom_right_btn.draw(screen)
+            self.bottom_right2_btn.draw(screen)
+            self.play_btn.draw(screen)
+
+            # Vẽ dòng "Top Scored" ngay dưới nút Play
+            score_x = (SCREEN_WIDTH - self.score_text.get_width()) // 2 -15  # Căn giữa theo nút Play
+            score_y = (SCREEN_HEIGHT - self.play_btn_height) // 2 + 30 + self.play_btn_height + 5  # Dưới nút Play 10 pixel
+            screen.blit(self.score_text, (score_x, score_y))
+        else:  # Giao diện Info
+            y_offset = 100
+            for text in self.info_texts:
+                text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, y_offset))
+                screen.blit(text, text_rect)
+                y_offset += text.get_height() + 10
+            
+            self.back_btn.draw(screen)
 
         pygame.display.flip()
         self.clock.tick(30)
@@ -148,27 +182,44 @@ class MainMenu:
                 pygame.quit()
                 sys.exit()
             
-            if self.top_left_btn.draw(screen):
-                print("Exit button clicked")
-                self.running = False
+            if not self.is_info_mode:  # Xử lý sự kiện ở Main Menu
+                if self.top_left_btn.draw(screen):
+                    print("Exit button clicked")
+                    self.running = False
                 
-            if self.top_right_btn.draw(screen):
-                print("Pause button clicked")
+                if self.bottom_right_btn.draw(screen):
+                    print("Sound button clicked")
+                    self.sound_on = not self.sound_on
+                    new_image_path = "assets/buttons/Sound-Two.png" if self.sound_on else "assets/buttons/Sound-None.png"
+                    self.bottom_right_btn = ImageButton(SCREEN_WIDTH-100 +24, SCREEN_HEIGHT-100 + 50, new_image_path)
+
+                if self.bottom_right2_btn.draw(screen):
+                    print("Music button clicked")
+                    self.music_on = not self.music_on
+                    new_image_path = "assets/buttons/Music-On.png" if self.music_on else "assets/buttons/Music-Off.png"
+                    self.bottom_right2_btn = ImageButton(SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, new_image_path)
                 
-            if self.bottom_right_btn.draw(screen):
-                print("Sound button clicked")
+                if self.bottom_left_btn.draw(screen):
+                    print("Info button clicked")
+                    self.is_info_mode = True  # Chuyển sang chế độ Info
                 
-            if self.bottom_right2_btn.draw(screen):
-                print("Music button clicked")
-                
-            if self.play_btn.draw(screen):
-                print("Play button clicked")
-                if hasattr(self, 'cap') and self.cap is not None:
-                    self.cap.release()
-                pygame.quit()
-                import subprocess
-                subprocess.Popen([sys.executable, "Main.py"])
-                sys.exit()
+                if self.play_btn.draw(screen):
+                    print("Play button clicked")
+                    if hasattr(self, 'cap') and self.cap is not None:
+                        self.cap.release()
+                    pygame.quit()
+                    import subprocess
+                    subprocess.Popen([sys.executable, "Main.py"])
+                    sys.exit()
+            else:  # Xử lý sự kiện ở chế độ Info
+                if self.back_btn.draw(screen):
+                    print("Back button clicked")
+                    self.is_info_mode = False  
+
+    def update_top_score(self, new_score):
+        if new_score > self.top_score:
+            self.top_score = new_score
+            self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, (255, 215, 0))
 
 if __name__ == "__main__":
     menu = MainMenu()

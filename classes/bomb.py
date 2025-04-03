@@ -13,7 +13,7 @@ class Boom:
         self.image=pygame.image.load(IMAGE_PATH+"boom.png")
         self.base_size=SCREEN_WIDTH//9
         self.image=pygame.transform.scale(self.image,(self.base_size,self.base_size))
-        self.speed=4
+        self.speed=2
         self.exploded = False  # trạng thái bom nổ
         self.time_create=0         # Thời gian để xóa bom
         self.time_cham_Xoa=0
