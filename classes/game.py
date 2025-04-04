@@ -4,7 +4,8 @@ import cv2
 # import mediapipe as mp
 import numpy as np
 import os
-import time
+import sys
+sys.path.append("D:\WorkSpace\DoAn_Feeding_Frenzy-main")
 from settings import *
 from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
@@ -55,11 +56,17 @@ MAX_BOOM=50
 list_bonus=[]
 MAX_BONUS=1
 list_boss=[]
-MAX_BOSS=4
-
+MAX_BOSS=2
 
 thoi_gian_cuoi_cung_spawn = 0  # Lưu thời gian lần cuối spawn cá
 thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Giãn cách spawn cá (1 - 2.5 giây)
+last_time_spawn = 0 #cũng là thời gian spawn nhưng dành cho cá mập
+if player.level <=4:
+    min_spawn_interval=30
+elif player.level<=8:
+    min_spawn_interval=15
+else:
+    min_spawn_interval=10
 
 def spawn_enemy():
     """Hàm spawn cá địch theo level người chơi, có sự đa dạng và độ khó tăng dần"""
@@ -89,7 +96,6 @@ def spawn_enemy():
 
         thoi_gian_cuoi_cung_spawn = current_time
         thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn
-
 def spawn_boom():
     if len(list_boom)<MAX_BOOM:
         x_position = random.randint(100, SCREEN_WIDTH-100)
@@ -100,20 +106,29 @@ def create_bonus():
         x_position = random.randint(100, SCREEN_WIDTH-100)
         new_bonus=BonusLv(x_position,-30)
         list_bonus.append(new_bonus)
-def create_boss():
-    if len(list_boss)<MAX_BOSS:
-        x_position=random.choice([-50,SCREEN_WIDTH])
-        y_position=random.randint(50,SCREEN_HEIGHT-50)
-        new_BossFish=BossFish(x_position,y_position)
-        list_boss.append(new_BossFish)
-        
+# def create_boss():
+#     if len(list_boss)<MAX_BOSS:
+#         x_position=random.choice([-50,SCREEN_WIDTH])
+#         y_position=random.randint(50,SCREEN_HEIGHT-50)
+#         new_BossFish=BossFish(x_position,y_position)
+#         list_boss.append(new_BossFish)
+
+# Hàm sinh BossFish dựa trên điều kiện cấp độ
+def create_boss(list_boss, player):
+    current_time = time.time()
+    global last_time_spawn
+    # Kiểm tra xem có đủ thời gian tối thiểu đã trôi qua không
+    if current_time - last_time_spawn >= min_spawn_interval:
+        if player.level > 7 and BossFish.should_spawn() and len(list_boss) <= MAX_BOSS:
+            new_boss = BossFish(x=0, y=random.randint(50, SCREEN_HEIGHT - 50))  # Tạo BossFish tại vị trí y ngẫu nhiên
+            list_boss.append(new_boss)
+            last_time_spawn=current_time
 
 running = True
 clock = pygame.time.Clock()
 spawn_timer = 0
 last_bubble_time = time.time() # Thời gian để spawn cá mới
 spawn_boom_timer=0
-
 
 # vong lap while dieu khien bang phim
 while running:
@@ -140,7 +155,7 @@ while running:
         spawn_timer = pygame.time.get_ticks()  
     # Hàm vẽ cá và vẽ lv trên đầu cá enemy
     for enemy in enemy_fishes:
-        enemy.move(player)
+        enemy.move(player)  
         enemy.draw(screen)
         draw_enemy_level(screen, enemy)
     # Sinh ra Bonus khi random đúng số
@@ -161,17 +176,32 @@ while running:
             spawn_boom_timer=pygame.time.get_ticks()
 
     # Hàm sinh ra cá boss
-    if player.level > 7 and random.randint(1,1500)==3:
-        create_boss()
+    # Xử lý sự kiện
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # Kiểm tra và tạo BossFish
+    create_boss(list_boss, player)
+
+    # Cập nhật và vẽ các BossFish hiện có
     for boss in list_boss[:]:
-        boss:BossFish
+        boss: BossFish
         boss.draw(screen)
         boss.move_boss()
+
         if boss.remove_boss():
             list_boss.remove(boss)
-        if boss.check_collision_mainfish(player):# Kiểm tra va chạm cá chính với boss
+
+        # Kiểm tra va chạm giữa BossFish và cá chính
+        if boss.check_collision_mainfish(player):  # Va chạm với cá chính
             player.game_over()
-        boss.check_colistion_enemy(enemy_fishes) # Kiểm tra boss va chạm cá enemy
+
+        # Kiểm tra va chạm giữa BossFish và cá enemy
+        boss.check_colistion_enemy(enemy_fishes)
+    
+    pygame.display.update()
+    clock.tick(120)
 
             
     # Kiểm tra va chạm bom với cá chính, cá enemy
@@ -190,14 +220,13 @@ while running:
         if b.remove_boom():
             list_boom.remove(b)
 
-
     pygame.display.update()
     clock.tick(FPS)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+  
 
 #vong lap while dieu khien bang tay
 

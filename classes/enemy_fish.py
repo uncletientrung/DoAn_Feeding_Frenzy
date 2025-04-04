@@ -38,7 +38,7 @@ class EnemyFish:
         self.wave_amplitude = random.uniform(0.5, 0.75)  #Tọa độ ban đầu là (0.5, 0.5) 
         self.wave_speed = random.uniform(0.05, 0.1)  
         self.wave_offset = random.uniform(0, math.pi * 2)  
-        self.khoangcach_quaydau_bo_chay=50;# cá địch thấy cá main bự hơn, và cách nó 150px thì nó sẽ quay đầu lại
+        self.khoangcach_quaydau_bo_chay=60;# cá địch thấy cá main bự hơn, và cách nó 150px thì nó sẽ quay đầu lại
 
     
 
@@ -67,7 +67,6 @@ class EnemyFish:
             if self.x < -self.width or self.x > SCREEN_WIDTH:
                 self.reset_position()
     
-
     def draw(self, screen):
         """Vẽ cá địch lên màn hình"""
         screen.blit(self.image, (self.x, self.y))
@@ -103,8 +102,3 @@ class EnemyFish:
         self.image_right = pygame.transform.scale(self.image_right, new_size)
         self.image_left = pygame.transform.scale(self.image_left, new_size)
         self.image = self.image_left if self.speed < 0 else self.image_right
-
-
-    
-
-

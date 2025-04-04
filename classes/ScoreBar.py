@@ -11,7 +11,7 @@ class ScoreBar:
     def __init__(self):
         self.score = 0
         self.level = 1
-        self.image = pygame.image.load(IMAGE_PATH + "Fishright11.png")
+        self.image = pygame.image.load(IMAGE_PATH + "fish_right.png")
         self.image = pygame.transform.scale(self.image, (50, 50))
         self.font = pygame.font.SysFont("Arial", 24, bold=True)  # Thêm chữ đậm cho rõ
         self.border_width = 2  # Độ dày viền
