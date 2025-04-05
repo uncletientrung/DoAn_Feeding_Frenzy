@@ -9,8 +9,8 @@ def load_frames(folder_path, count, size):
 
 class BossFish:
     # Tải các frame từ file thay vì GIF
-    frames_right = load_frames("DoAn_Feeding_Frenzy-main/assets/images/shark right", 10, (SCREEN_WIDTH // 12 + 150, SCREEN_WIDTH // 12 + 50))
-    frames_left = load_frames("DoAn_Feeding_Frenzy-main/assets/images/shark left", 10, (SCREEN_WIDTH // 12 + 150, SCREEN_WIDTH // 12 + 50))
+    frames_right = load_frames("DoAn_Feeding_Frenzy/assets/images/shark right", 10, (SCREEN_WIDTH // 12 + 150, SCREEN_WIDTH // 12 + 50))
+    frames_left = load_frames("DoAn_Feeding_Frenzy/assets/images/shark left", 10, (SCREEN_WIDTH // 12 + 150, SCREEN_WIDTH // 12 + 50))
 
     spawn_probability = 0.01  # Xác suất xuất hiện: 1%
 
