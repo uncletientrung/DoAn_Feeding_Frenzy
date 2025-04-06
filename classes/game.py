@@ -1,11 +1,11 @@
 import pygame
 import random
 import cv2
-# import mediapipe as mp
+import mediapipe as mp
 import numpy as np
 import os
 import sys
-sys.path.append("D:\WorkSpace\DoAn_Feeding_Frenzy-main")
+
 from settings import *
 from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
@@ -58,8 +58,7 @@ MAX_BONUS=1
 list_boss=[]
 MAX_BOSS=2
 
-thoi_gian_cuoi_cung_spawn = 0  # Lưu thời gian lần cuối spawn cá
-thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Giãn cách spawn cá (1 - 2.5 giây)
+
 last_time_spawn = 0 #cũng là thời gian spawn nhưng dành cho cá mập
 if player.level <=4:
     min_spawn_interval=30
@@ -67,6 +66,9 @@ elif player.level<=8:
     min_spawn_interval=15
 else:
     min_spawn_interval=10
+
+thoi_gian_cuoi_cung_spawn = 0
+thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)
 
 def spawn_enemy():
     """Hàm spawn cá địch theo level người chơi, có sự đa dạng và độ khó tăng dần"""
@@ -83,19 +85,23 @@ def spawn_enemy():
         # Chọn cá phù hợp với level hiện tại
         available_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level <= fish[4]]
 
-        # Thỉnh thoảng spawn cá vượt tầm để đe dọa
-        if random.randint(1, 500) <= 10:  # 10% tỉ lệ spawn cá khó
+        # Thỉnh thoảng spawn cá vượt tầm để đe dọa (2% cơ hội)
+        is_strong_fish = random.randint(1, 1000) <= 10
+        if is_strong_fish:
             strong_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] > player.level]
             if strong_fish:
-                available_fish.append(random.choice(strong_fish))
-
-        if available_fish:
+                fish_type = random.choice(strong_fish)
+            else:
+                fish_type = random.choice(available_fish)  # Nếu không có cá mạnh, dùng cá thường
+        else:
             fish_type = random.choice(available_fish)
-            new_enemy = EnemyFish(x_position, y_position, fish_type[2])
-            enemy_fishes.append(new_enemy)
+
+        # Tạo cá địch với thông tin fish_type
+        new_enemy = EnemyFish(x_position, y_position, player.level, fish_type)
+        enemy_fishes.append(new_enemy)
 
         thoi_gian_cuoi_cung_spawn = current_time
-        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn
+        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)
 def spawn_boom():
     if len(list_boom)<MAX_BOOM:
         x_position = random.randint(100, SCREEN_WIDTH-100)
@@ -106,12 +112,6 @@ def create_bonus():
         x_position = random.randint(100, SCREEN_WIDTH-100)
         new_bonus=BonusLv(x_position,-30)
         list_bonus.append(new_bonus)
-# def create_boss():
-#     if len(list_boss)<MAX_BOSS:
-#         x_position=random.choice([-50,SCREEN_WIDTH])
-#         y_position=random.randint(50,SCREEN_HEIGHT-50)
-#         new_BossFish=BossFish(x_position,y_position)
-#         list_boss.append(new_BossFish)
 
 # Hàm sinh BossFish dựa trên điều kiện cấp độ
 def create_boss(list_boss, player):
@@ -187,8 +187,9 @@ while running:
     # Cập nhật và vẽ các BossFish hiện có
     for boss in list_boss[:]:
         boss: BossFish
-        boss.draw(screen)
         boss.move_boss()
+        boss.draw(screen)
+        
 
         if boss.remove_boss():
             list_boss.remove(boss)
@@ -230,7 +231,7 @@ while running:
 
 #vong lap while dieu khien bang tay
 
-#khoi tao media
+# khoi tao media
 # mp_hands = mp.solutions.hands
 # hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7)
 # mp_draw = mp.solutions.drawing_utils
@@ -318,7 +319,7 @@ while running:
 #         spawn_timer = pygame.time.get_ticks()
 
 #     for enemy in enemy_fishes:
-#         enemy.move()
+#         enemy.move(player)
 #         enemy.draw(screen)
 #         draw_enemy_level(screen, enemy)
 
