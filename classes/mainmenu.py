@@ -111,7 +111,7 @@ class MainMenu:
         
         self.clock = pygame.time.Clock()
         self.running = True
-
+#fix
     def run(self):
         while self.running:
             self.update()

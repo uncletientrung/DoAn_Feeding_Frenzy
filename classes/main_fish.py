@@ -5,7 +5,7 @@ import pygame.time
 from settings import *
 import classes.ScoreBar
 import time
-
+#ákgfbhjsdfb
 class MainFish:
     def __init__(self, x, y):
         # Tạo từ điển chứa các hình ảnh của cá theo 8 hướng
