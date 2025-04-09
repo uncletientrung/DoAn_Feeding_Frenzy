@@ -6,35 +6,88 @@ from PDBCUtill import DatabaseManager
 from settings import *
 
 class FrameBXH(DatabaseManager):
-    def __init__(self,x,y):
-        super().__init__() # Cho nó kế thừa connect database
-        self.x=x
-        self.y=y
-        self.image=pygame.image.load(IMAGE_PATH+"bxh.png")
-        self.image=pygame.transform.scale(self.image,(SCREEN_WIDTH-200,SCREEN_HEIGHT-100))
-        self.dataset=self.SelectAll()
-        self.topScore=self.SelectTopScore()
+    def __init__(self, x, y):
+        super().__init__()  # Cho nó kế thừa connect database
+        self.x = x
+        self.y = y
+        self.image = pygame.image.load(IMAGE_PATH + "bxh.png")
+        self.image = pygame.transform.scale(self.image, (SCREEN_WIDTH - 200, SCREEN_HEIGHT - 100))
+        self.dataset = self.SelectAll()
+        self.topScore = self.SelectTopScore()
         self.font = pygame.font.Font(None, 36)
         self.row_height = 40
         self.header_height = 50
+        # Thiết kế đẹp hơn với màu sắc
+        self.bg_color = (240, 248, 255)  # AliceBlue background
+        self.header_color = (70, 130, 180)  # SteelBlue for headers
+        self.text_color = (25, 25, 112)  # MidnightBlue for text
+        self.line_color = (135, 206, 235)  # SkyBlue for lines
+        self.highlight_color = (173, 216, 230)  # LightBlue for hover/selection
+        
+        # Scrollbar settings
+        self.scroll_y = 0
+        self.max_scroll = max(0, len(self.dataset) * self.row_height - (SCREEN_HEIGHT - 200)) 
+        self.scrollbar_width = 10
+        self.scrollbar_color = (100, 149, 237)
+        self.scrollbar_hover_color = (65, 105, 225)  
 
-    def draw(self,screen):
-        screen.blit(self.image,(self.x,self.y))
+    def draw(self, screen):
+        # Vẽ nền bảng xếp hạng
+        screen.blit(self.image, (self.x, self.y)) 
         start_x = self.x + 170
-        start_y = self.y + 100  
-        # Draw tên tiêu đề
+        start_y = self.y + 100
+        
+        # Draw tên tiêu đề với màu nền header
         headers = ["Name", "Level", "Score", "Play time"]
+        pygame.draw.rect(screen, self.header_color, (start_x - 50, start_y - 10, 650, self.header_height))
         for i, header in enumerate(headers):
-            text = self.font.render(header, True, (0, 0, 0))
-            screen.blit(text, (start_x + i * 150, start_y))   
-        pygame.draw.line(screen, (0, 0, 0), (start_x-50, start_y + self.header_height -15),
-                         (start_x + 600, start_y + self.header_height- 15), 2)
-        # Draw dữ liệu
-        for i, row in enumerate(self.dataset):
-            for j, value in enumerate(row):
-                text = self.font.render(str(value), True, (0, 0, 0))
-                screen.blit(text, (start_x + j * 160, start_y + self.header_height + i * self.row_height))
+            text = self.font.render(header, True, (255, 255, 255))  # White text for contrast
+            screen.blit(text, (start_x + i * 150, start_y))
+        
+        # Vẽ đường kẻ phân cách dưới header
+        pygame.draw.line(screen, self.line_color, (start_x - 50, start_y + self.header_height - 15),
+                         (start_x + 600, start_y + self.header_height - 15), 2)
+        
+        # Vẽ dữ liệu với scroll
+        visible_rows = (SCREEN_HEIGHT - 200) // self.row_height  # Số hàng hiển thị được
+        start_idx = self.scroll_y // self.row_height
+        end_idx = min(start_idx + visible_rows + 1, len(self.dataset))
+
+        for i in range(start_idx, end_idx):
+            row_y = start_y + self.header_height + (i - start_idx) * self.row_height
+            if row_y + self.row_height > self.y + SCREEN_HEIGHT - 100:
+                break  # Không vẽ ngoài khung
+            # Highlight dòng khi hover
+            mouse_pos = pygame.mouse.get_pos()
+            if start_x - 50 <= mouse_pos[0] <= start_x + 600 and row_y <= mouse_pos[1] <= row_y + self.row_height:
+                pygame.draw.rect(screen, self.highlight_color, (start_x - 50, row_y, 650, self.row_height))
+            
+            # Vẽ dữ liệu từng ô
+            for j, value in enumerate(self.dataset[i]):
+                text = self.font.render(str(value), True, self.text_color)
+                screen.blit(text, (start_x + j * 160, row_y))
+
+        # Vẽ thanh ScoreBar
+        if self.max_scroll > 0:
+            scrollbar_height = (SCREEN_HEIGHT - 200) * (SCREEN_HEIGHT - 200) / (len(self.dataset) * self.row_height)
+            scrollbar_y = self.y + 50 + (self.scroll_y * (SCREEN_HEIGHT - 250) / self.max_scroll)
+            scrollbar_rect = pygame.Rect(self.x + SCREEN_WIDTH - 250, scrollbar_y, self.scrollbar_width, scrollbar_height)
+            
+            # Hover effect cho scrollbar
+            if scrollbar_rect.collidepoint(mouse_pos):
+                pygame.draw.rect(screen, self.scrollbar_hover_color, scrollbar_rect)
+                # Xử lý kéo thanh scroll
+                if pygame.mouse.get_pressed()[0]:
+                    self.scroll_y = max(0, min(self.max_scroll, self.scroll_y + pygame.mouse.get_rel()[1]))
+            else:
+                pygame.draw.rect(screen, self.scrollbar_color, scrollbar_rect)
+
         self.close()
+
+    def handle_event(self, event):
+        # Xử lý scroll bằng chuột
+        if event.type == pygame.MOUSEWHEEL:
+            self.scroll_y = max(0, min(self.max_scroll, self.scroll_y - event.y * 20))  # Cuộn 20px mỗi lần
 
 class ImageButton:
     def __init__(self, x, y, image_path, scale=1):
