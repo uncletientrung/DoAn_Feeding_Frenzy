@@ -8,8 +8,6 @@ from settings import *
 pygame.init()
 pygame.mixer.init()
 
-SCREEN_WIDTH = 1100
-SCREEN_HEIGHT = 680
 FPS = 60
 
 class GameState:
@@ -46,13 +44,22 @@ class Main:
                     self.menu.bottom_right2_btn = ImageButton(SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, new_image_path)
                 if self.menu.bottom_left_btn.draw(self.screen):
                     self.menu.is_info_mode = True
+                if self.menu.btnRanking.draw(self.screen):
+                    self.menu.is_info_mode=True
+                    self.menu.is_ranking_mode=True
                 if self.menu.play_btn.draw(self.screen):
                     if hasattr(self.menu, 'cap') and self.menu.cap.isOpened():
                         self.menu.cap.release()
                     return GameState.GAME
-            else:
+            elif self.menu.is_info_mode and not self.menu.is_ranking_mode:
                 if self.menu.back_btn.draw(self.screen):
                     self.menu.is_info_mode = False
+            elif self.menu.is_info_mode and self.menu.is_ranking_mode: # ấn vào btnRanking thì sẽ chuyển 2 cái mode=True
+                if self.menu.back_btn.draw(self.screen): # nếu ấn Back sẽ trả về False
+                    self.menu.is_info_mode = False 
+                    self.menu.is_ranking_mode=False
+            
+            
         return GameState.MENU
 
     def run_game(self):
