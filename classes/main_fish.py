@@ -225,8 +225,6 @@ class MainFish:
                         pygame.quit()  # Hoặc quay về main menu (cần chỉnh Main.py)
                         sys.exit()
 
-            # Không fill background, giữ nguyên background hiện tại
-            # Vẽ hình ảnh game over đã thu nhỏ lên trung tâm
             screen.blit(game_over_image, game_over_rect)
 
             # Vẽ "Your Score" ở trên cùng của bảng
@@ -247,21 +245,20 @@ class MainFish:
 
             pygame.display.flip()
 
-    # Nếu thoát vòng lặp
+        # Nếu thoát vòng lặp
         pygame.quit()
         sys.exit()
 
-def restart_game(self):
-    """Reset cá chính về trạng thái ban đầu"""
-    self.x, self.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-    self.level = 0
-    self.size = 1
-    self.eat_count = 0
-    self.score = 0
+    def restart_game(self):
+        """Reset cá chính về trạng thái ban đầu"""
+        self.x, self.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
+        self.level = 0
+        self.size = 1
+        self.eat_count = 0
 
-    base_size = SCREEN_WIDTH // 25
-    self.image = self.images["right"]
-    self.width, self.height = base_size, base_size
+        base_size = SCREEN_WIDTH // 25
+        self.image = self.images["right"]
+        self.width, self.height = base_size, base_size
 
     def eat_fish(self, enemy):
         """Xử lý khi cá chính ăn cá nhỏ hơn"""
