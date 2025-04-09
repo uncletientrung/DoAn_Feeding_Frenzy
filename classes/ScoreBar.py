@@ -68,7 +68,8 @@ class ScoreBar:
         time_text = self.font.render(time_str, True, BLACK)
         screen.blit(time_text, (SCREEN_WIDTH-120, inner_y-30))  # Đặt dưới Score, cách 24 pixel (khoảng cách giữa các dòng)
         # tạo các giá trị của data trước khi thêm vào bên gameOver 
-        self.data=["Player",self.level,self.score,time_str[:6]]
+        self.data=["Player",int(self.level),int(self.score),time_str[6:]]
+
     def reset_time(self):
         self.start_time = time.time()
 

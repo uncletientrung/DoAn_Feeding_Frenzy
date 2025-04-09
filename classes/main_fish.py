@@ -3,11 +3,12 @@ import pygame
 import sys
 import pygame.time
 from settings import *
-import classes.ScoreBar
+from PDBCUtill import DatabaseManager
 import time
 #ákgfbhjsdfb
-class MainFish:
+class MainFish(DatabaseManager):
     def __init__(self, x, y):
+        super().__init__()
         # Tạo từ điển chứa các hình ảnh của cá theo 8 hướng
         base_size = SCREEN_WIDTH // 25
         self.images = {
@@ -38,8 +39,9 @@ class MainFish:
         self.level = 9
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
+        self.data=[]
 
-    def check_collision(self, enemies, screen=None):  # Thêm tham số screen với giá trị mặc định None
+    def check_collision(self, enemies, dataScore,screen=None):  # Thêm tham số screen với giá trị mặc định None
         player_mask = pygame.mask.from_surface(self.image)
 
         for enemy in enemies[:]:
@@ -53,10 +55,12 @@ class MainFish:
                     enemies.remove(enemy)
                 elif self.level < enemy.size:
                     print(f" Bạn va chạm với cá lớn hơn! Player Level: {self.level} - Enemy Level: {enemy.size}")
+                    self.data=dataScore  # gán điểm cuối khi va chạm
                     if screen:  # Nếu screen được truyền vào
-                        self.game_over(screen)
+                        self.game_over(screen)  
                     else:
                         self.game_over()  # Gọi với giá trị mặc định
+                   
                 else:
                     print(f" Cá cùng cấp, không thể ăn!")
 
@@ -162,6 +166,8 @@ class MainFish:
         screen.blit(self.image, (self.x, self.y))
 
     def game_over(self, screen):
+        self.Insert(self.data)
+
         pygame.mixer.Sound.play(sound_death)
         pygame.time.delay(600)
         pygame.mixer.Sound.play(sound_game_over2)
