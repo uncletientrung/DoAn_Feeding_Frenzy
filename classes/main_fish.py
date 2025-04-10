@@ -5,7 +5,8 @@ import pygame.time
 from settings import *
 from PDBCUtill import DatabaseManager
 import time
-#ákgfbhjsdfb
+import random
+
 class MainFish(DatabaseManager):
     def __init__(self, x, y):
         super().__init__()
@@ -25,7 +26,7 @@ class MainFish(DatabaseManager):
         # Các thuộc tính ban đầu
         base_size = SCREEN_WIDTH // 25  # Tính toán kích thước cơ bản cho cá
 
-    # Resize tất cả 8 hướng trong từ điển self.images
+        # Resize tất cả 8 hướng trong từ điển self.images
         for direction in self.images:
             self.images[direction] = pygame.transform.scale(self.images[direction], (base_size, base_size))
         self.image = self.images["right"]  # Hình ảnh ban đầu (phải)
@@ -36,12 +37,12 @@ class MainFish(DatabaseManager):
         self.size = 1
         self.size_old = 1
         self.eat_count = 0
-        self.level = 9
+        self.level = 9  # Mặc định level là 9 (theo yêu cầu trước)
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
-        self.data=[]
+        self.data = []
 
-    def check_collision(self, enemies, dataScore,screen=None):  # Thêm tham số screen với giá trị mặc định None
+    def check_collision(self, enemies, dataScore, screen=None):  # Thêm tham số screen với giá trị mặc định None
         player_mask = pygame.mask.from_surface(self.image)
 
         for enemy in enemies[:]:
@@ -55,12 +56,11 @@ class MainFish(DatabaseManager):
                     enemies.remove(enemy)
                 elif self.level < enemy.size:
                     print(f" Bạn va chạm với cá lớn hơn! Player Level: {self.level} - Enemy Level: {enemy.size}")
-                    self.data=dataScore  # gán điểm cuối khi va chạm
+                    self.data = dataScore  # gán điểm cuối khi va chạm
                     if screen:  # Nếu screen được truyền vào
                         self.game_over(screen)  
                     else:
                         self.game_over()  # Gọi với giá trị mặc định
-                   
                 else:
                     print(f" Cá cùng cấp, không thể ăn!")
 
@@ -85,8 +85,6 @@ class MainFish(DatabaseManager):
             )
 
         self.width, self.height = new_size, new_size
-        global enemy_fishes
-        enemy_fishes = []
 
     def move1(self, keys):
         """Di chuyển cá chính bằng phím mũi tên với hỗ trợ 8 hướng"""
@@ -190,7 +188,7 @@ class MainFish(DatabaseManager):
 
         # Tải hai nút
         try:
-            repeat_button_image = pygame.image.load("assets/buttons/Repeat-Right.png")
+            repeat_button_image = pygame.image.load("assets/button2/button_restart-sheet1.png")
             home_button_image = pygame.image.load("assets/buttons/Home.png")
         except FileNotFoundError:
             print(f"Không tìm thấy file Repeat-Right.png hoặc Home.png trong assets/buttons!")
@@ -256,20 +254,35 @@ class MainFish(DatabaseManager):
         sys.exit()
 
     def restart_game(self):
-        """Reset cá chính về trạng thái ban đầu"""
-        self.x, self.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-        self.level = 0
-        self.size = 1
+        """Reset cá chính về trạng thái ban đầu với vị trí ngẫu nhiên và level mặc định là 9"""
+        # Tạo vị trí ngẫu nhiên trong màn hình, đảm bảo không nằm quá gần biên
+        self.x = random.randint(50, SCREEN_WIDTH - 50 - self.width)  # Tránh biên màn hình
+        self.y = random.randint(50, SCREEN_HEIGHT - 50 - self.height)  # Tránh biên màn hình
+        
+        # Reset level về 9 (theo yêu cầu)
+        self.level = 9
+        self.size = 1  # Reset kích thước về mức ban đầu
         self.eat_count = 0
+        self.score = 0  # Reset điểm về 0
 
-        base_size = SCREEN_WIDTH // 25
-        self.image = self.images["right"]
-        self.width, self.height = base_size, base_size
+        # Cập nhật kích thước hình ảnh về kích thước ban đầu (như trong __init__)
+        base_size = SCREEN_WIDTH // 25  # Kích thước cơ bản giống lúc khởi tạo
+        new_size = base_size  # Không nhân thêm hệ số, giữ nguyên kích thước ban đầu
+
+        # Resize tất cả hình ảnh theo kích thước ban đầu
+        for direction in self.images:
+            self.images[direction] = pygame.transform.scale(
+                pygame.image.load(IMAGE_PATH + f"fish_{direction}.png"), (new_size, new_size)
+            )
+
+        self.width, self.height = new_size, new_size
+        self.image = self.images["right"]  # Đặt lại hướng mặc định là "right"
+
+        # Cập nhật vị trí hình chữ nhật đại diện cá
+        self.rect.topleft = (self.x, self.y)
 
     def eat_fish(self, enemy):
         """Xử lý khi cá chính ăn cá nhỏ hơn"""
         self.eat_sound.play()
         self.grow(enemy.fish_level)
         print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
-
-

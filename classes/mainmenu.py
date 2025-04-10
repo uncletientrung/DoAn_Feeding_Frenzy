@@ -117,34 +117,54 @@ class MainMenu:
     def __init__(self):
         self.SCREEN_WIDTH = 1100
         self.SCREEN_HEIGHT = 680
-        # Nút Exit
-        self.top_left_btn = ImageButton(0, 0, "assets/buttons/Exit.png")
-        # Nút Info
-        self.bottom_left_btn = ImageButton(0, self.SCREEN_HEIGHT-100 + 50, "assets/buttons/Info.png")
-        # Nút BXH
-        self.btnRanking=ImageButton(77,self.SCREEN_HEIGHT-100 + 50,"assets/buttons/Levels.png")
-        # Trạng thái âm thanh
-        self.sound_on = True
-        self.music_on = True
-        # Nút Sound 
-        self.bottom_right_btn = ImageButton(self.SCREEN_WIDTH-100 +24, self.SCREEN_HEIGHT-100 + 50, 
-                                            "assets/buttons/Sound-Two.png" if self.sound_on else "assets/buttons/Sound-None.png")
-        # Nút Music
-        self.bottom_right2_btn = ImageButton(self.SCREEN_WIDTH-100-53, self.SCREEN_HEIGHT-100 + 50, 
-                                             "assets/buttons/Music-Off.png" if not self.music_on else "assets/buttons/Music-On.png")
         
-        self.play_btn_width = 200
-        self.play_btn_height = 200
-        # Nút Play
-        self.play_btn = ImageButton(
-            (self.SCREEN_WIDTH - self.play_btn_width) // 2 + 30, 
-            (self.SCREEN_HEIGHT - self.play_btn_height) // 2 + 30, 
-            "assets/buttons/Play.png", 
-            scale=1.5
-        )
-        # Nút back
-        self.back_btn = ImageButton(0, 0, "assets/buttons/Home.png", scale=1.0)
+        # Khai báo trạng thái âm thanh trước
+        self.sound_on = True  # Mặc định bật âm thanh
+        self.music_on = True  # Mặc định bật nhạc
+        
+        # Kích thước chuẩn cho các nút nhỏ (trừ Play)
+        SMALL_BUTTON_WIDTH = 76
+        SMALL_BUTTON_HEIGHT = 51
+        PLAY_BUTTON_SIZE = 200  # Kích thước cho nút Play giữ nguyên (200x200)
+        BUTTON_PADDING = 20     # Khoảng cách từ biên màn hình
+        BUTTON_SPACING = 10    # Khoảng cách giữa các nút nhỏ
 
+        # Nút Exit (góc trên bên trái)
+        self.top_left_btn = ImageButton(BUTTON_PADDING -17, BUTTON_PADDING -17, "assets/button2/Exit.png", 
+                                       scale=SMALL_BUTTON_WIDTH / 117)  # Scale từ 117x118 về 76x51
+        
+        # Nút Info và Ranking (cùng góc dưới bên trái, cạnh nhau)
+        info_y = self.SCREEN_HEIGHT - SMALL_BUTTON_HEIGHT - BUTTON_PADDING
+        self.bottom_left_btn = ImageButton(BUTTON_PADDING-17, info_y-5, 
+                                          "assets/button2/Info.png", scale=SMALL_BUTTON_WIDTH / 117)
+        self.btnRanking = ImageButton(BUTTON_PADDING + SMALL_BUTTON_WIDTH + BUTTON_SPACING -20, info_y +18, 
+                                     "assets/buttons/Levels.png", scale=SMALL_BUTTON_WIDTH / 117)  # Nằm cạnh nút Info
+        
+        # Nút Sound và Music (góc dưới bên phải, cách đều nhau)
+        sound_x = self.SCREEN_WIDTH - SMALL_BUTTON_WIDTH - BUTTON_PADDING
+        self.bottom_right_btn = ImageButton(sound_x +19, self.SCREEN_HEIGHT - SMALL_BUTTON_HEIGHT - BUTTON_PADDING -5, 
+                                          "assets/button2/Sound-One.png" if self.sound_on else "assets/button2/Sound-None.png", 
+                                          scale=SMALL_BUTTON_WIDTH / 117)
+        self.bottom_right2_btn = ImageButton(sound_x - SMALL_BUTTON_WIDTH - BUTTON_SPACING +24, 
+                                            self.SCREEN_HEIGHT - SMALL_BUTTON_HEIGHT - BUTTON_PADDING -5, 
+                                            "assets/button2/Music-On.png" if self.music_on else "assets/button2/Music-Off.png", 
+                                            scale=SMALL_BUTTON_WIDTH / 117)
+        
+        # Nút Play (ở trung tâm, lớn hơn một chút)
+        self.play_btn_width = PLAY_BUTTON_SIZE
+        self.play_btn_height = PLAY_BUTTON_SIZE  # Đảm bảo chiều cao và rộng của nút Play là như nhau
+        self.play_btn = ImageButton(
+            (self.SCREEN_WIDTH - self.play_btn_width) // 2, 
+            (self.SCREEN_HEIGHT - self.play_btn_height) // 2, 
+            "assets/button2/Play.png", 
+            scale=PLAY_BUTTON_SIZE / 275  # Scale từ 275x278 về 200x200
+        )
+        
+        # Nút Back (dùng khi ở chế độ info hoặc ranking)
+        self.back_btn = ImageButton(BUTTON_PADDING, BUTTON_PADDING, "assets/buttons/Home.png", 
+                                   scale=SMALL_BUTTON_WIDTH / 117)
+
+        # Các phần còn lại giữ nguyên (video, font, text, v.v.)
         try:
             self.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
@@ -184,11 +204,59 @@ class MainMenu:
         # Trạng thái bảng thông tin
         self.is_info_mode = False
         # Trạng thái bảng xếp hạng
-        self.is_ranking_mode=False
+        self.is_ranking_mode = False
         # Tạo khung bxh
-        self.frameRank=FrameBXH(120,70)
+        self.frameRank = FrameBXH(120, 70)
         self.top_score = self.frameRank.topScore
         self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, YELLOW_COLOR)
+
+    def update(self):
+        if hasattr(self, 'cap') and self.cap.isOpened():
+            self.success, self.video_frame = self.cap.read()
+            if not self.success:
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                self.success, self.video_frame = self.cap.read()
+            if self.success:
+                self.video_frame = cv2.resize(self.video_frame, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+                self.video_frame = cv2.cvtColor(self.video_frame, cv2.COLOR_BGR2RGB)
+                self.video_surface = pygame.image.frombuffer(self.video_frame.tobytes(), 
+                                                             self.video_frame.shape[1::-1], "RGB")
+
+    def draw(self, screen):
+        if self.success and self.video_frame is not None:
+            screen.blit(self.video_surface, (0, 0))
+        else:
+            screen.fill((0, 50, 100))
+        
+        if not self.is_info_mode:
+            title_x = (self.SCREEN_WIDTH - self.title_text.get_width()) // 2
+            title_y = (self.SCREEN_HEIGHT - self.play_btn_height) // 2 - 150
+            screen.blit(self.title_shadow, (title_x + 5, title_y + 5))
+            screen.blit(self.title_text, (title_x, title_y))
+            self.top_left_btn.draw(screen)
+            self.bottom_left_btn.draw(screen)
+            self.bottom_right_btn.draw(screen)
+            self.bottom_right2_btn.draw(screen)
+            self.btnRanking.draw(screen)
+            self.play_btn.draw(screen)
+            score_x = (self.SCREEN_WIDTH - self.score_text.get_width()) // 2
+            score_y = (self.SCREEN_HEIGHT - self.play_btn_height) // 2 + self.play_btn_height + 5
+            screen.blit(self.score_text, (score_x, score_y))
+        elif self.is_info_mode and not self.is_ranking_mode:
+            y_offset = 100
+            for text in self.info_texts:
+                text_rect = text.get_rect(center=(self.SCREEN_WIDTH // 2, y_offset))
+                screen.blit(text, text_rect)
+                y_offset += text.get_height() + 10
+            self.back_btn.draw(screen)
+        elif self.is_info_mode and self.is_ranking_mode:
+            self.frameRank.draw(screen)
+            self.back_btn.draw(screen)
+
+    def update_top_score(self, new_score):
+        if new_score > self.top_score:
+            self.top_score = new_score
+            self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, (255, 215, 0))
 
                                 
 
