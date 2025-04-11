@@ -1,11 +1,9 @@
 import pygame
 import random
 import cv2
-# import mediapipe as mp
+#import mediapipe as mp
 import numpy as np
 import os
-import sys
-sys.path.append("D:\WorkSpace\DoAn_Feeding_Frenzy-main")
 from settings import *
 from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
@@ -13,6 +11,7 @@ from classes.bomb import Boom
 from classes.bonuslv import BonusLv
 from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
+from classes.top_menu import TopMenu
 
 os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
 
@@ -47,6 +46,7 @@ pygame.mixer.music.load(SOUND_PATH + "feeding-frenzy.wav")
 
 # Tạo cá chính
 player = MainFish(400, 300)
+top_menu = TopMenu(player, screen)
 scoreBar= ScoreBar()
 
 enemy_fishes = []  
@@ -106,12 +106,6 @@ def create_bonus():
         x_position = random.randint(100, SCREEN_WIDTH-100)
         new_bonus=BonusLv(x_position,-30)
         list_bonus.append(new_bonus)
-# def create_boss():
-#     if len(list_boss)<MAX_BOSS:
-#         x_position=random.choice([-50,SCREEN_WIDTH])
-#         y_position=random.randint(50,SCREEN_HEIGHT-50)
-#         new_BossFish=BossFish(x_position,y_position)
-#         list_boss.append(new_BossFish)
 
 # Hàm sinh BossFish dựa trên điều kiện cấp độ
 def create_boss(list_boss, player):
@@ -130,6 +124,9 @@ spawn_timer = 0
 last_bubble_time = time.time() # Thời gian để spawn cá mới
 spawn_boom_timer=0
 
+running = True
+clock = pygame.time.Clock()
+
 # vong lap while dieu khien bang phim
 while running:
     current_time = time.time()
@@ -139,10 +136,15 @@ while running:
     screen.blit(background, (0, 0))  # Vẽ background
     keys = pygame.key.get_pressed()
     player.move1(keys)
+
     player.check_collision(enemy_fishes)  # Kiểm tra va chạm với cá địch
+    if player.score != top_menu.previous_score:
+        top_menu.update_frenzy(player.score)
+
     player.draw(screen)
     draw_fish_level(screen, player)
-
+    # Vẽ topmenu
+    top_menu.draw(player)
     # Vẽ bảng Score
     scoreBar.draw(screen,player)
 
@@ -176,11 +178,6 @@ while running:
             spawn_boom_timer=pygame.time.get_ticks()
 
     # Hàm sinh ra cá boss
-    # Xử lý sự kiện
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
     # Kiểm tra và tạo BossFish
     create_boss(list_boss, player)
 
@@ -199,11 +196,7 @@ while running:
 
         # Kiểm tra va chạm giữa BossFish và cá enemy
         boss.check_colistion_enemy(enemy_fishes)
-    
-    pygame.display.update()
-    clock.tick(120)
 
-            
     # Kiểm tra va chạm bom với cá chính, cá enemy
     for b in list_boom[:]:
         b:Boom
@@ -214,7 +207,7 @@ while running:
         
         if b.kick_mainfish(player):
             if b.changed_when_mainkick():
-                # player.game_over()
+                player.game_over()
                 print(b.time_create)
                 print(b.time_cham_Xoa)
         if b.remove_boom():
@@ -223,10 +216,24 @@ while running:
     pygame.display.update()
     clock.tick(FPS)
 
+    # Xử lý sự kiện
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_f:
+                top_menu.frenzy = 100
+                top_menu.update_frenzy(player.score+10) 
+                # Vì hàm update sẽ chỉ kích hoạt frenzy khi điểm số có sự thay đổi 
+                # nên khi dùng để test, cộng thêm 10 điểm sẽ ngay lập tức kích hoạt frenzy
+            elif event.key == pygame.K_SPACE:
+                player.dash()
+            elif event.key == pygame.K_ESCAPE:
+                running = False
+        elif event.type == pygame.QUIT:
             running = False
-  
+        
+    player.end_dash()
+    player.start_cooldown()
+
 
 #vong lap while dieu khien bang tay
 

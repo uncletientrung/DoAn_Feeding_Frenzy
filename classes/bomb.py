@@ -59,6 +59,7 @@ class Boom:
                 self.time_cham_Xoa = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới thua game
             return True
         return False
+    
     def kick_boss(self,list_boom): # hàm kiểm tra va chạm với cá enemy
         boom_mask=pygame.mask.from_surface(self.image)
         for boss in list_boom[:]:
