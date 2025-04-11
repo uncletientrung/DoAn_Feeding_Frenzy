@@ -3,10 +3,13 @@ import pygame
 import sys
 import pygame.time
 from settings import *
-import classes.ScoreBar
+from PDBCUtill import DatabaseManager
+import time
+import random
 
-class MainFish:
+class MainFish(DatabaseManager):
     def __init__(self, x, y):
+        super().__init__()
         # Tạo từ điển chứa các hình ảnh của cá theo 8 hướng
         base_size = SCREEN_WIDTH // 25
         self.images = {
@@ -23,7 +26,7 @@ class MainFish:
         # Các thuộc tính ban đầu
         base_size = SCREEN_WIDTH // 25  # Tính toán kích thước cơ bản cho cá
 
-    # Resize tất cả 8 hướng trong từ điển self.images
+        # Resize tất cả 8 hướng trong từ điển self.images
         for direction in self.images:
             self.images[direction] = pygame.transform.scale(self.images[direction], (base_size, base_size))
         self.image = self.images["right"]  # Hình ảnh ban đầu (phải)
@@ -34,14 +37,16 @@ class MainFish:
         self.size = 1
         self.size_old = 1
         self.eat_count = 0
-        self.level = 7
+        self.level = 9  # Mặc định level là 9 (theo yêu cầu trước)
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.can_dash = True
         self.dash_cooldown = 1.5
         self.is_frenzy = False
         self.dash_start_time = 0
-    def check_collision(self, enemies):
+        self.data = []
+
+    def check_collision(self, enemies, dataScore, screen=None):  # Thêm tham số screen với giá trị mặc định None
         player_mask = pygame.mask.from_surface(self.image)
 
         for enemy in enemies[:]:
@@ -55,7 +60,11 @@ class MainFish:
                     enemies.remove(enemy)
                 elif self.level < enemy.size:
                     print(f" Bạn va chạm với cá lớn hơn! Player Level: {self.level} - Enemy Level: {enemy.size}")
-                    self.game_over()
+                    self.data = dataScore  # gán điểm cuối khi va chạm
+                    if screen:  # Nếu screen được truyền vào
+                        self.game_over(screen)  
+                    else:
+                        self.game_over()  # Gọi với giá trị mặc định
                 else:
                     print(f" Cá cùng cấp, không thể ăn!")
 
@@ -80,8 +89,6 @@ class MainFish:
             )
 
         self.width, self.height = new_size, new_size
-        global enemy_fishes
-        enemy_fishes = []
 
     def move1(self, keys):
         """Di chuyển cá chính bằng phím mũi tên với hỗ trợ 8 hướng"""
@@ -160,12 +167,93 @@ class MainFish:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
-    def game_over(self):
+    def game_over(self, screen):
+        self.Insert(self.data)
+
         pygame.mixer.Sound.play(sound_death)
         pygame.time.delay(600)
         pygame.mixer.Sound.play(sound_game_over2)
-        print("💀 Game Over! Bạn đã bị ăn!")
-        pygame.time.delay(3000)
+
+        # Tải hình ảnh bar.png từ thư mục buttons
+        try:
+            game_over_image = pygame.image.load("assets/buttons/bar.png")
+        except FileNotFoundError:
+            print(f"Không tìm thấy file bar.png trong assets/buttons!")
+            pygame.quit()
+            sys.exit()
+
+        # Đặt kích thước mới cho bar.png: chỉ đủ hiển thị 3 người chơi ở trung tâm
+        target_width = 400
+        target_height = 300
+
+        # Thu nhỏ hình ảnh bar.png về kích thước mới
+        game_over_image = pygame.transform.scale(game_over_image, (target_width, target_height))
+        game_over_rect = game_over_image.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2))
+
+        # Tải hai nút
+        try:
+            repeat_button_image = pygame.image.load("assets/button2/button_restart-sheet1.png")
+            home_button_image = pygame.image.load("assets/buttons/Home.png")
+        except FileNotFoundError:
+            print(f"Không tìm thấy file Repeat-Right.png hoặc Home.png trong assets/buttons!")
+            pygame.quit()
+            sys.exit()
+
+        # Thu nhỏ nút về kích thước phù hợp (ví dụ: 100x50)
+        button_width, button_height = 100, 50
+        repeat_button_image = pygame.transform.scale(repeat_button_image, (button_width, button_height))
+        home_button_image = pygame.transform.scale(home_button_image, (button_width, button_height))
+
+        # Vị trí nút dưới bar (cách bar 20 pixel)
+        repeat_button_rect = repeat_button_image.get_rect(center=(SCREEN_WIDTH // 2 - 60, game_over_rect.bottom + 60))
+        home_button_rect = home_button_image.get_rect(center=(SCREEN_WIDTH // 2 + 60, game_over_rect.bottom + 60))
+
+        # Font để hiển thị text
+        font = pygame.font.Font(None, 48)
+        small_font = pygame.font.Font(None, 36)
+
+        # Giả sử có danh sách top 3 người chơi
+        top_scores = [
+            {"name": "Player1", "score": 1000},
+            {"name": "Player2", "score": 800},
+            {"name": "Player3", "score": 600}
+        ]
+
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if repeat_button_rect.collidepoint(event.pos):
+                        self.restart_game()  # Restart game
+                        return  # Thoát khỏi game over và quay lại game
+                    if home_button_rect.collidepoint(event.pos):
+                        pygame.quit()  # Hoặc quay về main menu (cần chỉnh Main.py)
+                        sys.exit()
+
+            screen.blit(game_over_image, game_over_rect)
+
+            # Vẽ "Your Score" ở trên cùng của bảng
+            your_score_text = font.render(f"Your Score: {self.score}", True, (255, 255, 255))
+            your_score_rect = your_score_text.get_rect(center=(SCREEN_WIDTH // 2, game_over_rect.top - 30))
+            screen.blit(your_score_text, your_score_rect)
+
+            # Vẽ top 3 người chơi với màu khác nhau
+            colors = [(0, 0, 0), (128, 0, 128), (0, 0, 255)]  # Đen, Tím, Xanh dương
+            for i, player in enumerate(top_scores):
+                top_text = small_font.render(f"{i+1}. {player['name']}: {player['score']}", True, colors[i])
+                top_rect = top_text.get_rect(center=(SCREEN_WIDTH // 2, game_over_rect.centery + (i - 1) * 40))
+                screen.blit(top_text, top_rect)
+
+            # Vẽ hai nút
+            screen.blit(repeat_button_image, repeat_button_rect)
+            screen.blit(home_button_image, home_button_rect)
+
+            pygame.display.flip()
+
+        # Nếu thoát vòng lặp
         pygame.quit()
         sys.exit()
 
@@ -179,15 +267,32 @@ class MainFish:
         sys.exit()
 
     def restart_game(self):
-        """Reset cá chính về trạng thái ban đầu"""
-        self.x, self.y = SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2
-        self.level = 0
-        self.size = 1
+        """Reset cá chính về trạng thái ban đầu với vị trí ngẫu nhiên và level mặc định là 9"""
+        # Tạo vị trí ngẫu nhiên trong màn hình, đảm bảo không nằm quá gần biên
+        self.x = random.randint(50, SCREEN_WIDTH - 50 - self.width)  # Tránh biên màn hình
+        self.y = random.randint(50, SCREEN_HEIGHT - 50 - self.height)  # Tránh biên màn hình
+        
+        # Reset level về 9 (theo yêu cầu)
+        self.level = 9
+        self.size = 1  # Reset kích thước về mức ban đầu
         self.eat_count = 0
+        self.score = 0  # Reset điểm về 0
 
-        base_size = SCREEN_WIDTH // 25
-        self.image = self.images["right"]
-        self.width, self.height = base_size, base_size
+        # Cập nhật kích thước hình ảnh về kích thước ban đầu (như trong __init__)
+        base_size = SCREEN_WIDTH // 25  # Kích thước cơ bản giống lúc khởi tạo
+        new_size = base_size  # Không nhân thêm hệ số, giữ nguyên kích thước ban đầu
+
+        # Resize tất cả hình ảnh theo kích thước ban đầu
+        for direction in self.images:
+            self.images[direction] = pygame.transform.scale(
+                pygame.image.load(IMAGE_PATH + f"fish_{direction}.png"), (new_size, new_size)
+            )
+
+        self.width, self.height = new_size, new_size
+        self.image = self.images["right"]  # Đặt lại hướng mặc định là "right"
+
+        # Cập nhật vị trí hình chữ nhật đại diện cá
+        self.rect.topleft = (self.x, self.y)
 
     def eat_fish(self, enemy):
         """Xử lý khi cá chính ăn cá nhỏ hơn"""

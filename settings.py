@@ -6,8 +6,9 @@ pygame.mixer.init()
 
 SCREEN_WIDTH = 1100
 SCREEN_HEIGHT = 680
+BACKGROUND_COLOR = (0, 0, 0)
 
-FPS = 60
+FPS = 120
 
 PLAYER_SPEED = 5
 

@@ -1,9 +1,10 @@
+from turtle import Screen
 import pygame
 import random
 import cv2
-#import mediapipe as mp
 import numpy as np
 import os
+import time
 from settings import *
 from classes.main_fish import MainFish
 from classes.enemy_fish import EnemyFish
@@ -13,331 +14,239 @@ from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
 from classes.top_menu import TopMenu
 
-os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
+class Game:
+    def __init__(self):
+        # Thiết lập môi trường Pygame
+        os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
+        pygame.init()
+        pygame.mixer.init()
+        self.SCREEN_WIDTH = 1100
+        self.SCREEN_HEIGHT = 680
+        self.FPS = 120
+        self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        pygame.display.set_caption("Feeding Frenzy")
+        self.clock = pygame.time.Clock()
 
+        # Load background
+        self.background = pygame.image.load(IMAGE_PATH + "bg11.jpg")
+        self.background = pygame.transform.scale(self.background, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
-pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Feeding Frenzy")
+        # Tạo font chữ
+        pygame.font.init()
+        self.font = pygame.font.SysFont('Comic Sans MS', 15)
 
-# Load background
-background = pygame.image.load(IMAGE_PATH + "bg11.jpg")
-background = pygame.transform.scale(background, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        # Load âm thanh
+        pygame.mixer.music.load(SOUND_PATH + "feeding-frenzy.wav")
+        self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")  # Giả định có file bubble.wav
 
-#tao font chu
-pygame.font.init()
-font = pygame.font.SysFont('Comic Sans MS', 15)
+        # Khởi tạo các đối tượng game
+        self.player = MainFish(400, 300)
+        self.top_menu = TopMenu(self.player, self.screen)
+        self.scoreBar = ScoreBar()
+        self.enemy_fishes = []
+        self.MAX_ENEMIES = 10
+        self.list_boom = []
+        self.MAX_BOOM = 50
+        self.list_bonus = []
+        self.MAX_BONUS = 1
+        self.list_boss = []
+        self.MAX_BOSS = 2
 
-def draw_fish_level(screen, fish):
-    """Hiển thị level của cá trên đầu nó"""
-    text_surface = font.render(f"Lv {fish.level}", True, (255, 255, 255)) 
-    text_rect = text_surface.get_rect(center=(fish.x + fish.width // 2, fish.y - 10))
-    screen.blit(text_surface, text_rect)
+        # Biến thời gian
+        self.last_time_spawn = 0
+        self.min_spawn_interval = 30 if self.player.level <= 4 else 15 if self.player.level <= 8 else 10
+        self.thoi_gian_cuoi_cung_spawn = 0
+        self.thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)
+        self.spawn_timer = 0
+        self.spawn_boom_timer = 0
+        self.last_bubble_time = time.time()
 
-def draw_enemy_level(screen, fish):
-    """Hiển thị level của cá địch trên đầu nó"""
-    text_surface = font.render(f"Lv {fish.size}", True, (255, 255, 255)) 
-    text_rect = text_surface.get_rect(center=(fish.x + fish.width // 2, fish.y - 10))
-    screen.blit(text_surface, text_rect)
+        # Biến trạng thái
+        self.running = True
 
-# Load âm thanh
-pygame.mixer.music.load(SOUND_PATH + "feeding-frenzy.wav")
-# pygame.mixer.music.play(-1)  
+    def draw_fish_level(self, fish):
+        """Hiển thị level của cá trên đầu nó"""
+        text_surface = self.font.render(f"Lv {fish.level}", True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(fish.x + fish.width // 2, fish.y - 10))
+        self.screen.blit(text_surface, text_rect)
 
-# Tạo cá chính
-player = MainFish(400, 300)
-top_menu = TopMenu(player, screen)
-scoreBar= ScoreBar()
+    def draw_enemy_level(self, fish):
+        """Hiển thị level của cá địch trên đầu nó"""
+        text_surface = self.font.render(f"Lv {fish.size}", True, (255, 255, 255))
+        text_rect = text_surface.get_rect(center=(fish.x + fish.width // 2, fish.y - 10))
+        self.screen.blit(text_surface, text_rect)
 
-enemy_fishes = []  
-MAX_ENEMIES = 10
-list_boom=[]
-MAX_BOOM=50
-list_bonus=[]
-MAX_BONUS=1
-list_boss=[]
-MAX_BOSS=2
+    def spawn_enemy(self):
+        """Hàm spawn cá địch theo level người chơi, có sự đa dạng và độ khó tăng dần"""
+        current_time = pygame.time.get_ticks()
+        if current_time - self.thoi_gian_cuoi_cung_spawn < self.thoi_gian_cho_doi_spawn:
+            return
 
-thoi_gian_cuoi_cung_spawn = 0  # Lưu thời gian lần cuối spawn cá
-thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Giãn cách spawn cá (1 - 2.5 giây)
-last_time_spawn = 0 #cũng là thời gian spawn nhưng dành cho cá mập
-if player.level <=4:
-    min_spawn_interval=30
-elif player.level<=8:
-    min_spawn_interval=15
-else:
-    min_spawn_interval=10
+        if len(self.enemy_fishes) < self.MAX_ENEMIES:
+            x_position = random.choice([-50, self.SCREEN_WIDTH])
+            y_position = random.randint(50, self.SCREEN_HEIGHT - 50)
 
-def spawn_enemy():
-    """Hàm spawn cá địch theo level người chơi, có sự đa dạng và độ khó tăng dần"""
-    global thoi_gian_cuoi_cung_spawn, thoi_gian_cho_doi_spawn
-    
-    current_time = pygame.time.get_ticks()
-    if current_time - thoi_gian_cuoi_cung_spawn < thoi_gian_cho_doi_spawn:
-        return
+            # Chọn cá phù hợp với level hiện tại
+            available_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= self.player.level <= fish[4]]
 
-    if len(enemy_fishes) < MAX_ENEMIES:
-        x_position = random.choice([-50, SCREEN_WIDTH])
-        y_position = random.randint(50, SCREEN_HEIGHT - 50)
+            # Thỉnh thoảng spawn cá vượt tầm để đe dọa (2% cơ hội)
+            is_strong_fish = random.randint(1, 1000) <= 10
+            if is_strong_fish:
+                strong_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] > self.player.level]
+                if strong_fish:
+                    fish_type = random.choice(strong_fish)
+                else:
+                    fish_type = random.choice(available_fish)
+            else:
+                fish_type = random.choice(available_fish)
 
-        # Chọn cá phù hợp với level hiện tại
-        available_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= player.level <= fish[4]]
+            # Tạo cá địch với thông tin fish_type
+            new_enemy = EnemyFish(x_position, y_position, self.player.level, fish_type)
+            self.enemy_fishes.append(new_enemy)
 
-        # Thỉnh thoảng spawn cá vượt tầm để đe dọa
-        if random.randint(1, 500) <= 10:  # 10% tỉ lệ spawn cá khó
-            strong_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] > player.level]
-            if strong_fish:
-                available_fish.append(random.choice(strong_fish))
+            self.thoi_gian_cuoi_cung_spawn = current_time
+            self.thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)
 
-        if available_fish:
-            fish_type = random.choice(available_fish)
-            new_enemy = EnemyFish(x_position, y_position, fish_type[2])
-            enemy_fishes.append(new_enemy)
+    def spawn_boom(self):
+        """Hàm sinh bom"""
+        if len(self.list_boom) < self.MAX_BOOM:
+            x_position = random.randint(100, self.SCREEN_WIDTH - 100)
+            new_boom = Boom(x_position, -30)
+            self.list_boom.append(new_boom)
 
-        thoi_gian_cuoi_cung_spawn = current_time
-        thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)  # Reset thời gian spawn
-def spawn_boom():
-    if len(list_boom)<MAX_BOOM:
-        x_position = random.randint(100, SCREEN_WIDTH-100)
-        new_boom=Boom(x_position,-30)
-        list_boom.append(new_boom)
-def create_bonus():
-    if len(list_bonus)<MAX_BONUS:
-        x_position = random.randint(100, SCREEN_WIDTH-100)
-        new_bonus=BonusLv(x_position,-30)
-        list_bonus.append(new_bonus)
+    def create_bonus(self):
+        """Hàm sinh bonus"""
+        if len(self.list_bonus) < self.MAX_BONUS:
+            x_position = random.randint(100, self.SCREEN_WIDTH - 100)
+            new_bonus = BonusLv(x_position, -30)
+            self.list_bonus.append(new_bonus)
 
-# Hàm sinh BossFish dựa trên điều kiện cấp độ
-def create_boss(list_boss, player):
-    current_time = time.time()
-    global last_time_spawn
-    # Kiểm tra xem có đủ thời gian tối thiểu đã trôi qua không
-    if current_time - last_time_spawn >= min_spawn_interval:
-        if player.level > 7 and BossFish.should_spawn() and len(list_boss) <= MAX_BOSS:
-            new_boss = BossFish(x=0, y=random.randint(50, SCREEN_HEIGHT - 50))  # Tạo BossFish tại vị trí y ngẫu nhiên
-            list_boss.append(new_boss)
-            last_time_spawn=current_time
+    def create_boss(self):
+        """Hàm sinh BossFish dựa trên điều kiện cấp độ"""
+        current_time = time.time()
+        if current_time - self.last_time_spawn >= self.min_spawn_interval:
+            if self.player.level > 7 and BossFish.should_spawn() and len(self.list_boss) <= self.MAX_BOSS:
+                new_boss = BossFish(x=0, y=random.randint(50, self.SCREEN_HEIGHT - 50))
+                self.list_boss.append(new_boss)
+                self.last_time_spawn = current_time
 
-running = True
-clock = pygame.time.Clock()
-spawn_timer = 0
-last_bubble_time = time.time() # Thời gian để spawn cá mới
-spawn_boom_timer=0
+    def update(self):
+        """Cập nhật trạng thái game"""
+        current_time = time.time()
+        if current_time - self.last_bubble_time >= 7:  # Mỗi 7 giây
+            self.sound_bubble.play()
+            self.last_bubble_time = current_time
 
-running = True
-clock = pygame.time.Clock()
+        # Di chuyển cá chính
+        keys = pygame.key.get_pressed()
+        self.player.move1(keys)
+        self.player.check_collision(self.enemy_fishes, self.scoreBar.data,self.screen)  # Truyền self.screen vào
+        if self.player.score != self.top_menu.previous_score:
+            self.top_menu.update_frenzy(self.player.score)
 
-# vong lap while dieu khien bang phim
-while running:
-    current_time = time.time()
-    if current_time - last_bubble_time >= 7:  # Mỗi 7 giây
-        sound_bubble.play()
-        last_bubble_time = current_time
-    screen.blit(background, (0, 0))  # Vẽ background
-    keys = pygame.key.get_pressed()
-    player.move1(keys)
+        # Sinh cá địch
+        if self.player.eat_count == 0:
+            for _ in range(2):
+                self.spawn_enemy()
+        if pygame.time.get_ticks() - self.spawn_timer > 2000:
+            self.spawn_enemy()
+            self.spawn_timer = pygame.time.get_ticks()
 
-    player.check_collision(enemy_fishes)  # Kiểm tra va chạm với cá địch
-    if player.score != top_menu.previous_score:
-        top_menu.update_frenzy(player.score)
+        # Sinh bonus
+        if random.randint(1, 2000) == 3 and self.player.level >= 7:
+            self.create_bonus()
 
-    player.draw(screen)
-    draw_fish_level(screen, player)
-    # Vẽ topmenu
-    top_menu.draw(player)
-    # Vẽ bảng Score
-    scoreBar.draw(screen,player)
+        # Sinh bom
+        if self.player.level >= 7:
+            if pygame.time.get_ticks() - self.spawn_boom_timer > 20000:
+                self.spawn_boom()
+                self.spawn_boom_timer = pygame.time.get_ticks()
 
-    if player.eat_count == 0:  
-        for _ in range(2):  
-            spawn_enemy()
-    
-    if pygame.time.get_ticks() - spawn_timer > 2000: 
-        spawn_enemy()
-        spawn_timer = pygame.time.get_ticks()  
-    # Hàm vẽ cá và vẽ lv trên đầu cá enemy
-    for enemy in enemy_fishes:
-        enemy.move(player)  
-        enemy.draw(screen)
-        draw_enemy_level(screen, enemy)
-    # Sinh ra Bonus khi random đúng số
-    if random.randint(1,2000)==3 and player.level >=7:
-        create_bonus()
-    for bonus in list_bonus[:]:
-        bonus:BonusLv
-        bonus.draw_bonus(screen)
-        bonus.move_bonus()
-        if bonus.check_collision_main(player):
-            list_bonus.remove(bonus)
+        # Sinh boss
+        self.create_boss()
+    # Cập nhật cá địch
+        for enemy in self.enemy_fishes[:]:
+            enemy.move(self.player)
+        # Cập nhật bonus
+        for bonus in self.list_bonus[:]:
+            bonus.move_bonus()
+            if bonus.check_collision_main(self.player):
+                self.list_bonus.remove(bonus)
+        # Cập nhật boss
+        for boss in self.list_boss[:]:
+            boss.move_boss()
+            if boss.check_collision_mainfish(self.player):
+                self.player.data= self.scoreBar.data
+                self.player.game_over(self.screen)  # Đã được sửa ở câu trả lời trước 
+            boss.check_colistion_enemy(self.enemy_fishes)
+            if boss.remove_boss():
+                self.list_boss.remove(boss)
+        # Cập nhật bom
+        for b in self.list_boom[:]:
+            b.move_boom()
+            b.kick_enemy(self.enemy_fishes)
+            b.kick_boss(self.list_boss)
+            if b.kick_mainfish(self.player):
+                if b.changed_when_mainkick():
+                    print(b.time_create)
+                    print(b.time_cham_Xoa)
+            if b.remove_boom():
+                self.list_boom.remove(b)
 
+    def draw(self):
+        """Vẽ các thành phần game lên màn hình"""
+        self.screen.blit(self.background, (0, 0))
+        self.player.draw(self.screen)
+        self.draw_fish_level(self.player)
+        self.scoreBar.draw(self.screen, self.player)
 
-    # Hàm sinh ra boom ở cấp 7
-    if player.level >=7:
-        if pygame.time.get_ticks() - spawn_boom_timer >20000:
-            spawn_boom()
-            spawn_boom_timer=pygame.time.get_ticks()
+        for enemy in self.enemy_fishes:
+            enemy.draw(self.screen)
+            self.draw_enemy_level(enemy)
 
-    # Hàm sinh ra cá boss
-    # Kiểm tra và tạo BossFish
-    create_boss(list_boss, player)
+        for bonus in self.list_bonus:
+            bonus.draw_bonus(self.screen)
 
-    # Cập nhật và vẽ các BossFish hiện có
-    for boss in list_boss[:]:
-        boss: BossFish
-        boss.draw(screen)
-        boss.move_boss()
+        for boss in self.list_boss:
+            boss.draw(self.screen)
 
-        if boss.remove_boss():
-            list_boss.remove(boss)
+        for b in self.list_boom:
+            b.draw(self.screen)
 
-        # Kiểm tra va chạm giữa BossFish và cá chính
-        if boss.check_collision_mainfish(player):  # Va chạm với cá chính
-            player.game_over()
+        pygame.display.update()
 
-        # Kiểm tra va chạm giữa BossFish và cá enemy
-        boss.check_colistion_enemy(enemy_fishes)
+    def handle_events(self):
+        """Xử lý sự kiện"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_f:
+                    self.top_menu.frenzy = 100
+                    self.top_menu.update_frenzy(self.player.score+10) 
+                    # Vì hàm update sẽ chỉ kích hoạt frenzy khi điểm số có sự thay đổi 
+                    # nên khi dùng để test, cộng thêm 10 điểm sẽ ngay lập tức kích hoạt frenzy
+                elif event.key == pygame.K_SPACE:
+                    self.player.dash()
+                elif event.key == pygame.K_ESCAPE:
+                    self.running = False
+            elif event.type == pygame.QUIT:
+                self.running = False
+            return self.running
+            
+        self.player.end_dash()
+        self.player.start_cooldown()
 
-    # Kiểm tra va chạm bom với cá chính, cá enemy
-    for b in list_boom[:]:
-        b:Boom
-        b.draw(screen) # Vẽ bom
-        b.move_boom()  # Cho bom di chuyển
-        b.kick_enemy(enemy_fishes) # kiểm tra va chạm list boom với list cá enemy
-        b.kick_boss(list_boss)
-        
-        if b.kick_mainfish(player):
-            if b.changed_when_mainkick():
-                player.game_over()
-                print(b.time_create)
-                print(b.time_cham_Xoa)
-        if b.remove_boom():
-            list_boom.remove(b)
+    def run(self):
+        """Chạy vòng lặp chính của game"""
+        while self.running:
+            self.update()
+            self.draw()
+            self.running = self.handle_events()
+            self.clock.tick(self.FPS)
 
-    pygame.display.update()
-    clock.tick(FPS)
+        pygame.quit()
 
-    # Xử lý sự kiện
-    for event in pygame.event.get():
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_f:
-                top_menu.frenzy = 100
-                top_menu.update_frenzy(player.score+10) 
-                # Vì hàm update sẽ chỉ kích hoạt frenzy khi điểm số có sự thay đổi 
-                # nên khi dùng để test, cộng thêm 10 điểm sẽ ngay lập tức kích hoạt frenzy
-            elif event.key == pygame.K_SPACE:
-                player.dash()
-            elif event.key == pygame.K_ESCAPE:
-                running = False
-        elif event.type == pygame.QUIT:
-            running = False
-        
-    player.end_dash()
-    player.start_cooldown()
-
-
-#vong lap while dieu khien bang tay
-
-#khoi tao media
-# mp_hands = mp.solutions.hands
-# hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.7)
-# mp_draw = mp.solutions.drawing_utils
-# cap = cv2.VideoCapture(0)
-# cap.set(cv2.CAP_PROP_FPS, 40)
-# last_x=0;
-# positions = []  # Danh sách lưu vị trí trung bình
-# BUFFER_SIZE = 5
-# while running:
-#     current_time = time.time()
-#     if current_time - last_bubble_time >= 7:
-#         sound_bubble.play()
-#         last_bubble_time = current_time
-
-#     screen.blit(background, (0, 0))
-
-#     detected_tay = False  # Mặc định là không thấy tay
-#     ret, frame = cap.read()
-    
-#     if ret:
-#         frame = cv2.flip(frame, 1)
-#         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#         result = hands.process(rgb_frame)
-        
-#         if result.multi_hand_landmarks:
-#             detected_tay = True
-#             for hand_landmarks in result.multi_hand_landmarks:
-#                 x_pos = hand_landmarks.landmark[8].x  
-#                 y_pos = hand_landmarks.landmark[8].y  
-
-#                 new_x = int(x_pos * SCREEN_WIDTH)
-#                 new_y = int(y_pos * SCREEN_HEIGHT)
-
-#                 # Thêm vị trí vào bộ nhớ đệm
-#                 positions.append((new_x, new_y))
-#                 if len(positions) > BUFFER_SIZE:
-#                     positions.pop(0)  # Giữ lại BUFFER_SIZE phần tử gần nhất
-
-#                 # Lấy trung bình để làm mượt di chuyển
-#                 avg_x = int(sum(p[0] for p in positions) / len(positions))
-#                 avg_y = int(sum(p[1] for p in positions) / len(positions))
-
-#                 # Chỉ đổi hướng khi di chuyển đủ xa
-#                 if abs(avg_x - last_x) > SCREEN_WIDTH * 0.05:  
-#                     if avg_x > player.x:
-#                         player.image = player.image_right
-#                     else:
-#                         player.image = player.image_left
-#                     last_x = avg_x  
-
-#                 player.x, player.y = avg_x, avg_y
-#                 player.rect.topleft = (player.x, player.y)
-
-#                 mp_draw.draw_landmarks(frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
-
-# # chinh lai vi tri cua camera chut xiu
-#         cv2.namedWindow("Hand Tracking", cv2.WINDOW_NORMAL)
-#         cv2.moveWindow("Hand Tracking", 1000, 100)
-#         cv2.imshow("Hand Tracking", frame)
-
-
-
-#         if cv2.waitKey(1) & 0xFF == ord('q'):
-#             running = False
-
-#     # Nếu không thấy tay, dùng phím để điều khiển, chức năng này vẫn ch chạy được, ai thấy fix dùm
-#     if detected_tay:
-#         player.move(0, 0)
-#     else:      
-#         keys = pygame.key.get_pressed()  # Lấy trạng thái phím
-#         player.move1(keys)  # Di chuyển bằng phím
-
-#     # Kiểm tra va chạm
-#     player.check_collision(enemy_fishes)
-#     player.draw(screen)
-#     draw_fish_level(screen, player)
-
-
-#     if player.eat_count == 0:
-#         for _ in range(2):
-#             spawn_enemy()
-
-#     if pygame.time.get_ticks() - spawn_timer > 4000:
-#         spawn_enemy()
-#         spawn_timer = pygame.time.get_ticks()
-
-#     for enemy in enemy_fishes:
-#         enemy.move()
-#         enemy.draw(screen)
-#         draw_enemy_level(screen, enemy)
-
-
-#     pygame.display.update()
-#     clock.tick(FPS)
-
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             running = False
-
-# cap.release()
-# cv2.destroyAllWindows()
-# pygame.quit()
-
+if __name__ == "__main__":
+    game = Game()
+    game.run()
