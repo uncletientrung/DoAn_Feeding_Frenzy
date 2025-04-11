@@ -17,7 +17,7 @@ class FrameBXH(DatabaseManager):
         self.font = pygame.font.Font(None, 36)
         self.row_height = 40
         self.header_height = 50
-        # Thiết kế đẹp hơn với màu sắc
+        # Làm màu cái khung
         self.bg_color = (240, 248, 255)  # AliceBlue background
         self.header_color = (70, 130, 180)  # SteelBlue for headers
         self.text_color = (25, 25, 112)  # MidnightBlue for text
@@ -49,7 +49,7 @@ class FrameBXH(DatabaseManager):
                          (start_x + 600, start_y + self.header_height - 15), 2)
         
         # Vẽ dữ liệu với scroll
-        visible_rows = (SCREEN_HEIGHT - 200) // self.row_height  # Số hàng hiển thị được
+        visible_rows = (SCREEN_HEIGHT - 400) // self.row_height  # Số hàng hiển thị được
         start_idx = self.scroll_y // self.row_height
         end_idx = min(start_idx + visible_rows + 1, len(self.dataset))
 
@@ -69,9 +69,9 @@ class FrameBXH(DatabaseManager):
 
         # Vẽ thanh ScoreBar
         if self.max_scroll > 0:
-            scrollbar_height = (SCREEN_HEIGHT - 200) * (SCREEN_HEIGHT - 200) / (len(self.dataset) * self.row_height)
+            scrollbar_height = (SCREEN_HEIGHT - 500) * (SCREEN_HEIGHT - 200) / (len(self.dataset) * self.row_height)
             scrollbar_y = self.y + 50 + (self.scroll_y * (SCREEN_HEIGHT - 250) / self.max_scroll)
-            scrollbar_rect = pygame.Rect(self.x + SCREEN_WIDTH - 250, scrollbar_y, self.scrollbar_width, scrollbar_height)
+            scrollbar_rect = pygame.Rect(self.x + 800, scrollbar_y+100, self.scrollbar_width, scrollbar_height)
             
             # Hover effect cho scrollbar
             if scrollbar_rect.collidepoint(mouse_pos):
@@ -87,7 +87,7 @@ class FrameBXH(DatabaseManager):
     def handle_event(self, event):
         # Xử lý scroll bằng chuột
         if event.type == pygame.MOUSEWHEEL:
-            self.scroll_y = max(0, min(self.max_scroll, self.scroll_y - event.y * 20))  # Cuộn 20px mỗi lần
+            self.scroll_y = max(0, min(self.max_scroll, self.scroll_y - event.y * 10))  # Cuộn 10px mỗi lần
 
 class ImageButton:
     def __init__(self, x, y, image_path, scale=1):

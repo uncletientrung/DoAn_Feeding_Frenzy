@@ -174,7 +174,7 @@ class Game:
         for boss in self.list_boss[:]:
             boss.move_boss()
             if boss.check_collision_mainfish(self.player):
-                self.scoreBar.data=self.player.data
+                self.player.data= self.scoreBar.data
                 self.player.game_over(self.screen)  # Đã được sửa ở câu trả lời trước 
             boss.check_colistion_enemy(self.enemy_fishes)
             if boss.remove_boss():
