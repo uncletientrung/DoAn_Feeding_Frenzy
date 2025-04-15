@@ -1,3 +1,4 @@
+from turtle import Screen
 import pygame
 import random
 import cv2
@@ -12,6 +13,7 @@ from classes.bonuslv import BonusLv
 from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
 from classes.top_menu import TopMenu
+
 class Game:
     def __init__(self):
         # Thiết lập môi trường Pygame
@@ -39,8 +41,8 @@ class Game:
 
         # Khởi tạo các đối tượng game
         self.player = MainFish(400, 300)
-        self.scoreBar = ScoreBar()
         self.top_menu = TopMenu(self.player, self.screen)
+        self.scoreBar = ScoreBar()
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
         self.list_boom = []
@@ -162,17 +164,14 @@ class Game:
 
         # Sinh boss
         self.create_boss()
-
-        # Cập nhật cá địch
+    # Cập nhật cá địch
         for enemy in self.enemy_fishes[:]:
             enemy.move(self.player)
-
         # Cập nhật bonus
         for bonus in self.list_bonus[:]:
             bonus.move_bonus()
             if bonus.check_collision_main(self.player):
                 self.list_bonus.remove(bonus)
-
         # Cập nhật boss
         for boss in self.list_boss[:]:
             boss.move_boss()
@@ -182,7 +181,6 @@ class Game:
             boss.check_colistion_enemy(self.enemy_fishes)
             if boss.remove_boss():
                 self.list_boss.remove(boss)
-
         # Cập nhật bom
         for b in self.list_boom[:]:
             b.move_boom()
@@ -224,8 +222,9 @@ class Game:
     def handle_events(self):
         """Xử lý sự kiện"""
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
             if event.type == pygame.KEYDOWN:
-                print(f"Key pressed: {event.key}")
                 if event.key == pygame.K_f:
                     self.top_menu.frenzy = 100
                     self.top_menu.update_frenzy(self.player.score+10) 
@@ -237,5 +236,21 @@ class Game:
                     self.running = False
             elif event.type == pygame.QUIT:
                 self.running = False
-        return self.running
+            return self.running
+            
+        self.player.end_dash()
+        self.player.start_cooldown()
 
+    def run(self):
+        """Chạy vòng lặp chính của game"""
+        while self.running:
+            self.update()
+            self.draw()
+            self.running = self.handle_events()
+            self.clock.tick(self.FPS)
+
+        pygame.quit()
+
+if __name__ == "__main__":
+    game = Game()
+    game.run()

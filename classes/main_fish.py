@@ -257,6 +257,15 @@ class MainFish(DatabaseManager):
         pygame.quit()
         sys.exit()
 
+    def get_bombed(self):
+        pygame.mixer.Sound.play(sound_boom)
+        pygame.time.delay(600)
+        pygame.mixer.Sound.play(sound_game_over2)
+        print("💀 Game Over! Bạn đã bị bom nổ chết!")
+        pygame.time.delay(3000)
+        pygame.quit()
+        sys.exit()
+
     def restart_game(self):
         """Reset cá chính về trạng thái ban đầu với vị trí ngẫu nhiên và level mặc định là 9"""
         # Tạo vị trí ngẫu nhiên trong màn hình, đảm bảo không nằm quá gần biên
@@ -299,6 +308,7 @@ class MainFish(DatabaseManager):
                 self.dash_start_time = time.time()  # Ghi thời gian bắt đầu dash
 
     def end_dash(self):
+        if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:  # Dash kéo dài 0.05 giây
             self.speed /= 2  # Khôi phục tốc độ ban đầu
             self.dash_start_time = None  # Xóa trạng thái dash
             self.start_cooldown()  # Bắt đầu cooldown
