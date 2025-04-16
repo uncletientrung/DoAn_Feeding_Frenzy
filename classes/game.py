@@ -15,7 +15,7 @@ from classes.ScoreBar import ScoreBar
 from classes.top_menu import TopMenu
 
 class Game:
-    def __init__(self,image_background):
+    def __init__(self,image_background,list_images_fish):
         # Thiết lập môi trường Pygame
         os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
         pygame.init()
@@ -29,6 +29,7 @@ class Game:
 
         # Load background bằng ảnh gán từ Main ngay hàm selection
         self.background = image_background
+        self.list_images_fish=list_images_fish
 
         # Tạo font chữ
         pygame.font.init()
@@ -39,9 +40,9 @@ class Game:
         self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")  # Giả định có file bubble.wav
 
         # Khởi tạo các đối tượng game
-        self.player = MainFish(400, 300)
-        self.top_menu = TopMenu(self.player, self.screen)
-        self.scoreBar = ScoreBar()
+        self.player = MainFish(400, 300,self.list_images_fish)
+        self.top_menu = TopMenu(self.player, self.screen,self.list_images_fish) # truyền list_image vào nhưng mà chưa hiểu sao phải tạo(Trung)
+        self.scoreBar = ScoreBar(self.list_images_fish)
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
         self.list_boom = []
@@ -185,7 +186,9 @@ class Game:
             b.move_boom()
             b.kick_enemy(self.enemy_fishes)
             b.kick_boss(self.list_boss)
-            if b.kick_mainfish(self.player):
+            if b.kick_mainfish(self.player, self.screen):
+                self.player.data= self.scoreBar.data
+                self.player.game_over(self.screen)
                 if b.changed_when_mainkick():
                     print(b.time_create)
                     print(b.time_cham_Xoa)
@@ -225,14 +228,16 @@ class Game:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_f:
-                    self.top_menu.frenzy = 100
+                    self.top_menu.frenzy += 80
                     self.top_menu.update_frenzy(self.player.score+10) 
                     # Vì hàm update sẽ chỉ kích hoạt frenzy khi điểm số có sự thay đổi 
                     # nên khi dùng để test, cộng thêm 10 điểm sẽ ngay lập tức kích hoạt frenzy
                 elif event.key == pygame.K_SPACE:
                     self.player.dash()
-                elif event.key == pygame.K_ESCAPE:
-                    self.running = False
+                elif event.key == pygame.K_b:
+                    self.spawn_boom()
+                elif event.key == pygame.K_c:
+                    self.create_boss()
             elif event.type == pygame.QUIT:
                 self.running = False
             return self.running
@@ -247,7 +252,6 @@ class Game:
             self.draw()
             self.running = self.handle_events()
             self.clock.tick(self.FPS)
-
         pygame.quit()
 
 if __name__ == "__main__":

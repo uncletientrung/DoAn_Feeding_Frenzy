@@ -17,10 +17,10 @@ class DatabaseManager:
         resutl=self.cursor.fetchall()
         return resutl
     def Insert(self,data):
-        sql="Insert into lichsudau(name, level,score,time) Values (%s, %s, %s, %s)"
+        sql="Insert into lichsudau(name, level, score, time) Values (%s, %s, %s, %s)"
         self.cursor.execute(sql,data)
         self.connection.commit()
-        print("Thên vào đc")
+        print("Thêm vào đc")
     def SelectTopScore(self):
         sql="Select MAX(score) From lichsudau"
         self.cursor.execute(sql)

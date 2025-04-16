@@ -12,6 +12,7 @@ PLAYER_SPEED = 5
 
 IMAGE_PATH = "assets/images/"
 SOUND_PATH = "assets/sounds/"
+IMAGE_BUTTON="assets/buttons"
 sound_game_over = pygame.mixer.Sound(SOUND_PATH + "gameover.wav")
 sound_game_over2 = pygame.mixer.Sound(SOUND_PATH + "GameOver2.wav")
 sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
@@ -33,7 +34,7 @@ ENEMY_FISH_TYPES = [
     ("sharkleft1.png", "shark1.png", 0, 1, 99, 5)
 ]
 
-def update_fish(choice_fish):
+def update_images_fish(choice_fish):
     if choice_fish == 1:
         images_fish = {
             "left_down": pygame.image.load(IMAGE_PATH + "fish1_left_down.png"),
@@ -43,7 +44,8 @@ def update_fish(choice_fish):
             "left": pygame.image.load(IMAGE_PATH + "fish1_left.png"),
             "up": pygame.image.load(IMAGE_PATH + "fish1_up.png"),
             "right_down": pygame.image.load(IMAGE_PATH + "fish1_right_down.png"),
-            "right_up": pygame.image.load(IMAGE_PATH + "fish1_right_up.png")
+            "right_up": pygame.image.load(IMAGE_PATH + "fish1_right_up.png"),
+            "fish_number":1
         }
     elif choice_fish == 2:
         images_fish = {
@@ -54,7 +56,8 @@ def update_fish(choice_fish):
             "left": pygame.image.load(IMAGE_PATH + "fish2_left.png"),
             "up": pygame.image.load(IMAGE_PATH + "fish2_up.png"),
             "right_down": pygame.image.load(IMAGE_PATH + "fish2_right_down.png"),
-            "right_up": pygame.image.load(IMAGE_PATH + "fish2_right_up.png")
+            "right_up": pygame.image.load(IMAGE_PATH + "fish2_right_up.png"),
+            "fish_number":2
         }
     elif choice_fish == 3:
         images_fish = {
@@ -65,8 +68,10 @@ def update_fish(choice_fish):
             "left": pygame.image.load(IMAGE_PATH + "fish3_left.png"),
             "up": pygame.image.load(IMAGE_PATH + "fish3_up.png"),
             "right_down": pygame.image.load(IMAGE_PATH + "fish3_right_down.png"),
-            "right_up": pygame.image.load(IMAGE_PATH + "fish3_right_up.png")
+            "right_up": pygame.image.load(IMAGE_PATH + "fish3_right_up.png"),
+            "fish_number":3
         }
+    return images_fish
 
 def update_background(choice_background):
     try:

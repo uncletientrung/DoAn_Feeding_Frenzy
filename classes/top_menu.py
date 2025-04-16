@@ -4,7 +4,7 @@ from settings import *
 from classes.ScoreBar import ScoreBar  # Import lớp ScoreBar
 from classes.main_fish import MainFish
 class TopMenu:
-    def __init__(self, player: MainFish, screen, pos=(0, 0), width=10000, height=1000):
+    def __init__(self, player: MainFish, screen, list_images_fish,pos=(0, 0), width=10000, height=1000):
         self.screen = screen
         self.main_fish: MainFish = player
         self.x, self.y = pos
@@ -20,7 +20,7 @@ class TopMenu:
         self.flash_state = False
         self.flash_timer = 0
         self.frenzy_completed = False
-        self.score_bar = ScoreBar()
+        self.score_bar = ScoreBar(list_images_fish) # truyền list_image_fish để không bị lỗi
 
         # Thiết lập màu sắc và font chữ
         self.WHITE = (255, 255, 255)
@@ -29,6 +29,9 @@ class TopMenu:
         self.RED = (200, 0, 0)
         self.BLUE = (0, 120, 255)
         self.font = pygame.font.SysFont("Arial", 24)
+
+
+
 
     def draw(self, player):
         """Vẽ top menu và tất cả các thành phần của nó."""
@@ -75,10 +78,9 @@ class TopMenu:
                 self.frenzy = 100
                 self.main_fish.is_frenzy = True  # Kích hoạt trạng thái MAX
                 self.flash_timer = 5  # Bộ đếm nhấp nháy (tùy chỉnh tần suất)
-                self.main_fish.speed *= 2
-        else:
-            # Giảm giá trị FRENZY nếu đã MAX
+        else:   # Giảm giá trị FRENZY nếu đã MAX
             self.flash_timer -= 1
+            self.main_fish.speed = PLAYER_SPEED * 1.5
             if self.flash_timer <= 0:  # Điều khiển nhấp nháy
                 self.flash_state = not self.flash_state  # Đổi trạng thái nhấp nháy
                 self.flash_timer = 5  # Reset bộ đếm nhấp nháy
@@ -94,4 +96,3 @@ class TopMenu:
                 self.previous_score = self.score_bar.score
                 self.frenzy_completed = False
                 self.main_fish.speed = PLAYER_SPEED
-    

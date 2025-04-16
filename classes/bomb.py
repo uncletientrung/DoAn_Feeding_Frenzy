@@ -7,7 +7,7 @@ from classes.boss_fish import *
 
 
 class Boom:
-    def __init__(self,x,y):
+    def __init__(self, x, y):
         self.x=x
         self.y=y
         self.image=pygame.image.load(IMAGE_PATH+"boom.png")
@@ -18,8 +18,6 @@ class Boom:
         self.time_create=0         # Thời gian để xóa bom
         self.time_cham_Xoa=0
         self.time=0
-
-    
     def move_boom(self):
         if self.y <570:
             self.y+=self.speed
@@ -46,7 +44,7 @@ class Boom:
                 self.change_when_kick()
                 self.exploded = True
                 self.time = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới xóa boom
-    def kick_mainfish(self,player):  # hàm kiểm tra va chạm với cá main
+    def kick_mainfish(self,player, screen):  # hàm kiểm tra va chạm với cá main
         player:MainFish
         boom_mask=pygame.mask.from_surface(self.image)
         player_mask=pygame.mask.from_surface(player.image)
@@ -54,7 +52,7 @@ class Boom:
         if boom_mask.overlap(player_mask,player_offset):
             sound_boom.play()
             if not self.exploded:
-                self.change_when_kick() 
+                self.change_when_kick()
                 self.exploded = True
                 self.time_cham_Xoa = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới thua game
             return True

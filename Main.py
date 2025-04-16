@@ -82,10 +82,11 @@ class Main:
                     # Khi nhấn Confirm
                     selections = self.selection_screen.get_selections()
                     self.choice_background = selections["map"] # Chọn map từ select
-                    choice_fish = selections["character"]   # Chọn fish từ select
-                       # Sau khi chọn map xong update lun để lấy ảnh gán cho Game
+                    self.choice_fish = selections["character"]   # Chọn fish từ select
+                    # Sau khi chọn map và nhân vật xong xong update lun để lấy ảnh gán cho Game
                     self.image_background=update_background(self.choice_background) 
-                    self.game = Game(self.image_background)
+                    self.list_images_fish=update_images_fish(self.choice_fish)
+                    self.game = Game(self.image_background,self.list_images_fish)
                     return GameState.GAME
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return GameState.MENU
@@ -95,7 +96,7 @@ class Main:
     def run_game(self):
         # Chạy game
         if self.game is None:
-            self.game = Game(self.image_background)
+            self.game = Game(self.image_background,self.list_images_fish)
             print("main2 "+str(self.choice_background))
         self.game.update()
         self.game.draw()
