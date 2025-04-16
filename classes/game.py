@@ -186,7 +186,9 @@ class Game:
             b.move_boom()
             b.kick_enemy(self.enemy_fishes)
             b.kick_boss(self.list_boss)
-            if b.kick_mainfish(self.player):
+            if b.kick_mainfish(self.player, self.screen):
+                self.player.data= self.scoreBar.data
+                self.player.game_over(self.screen)
                 if b.changed_when_mainkick():
                     print(b.time_create)
                     print(b.time_cham_Xoa)
@@ -226,14 +228,16 @@ class Game:
                 self.running = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_f:
-                    self.top_menu.frenzy = 100
+                    self.top_menu.frenzy += 80
                     self.top_menu.update_frenzy(self.player.score+10) 
                     # Vì hàm update sẽ chỉ kích hoạt frenzy khi điểm số có sự thay đổi 
                     # nên khi dùng để test, cộng thêm 10 điểm sẽ ngay lập tức kích hoạt frenzy
                 elif event.key == pygame.K_SPACE:
                     self.player.dash()
-                elif event.key == pygame.K_ESCAPE:
-                    self.running = False
+                elif event.key == pygame.K_b:
+                    self.spawn_boom()
+                elif event.key == pygame.K_c:
+                    self.create_boss()
             elif event.type == pygame.QUIT:
                 self.running = False
             return self.running
@@ -248,7 +252,6 @@ class Game:
             self.draw()
             self.running = self.handle_events()
             self.clock.tick(self.FPS)
-
         pygame.quit()
 
 if __name__ == "__main__":

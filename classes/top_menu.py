@@ -75,10 +75,9 @@ class TopMenu:
                 self.frenzy = 100
                 self.main_fish.is_frenzy = True  # Kích hoạt trạng thái MAX
                 self.flash_timer = 5  # Bộ đếm nhấp nháy (tùy chỉnh tần suất)
-                self.main_fish.speed *= 2
-        else:
-            # Giảm giá trị FRENZY nếu đã MAX
+        else:   # Giảm giá trị FRENZY nếu đã MAX
             self.flash_timer -= 1
+            self.main_fish.speed = PLAYER_SPEED * 1.5
             if self.flash_timer <= 0:  # Điều khiển nhấp nháy
                 self.flash_state = not self.flash_state  # Đổi trạng thái nhấp nháy
                 self.flash_timer = 5  # Reset bộ đếm nhấp nháy
@@ -94,4 +93,3 @@ class TopMenu:
                 self.previous_score = self.score_bar.score
                 self.frenzy_completed = False
                 self.main_fish.speed = PLAYER_SPEED
-    

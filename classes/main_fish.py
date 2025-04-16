@@ -269,9 +269,9 @@ class MainFish(DatabaseManager):
     def restart_game(self):
         """Reset cá chính về trạng thái ban đầu với vị trí ngẫu nhiên và level mặc định là 9"""
         # Tạo vị trí ngẫu nhiên trong màn hình, đảm bảo không nằm quá gần biên
-        self.x = random.randint(50, SCREEN_WIDTH - 50 - self.width)  # Tránh biên màn hình
-        self.y = random.randint(50, SCREEN_HEIGHT - 50 - self.height)  # Tránh biên màn hình
-        
+        self.x = max(50, min(random.randint(50, SCREEN_WIDTH - 50 - self.width), SCREEN_WIDTH - 50 - self.width))
+        self.y = max(50, min(random.randint(50, SCREEN_HEIGHT - 50 - self.height), SCREEN_HEIGHT - 50 - self.height))
+
         # Reset level về 9 (theo yêu cầu)
         self.level = 9
         self.size = 1  # Reset kích thước về mức ban đầu
