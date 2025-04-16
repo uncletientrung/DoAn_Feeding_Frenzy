@@ -1,6 +1,7 @@
 import pygame
 import os
 from settings import *
+from classes import mainmenu
 
 class SelectionScreen:
     def __init__(self, screen):
@@ -58,17 +59,9 @@ class SelectionScreen:
         )
         self.confirm_button_text = self.button_font.render("Confirm", True, self.text_color)  # Văn bản trên nút
 
-        # Load icon trang trí ở góc trên trái
-        try:
-            self.icon_topleft = pygame.transform.scale(
-                pygame.image.load(os.path.join(IMAGE_BUTTON, "Back.png")), (40, 40)
-            )
-        except FileNotFoundError:
-            print("Không tìm thấy file icon trang trí!")
-            self.icon_topleft = pygame.Surface((80, 80))  # Tạo bề mặt trống nếu lỗi
+        self.image_home=mainmenu.ImageButton(0,0,"assets/buttons/Exit.png")
 
-    def load_images(self, filenames, width, height, scale_factor=1):
-        # Hàm tải và xử lý các hình ảnh cho ô lựa chọn
+    def load_images(self, filenames, width, height, scale_factor=1):# Hàm tải và xử lý các hình ảnh cho ô lựa chọn
         images = []
         for filename in filenames:
             path = os.path.join(IMAGE_PATH, filename)  # Đường dẫn tới file hình ảnh
@@ -173,7 +166,7 @@ class SelectionScreen:
         self.screen.blit(self.confirm_button_text, text_rect)
 
         # Vẽ icon trang trí ở góc trên trái
-        self.screen.blit(self.icon_topleft, (0, 0))
+        self.image_home.draw(self.screen)
 
         # Trả về các hình chữ nhật để xử lý click
         return map_rects, control_rects, char_rects

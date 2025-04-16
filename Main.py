@@ -9,7 +9,7 @@ from settings import *
 # Khởi tạo Pygame
 pygame.init()
 pygame.mixer.init()
-
+FPS=60
 class GameState:
     MENU = "menu"
     SELECTION = "selection"  # Thêm trạng thái mới cho giao diện chọn
@@ -39,18 +39,14 @@ class Main:
                     return GameState.EXIT
                 if self.menu.bottom_right_btn.draw(self.screen):
                     self.menu.sound_on = not self.menu.sound_on
-                    new_image_path = "assets/button2/Sound-One.png" if self.menu.sound_on else "assets/button2/Sound-None.png"
+                    new_image_path = "assets/buttons/Sound-Two.png" if self.menu.sound_on else "assets/buttons/Sound-None.png"
                     self.menu.bottom_right_btn = ImageButton(
-                        SCREEN_WIDTH - 100 + 24, SCREEN_HEIGHT - 100 - 5, new_image_path,
-                        scale=76 / 117
-                    )
+                        SCREEN_WIDTH-100 +24, SCREEN_HEIGHT-100 + 50, new_image_path)
                 if self.menu.bottom_right2_btn.draw(self.screen):
                     self.menu.music_on = not self.menu.music_on
-                    new_image_path = "assets/button2/Music-On.png" if self.menu.music_on else "assets/button2/Music-Off.png"
+                    new_image_path = "assets/buttons/Music-On.png" if self.menu.music_on else "assets/buttons/Music-Off.png"
                     self.menu.bottom_right2_btn = ImageButton(
-                        SCREEN_WIDTH - 100 - 53 + 24, SCREEN_HEIGHT - 100 - 5, new_image_path,
-                        scale=76 / 117
-                    )
+                        SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, new_image_path)
                 if self.menu.bottom_left_btn.draw(self.screen):
                     self.menu.is_info_mode = True
                 if self.menu.btnRanking.draw(self.screen):

@@ -11,6 +11,7 @@ FPS = 120
 PLAYER_SPEED = 5
 
 IMAGE_PATH = "assets/images/"
+IMAGE_PATH2="assets/images2/"
 SOUND_PATH = "assets/sounds/"
 IMAGE_BUTTON="assets/buttons"
 sound_game_over = pygame.mixer.Sound(SOUND_PATH + "gameover.wav")
@@ -19,7 +20,7 @@ sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
 sound_level_up = pygame.mixer.Sound(SOUND_PATH + "levelUp.wav")
 sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")
 sound_boom = pygame.mixer.Sound(SOUND_PATH + "soundboom.wav")
-
+    # (ảnh nhỏ, ảnh to, size, min_level_required, max_level_appear, điểm)
 ENEMY_FISH_TYPES = [
     ("Fishright10.png", "Fishleft10.png", 1, 0, 10, 5),
     ("Fishright2.png", "Fishleft2.png", 2, 0, 11, 10),
@@ -33,6 +34,26 @@ ENEMY_FISH_TYPES = [
     ("Fishright9.png", "Fishleft9.png", 21, 18, 99, 150),
     ("sharkleft1.png", "shark1.png", 0, 1, 99, 5)
 ]
+ENEMY_FISH_TYPES_2 = [
+    # (ảnh phải, ảnh trái, size, min_level_required, max_level_appear, điểm)
+
+    ("Fishright0.png",  "Fishleft0.png",  1, 1, 9, 5),
+    ("Fishright1.png",  "Fishleft1.png",  1, 1, 9, 5),
+    ("Fishright2.png",  "Fishleft2.png",  3, 1, 12, 15),
+    ("Fishright3.png",  "Fishleft3.png",  4, 1, 12, 20),
+    ("Fishright4.png",  "Fishleft4.png",  5, 1, 14, 25),
+    ("Fishright5.png",  "Fishleft5.png",  7, 3, 17, 35),
+    ("Fishright6.png",  "Fishleft6.png",  7, 5, 17, 35),
+    ("Fishright7.png",  "Fishleft7.png",  8, 5, 99, 40),
+    ("Fishright8.png",  "Fishleft8.png",  9, 7, 99, 45),
+    ("Fishright9.png",  "Fishleft9.png", 9,7,99, 45),
+    ("Fishright10.png", "Fishleft10.png",11,8,99, 55),
+    ("Fishright11.png", "Fishleft11.png",13,10,99, 65),
+    ("Fishright12.png", "Fishleft12.png",13,10,99, 65),
+    ("Fishright13.png", "Fishleft13.png",15,13,99, 75),
+    ("Fishright14.png", "Fishleft14.png",15,15,99, 75),
+]
+
 
 def update_images_fish(choice_fish):
     if choice_fish == 1:
