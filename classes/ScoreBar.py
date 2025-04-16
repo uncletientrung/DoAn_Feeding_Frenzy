@@ -9,15 +9,18 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)  # Màu đỏ đậm, không trong suốt
 
 class ScoreBar:
-    def __init__(self):
+    def __init__(self,list_images_fish):
         self.score = 0
         self.level = 1
-        self.image = pygame.image.load(IMAGE_PATH + "fish_right.png")
-        self.image = pygame.transform.scale(self.image, (50, 50))
+
         self.font = pygame.font.SysFont("Arial", 24, bold=True)  # Thêm chữ đậm cho rõ
         self.border_width = 2  # Độ dày viền
         self.start_time = time.time()  # Lưu thời gian bắt đầu (giây)
         self.data=["",0,0,""] # khởi tạo để thêm dữ liệu vào database
+
+        # Kiểm tra cá số mấy để làm hình avatar
+        self.image = list_images_fish["right"]
+        self.image = pygame.transform.scale(self.image, (50, 50))
 
     def draw(self, screen, player):
         self.level = player.level

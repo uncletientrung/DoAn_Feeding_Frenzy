@@ -8,27 +8,23 @@ import time
 import random
 
 class MainFish(DatabaseManager):
-    def __init__(self, x, y):
+    def __init__(self, x, y,list_images_fish):
         super().__init__()
         # Tạo từ điển chứa các hình ảnh của cá theo 8 hướng
         base_size = SCREEN_WIDTH // 25
-        self.images = {
-            "left_down": pygame.image.load(IMAGE_PATH + "fish_left_down.png"),
-            "left_up": pygame.image.load(IMAGE_PATH + "fish_left_up.png"),
-            "right": pygame.image.load(IMAGE_PATH + "fish_right.png"),
-            "down": pygame.image.load(IMAGE_PATH + "fish_down.png"),
-            "left": pygame.image.load(IMAGE_PATH + "fish_left.png"),
-            "up": pygame.image.load(IMAGE_PATH + "fish_up.png"),
-            "right_down": pygame.image.load(IMAGE_PATH + "fish_right_down.png"),
-            "right_up": pygame.image.load(IMAGE_PATH + "fish_right_up.png")
-        }
+
+        # lấy danh sách các cá bên settings
+        self.images = list_images_fish
+        # kiểm tra list cá vừa lấy là list cá số mấy
+        self.fish_number=self.images["fish_number"]
 
         # Các thuộc tính ban đầu
         base_size = SCREEN_WIDTH // 25  # Tính toán kích thước cơ bản cho cá
 
         # Resize tất cả 8 hướng trong từ điển self.images
         for direction in self.images:
-            self.images[direction] = pygame.transform.scale(self.images[direction], (base_size, base_size))
+            if direction != "fish_number":
+                self.images[direction] = pygame.transform.scale(self.images[direction], (base_size, base_size))
         self.image = self.images["right"]  # Hình ảnh ban đầu (phải)
         self.x, self.y = x, y
         self.width, self.height = self.image.get_size()
@@ -59,7 +55,6 @@ class MainFish(DatabaseManager):
                     self.score += enemy.score_enemy
                     enemies.remove(enemy)
                 elif self.level < enemy.size:
-                    print(f" Bạn va chạm với cá lớn hơn! Player Level: {self.level} - Enemy Level: {enemy.size}")
                     self.data = dataScore  # gán điểm cuối khi va chạm
                     if screen:  # Nếu screen được truyền vào
                         self.game_over(screen)  
@@ -84,9 +79,11 @@ class MainFish(DatabaseManager):
 
         # Resize tất cả hình ảnh theo kích thước mới
         for direction in self.images:
-            self.images[direction] = pygame.transform.scale(
-                pygame.image.load(IMAGE_PATH + f"fish_{direction}.png"), (new_size, new_size)
-            )
+            if direction != "fish_number":
+                self.images[direction] = pygame.transform.scale(
+                    pygame.image.load(IMAGE_PATH + f"fish{self.fish_number}_{direction}.png"), (new_size, new_size)
+                )
+                print(f"fish{self.fish_number}_{direction}.png")
 
         self.width, self.height = new_size, new_size
 

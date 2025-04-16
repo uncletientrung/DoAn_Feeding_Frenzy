@@ -15,7 +15,7 @@ from classes.ScoreBar import ScoreBar
 from classes.top_menu import TopMenu
 
 class Game:
-    def __init__(self):
+    def __init__(self,image_background,list_images_fish):
         # Thiết lập môi trường Pygame
         os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
         pygame.init()
@@ -27,9 +27,9 @@ class Game:
         pygame.display.set_caption("Feeding Frenzy")
         self.clock = pygame.time.Clock()
 
-        # Load background
-        self.background = pygame.image.load(IMAGE_PATH + "bg11.jpg")
-        self.background = pygame.transform.scale(self.background, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        # Load background bằng ảnh gán từ Main ngay hàm selection
+        self.background = image_background
+        self.list_images_fish=list_images_fish
 
         # Tạo font chữ
         pygame.font.init()
@@ -40,9 +40,9 @@ class Game:
         self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")  # Giả định có file bubble.wav
 
         # Khởi tạo các đối tượng game
-        self.player = MainFish(400, 300)
-        self.top_menu = TopMenu(self.player, self.screen)
-        self.scoreBar = ScoreBar()
+        self.player = MainFish(400, 300,self.list_images_fish)
+        self.top_menu = TopMenu(self.player, self.screen,self.list_images_fish) # truyền list_image vào nhưng mà chưa hiểu sao phải tạo(Trung)
+        self.scoreBar = ScoreBar(self.list_images_fish)
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
         self.list_boom = []

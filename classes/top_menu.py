@@ -4,7 +4,7 @@ from settings import *
 from classes.ScoreBar import ScoreBar  # Import lớp ScoreBar
 from classes.main_fish import MainFish
 class TopMenu:
-    def __init__(self, player: MainFish, screen, pos=(0, 0), width=10000, height=1000):
+    def __init__(self, player: MainFish, screen, list_images_fish,pos=(0, 0), width=10000, height=1000):
         self.screen = screen
         self.main_fish: MainFish = player
         self.x, self.y = pos
@@ -12,7 +12,7 @@ class TopMenu:
         self.height = height
         
         # Các thông số game
-        self.previous_score = -1
+        self.previous_score = -1    
         self.bonus = 0
         self.level = 1
         self.exp = 0      # Kinh nghiệm từ 0 đến 100
@@ -20,7 +20,7 @@ class TopMenu:
         self.flash_state = False
         self.flash_timer = 0
         self.frenzy_completed = False
-        self.score_bar = ScoreBar()
+        self.score_bar = ScoreBar(list_images_fish) # truyền list_image_fish để không bị lỗi
 
         # Thiết lập màu sắc và font chữ
         self.WHITE = (255, 255, 255)
@@ -29,6 +29,9 @@ class TopMenu:
         self.RED = (200, 0, 0)
         self.BLUE = (0, 120, 255)
         self.font = pygame.font.SysFont("Arial", 24)
+
+
+
 
     def draw(self, player):
         """Vẽ top menu và tất cả các thành phần của nó."""

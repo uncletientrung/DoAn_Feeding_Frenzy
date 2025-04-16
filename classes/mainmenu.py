@@ -258,9 +258,6 @@ class MainMenu:
             self.top_score = new_score
             self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, (255, 215, 0))
 
-                                
-
-
     def update(self):
         if hasattr(self, 'cap') and self.cap.isOpened():
             self.success, self.video_frame = self.cap.read()
