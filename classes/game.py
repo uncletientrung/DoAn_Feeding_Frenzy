@@ -15,7 +15,7 @@ from classes.ScoreBar import ScoreBar
 from classes.top_menu import TopMenu
 
 class Game:
-    def __init__(self):
+    def __init__(self,image_background):
         # Thiết lập môi trường Pygame
         os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
         pygame.init()
@@ -27,9 +27,8 @@ class Game:
         pygame.display.set_caption("Feeding Frenzy")
         self.clock = pygame.time.Clock()
 
-        # Load background
-        self.background = pygame.image.load(IMAGE_PATH + "bg11.jpg")
-        self.background = pygame.transform.scale(self.background, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+        # Load background bằng ảnh gán từ Main ngay hàm selection
+        self.background = image_background
 
         # Tạo font chữ
         pygame.font.init()

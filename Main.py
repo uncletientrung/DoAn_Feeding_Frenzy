@@ -1,17 +1,18 @@
+
 import pygame
 import sys
 from classes.game import Game
-from classes.mainmenu import MainMenu,ImageButton  # Import class MainMenu từ file MainMenu.py
+from classes.mainmenu import MainMenu, ImageButton
+from classes.selectionScreen import SelectionScreen
 from settings import *
 
-# Khởi tạo Pygame một lần duy nhất
+# Khởi tạo Pygame
 pygame.init()
 pygame.mixer.init()
 
-FPS = 60
-
 class GameState:
     MENU = "menu"
+    SELECTION = "selection"  # Thêm trạng thái mới cho giao diện chọn
     GAME = "game"
     EXIT = "exit"
 
@@ -23,9 +24,11 @@ class Main:
         self.running = True
         self.state = GameState.MENU
         self.menu = MainMenu()
+        self.selection_screen = None
         self.game = None
 
-    def run_menu(self): #Chạy menu và up
+    def run_menu(self):
+        # Chạy menu chính
         self.menu.update()
         self.menu.draw(self.screen)
         for event in pygame.event.get():
@@ -36,34 +39,64 @@ class Main:
                     return GameState.EXIT
                 if self.menu.bottom_right_btn.draw(self.screen):
                     self.menu.sound_on = not self.menu.sound_on
-                    new_image_path = "assets/buttons/Sound-Two.png" if self.menu.sound_on else "assets/buttons/Sound-None.png"
-                    self.menu.bottom_right_btn = ImageButton(SCREEN_WIDTH-100 +24, SCREEN_HEIGHT-100 + 50, new_image_path)
+                    new_image_path = "assets/button2/Sound-One.png" if self.menu.sound_on else "assets/button2/Sound-None.png"
+                    self.menu.bottom_right_btn = ImageButton(
+                        SCREEN_WIDTH - 100 + 24, SCREEN_HEIGHT - 100 - 5, new_image_path,
+                        scale=76 / 117
+                    )
                 if self.menu.bottom_right2_btn.draw(self.screen):
                     self.menu.music_on = not self.menu.music_on
-                    new_image_path = "assets/buttons/Music-On.png" if self.menu.music_on else "assets/buttons/Music-Off.png"
-                    self.menu.bottom_right2_btn = ImageButton(SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, new_image_path)
+                    new_image_path = "assets/button2/Music-On.png" if self.menu.music_on else "assets/button2/Music-Off.png"
+                    self.menu.bottom_right2_btn = ImageButton(
+                        SCREEN_WIDTH - 100 - 53 + 24, SCREEN_HEIGHT - 100 - 5, new_image_path,
+                        scale=76 / 117
+                    )
                 if self.menu.bottom_left_btn.draw(self.screen):
                     self.menu.is_info_mode = True
                 if self.menu.btnRanking.draw(self.screen):
-                    self.menu.is_info_mode=True
-                    self.menu.is_ranking_mode=True
+                    self.menu.is_info_mode = True
+                    self.menu.is_ranking_mode = True
                 if self.menu.play_btn.draw(self.screen):
                     if hasattr(self.menu, 'cap') and self.menu.cap.isOpened():
                         self.menu.cap.release()
-                    return GameState.GAME
+                    self.selection_screen = SelectionScreen(self.screen)
+                    return GameState.SELECTION  # Chuyển sang giao diện chọn
             elif self.menu.is_info_mode and not self.menu.is_ranking_mode:
                 if self.menu.back_btn.draw(self.screen):
                     self.menu.is_info_mode = False
-            elif self.menu.is_info_mode and self.menu.is_ranking_mode: # ấn vào btnRanking thì sẽ chuyển 2 cái mode=True
-                if self.menu.back_btn.draw(self.screen): # nếu ấn Back sẽ trả về False
-                    self.menu.is_info_mode = False 
-                    self.menu.is_ranking_mode=False
+            elif self.menu.is_info_mode and self.menu.is_ranking_mode:
+                self.menu.frameRank.handle_event(event)  # Xử lý scroll bảng xếp hạng
+                if self.menu.back_btn.draw(self.screen):
+                    self.menu.is_info_mode = False
+                    self.menu.is_ranking_mode = False
         return GameState.MENU
 
+    def run_selection(self):
+        # Chạy giao diện chọn map, điều khiển, nhân vật
+        map_rects, control_rects, char_rects = self.selection_screen.draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return GameState.EXIT
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.selection_screen.handle_click(event.pos, map_rects, control_rects, char_rects):
+                    # Khi nhấn Confirm
+                    selections = self.selection_screen.get_selections()
+                    self.choice_background = selections["map"] # Chọn map từ select
+                    choice_fish = selections["character"]   # Chọn fish từ select
+                       # Sau khi chọn map xong update lun để lấy ảnh gán cho Game
+                    self.image_background=update_background(self.choice_background) 
+                    self.game = Game(self.image_background)
+                    return GameState.GAME
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return GameState.MENU
+        
+        return GameState.SELECTION
+
     def run_game(self):
-        """Chạy Game và trả về trạng thái tiếp theo"""
+        # Chạy game
         if self.game is None:
-            self.game = Game()
+            self.game = Game(self.image_background)
+            print("main2 "+str(self.choice_background))
         self.game.update()
         self.game.draw()
         self.game.handle_events()
@@ -79,19 +112,18 @@ class Main:
         while self.running:
             if self.state == GameState.MENU:
                 next_state = self.run_menu()
-                if next_state == GameState.GAME:
-                    self.state = GameState.GAME
-                elif next_state == GameState.EXIT:
-                    self.running = False
+            elif self.state == GameState.SELECTION:
+                next_state = self.run_selection()
             elif self.state == GameState.GAME:
                 next_state = self.run_game()
-                if next_state == GameState.MENU:
-                    self.state = GameState.MENU
-                    self.menu.update_top_score(self.game.player.eat_count)
-                    self.game = None
-                elif next_state == GameState.EXIT:
-                    self.running = False
+            else:
+                next_state = GameState.EXIT
 
+            if next_state == GameState.EXIT:
+                self.running = False
+            else:
+                self.state = next_state
+        
             pygame.display.flip()
             self.clock.tick(FPS)
 

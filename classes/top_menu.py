@@ -12,7 +12,7 @@ class TopMenu:
         self.height = height
         
         # Các thông số game
-        self.previous_score = -1
+        self.previous_score = -1    
         self.bonus = 0
         self.level = 1
         self.exp = 0      # Kinh nghiệm từ 0 đến 100
