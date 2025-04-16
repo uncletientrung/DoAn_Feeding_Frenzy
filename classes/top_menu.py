@@ -72,8 +72,9 @@ class TopMenu:
             if new_score != self.previous_score:  # Phát hiện sự thay đổi
                 self.frenzy += min(new_score - self.previous_score, 10)  # Giới hạn tăng tối đa là 10
                 self.previous_score = new_score  # Cập nhật giá trị trước đó
-
             # Kiểm tra nếu đạt MAX
+            while self.frenzy > 0:  # Chỉ giảm khi frenzy lớn hơn 0
+                self.frenzy -= 0.1  # Tốc độ giảm có thể tùy chỉnh (0.5 là ví dụ)
             if self.frenzy >= 100:  # MAX giá trị
                 self.frenzy = 100
                 self.main_fish.is_frenzy = True  # Kích hoạt trạng thái MAX
@@ -85,7 +86,7 @@ class TopMenu:
                 self.flash_state = not self.flash_state  # Đổi trạng thái nhấp nháy
                 self.flash_timer = 5  # Reset bộ đếm nhấp nháy
 
-            self.frenzy -= 1  # Giảm dần giá trị frenzy
+            self.frenzy -= 0.5  # Giảm dần giá trị frenzy
             if self.frenzy <= 0:
                 self.frenzy = -10
                 self.main_fish.is_frenzy = False  # Reset trạng thái MAX

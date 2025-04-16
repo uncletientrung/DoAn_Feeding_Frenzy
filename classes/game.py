@@ -143,7 +143,6 @@ class Game:
         self.player.check_collision(self.enemy_fishes, self.scoreBar.data,self.screen)  # Truyền self.screen vào
         if self.player.score != self.top_menu.previous_score:
             self.top_menu.update_frenzy(self.player.score)
-
         # Sinh cá địch
         if self.player.eat_count == 0:
             for _ in range(2):
