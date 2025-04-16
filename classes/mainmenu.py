@@ -190,8 +190,6 @@ class MainMenu:
         self.top_score = self.frameRank.topScore
         self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, YELLOW_COLOR)
 
-                                
-
 
     def update(self):
         if hasattr(self, 'cap') and self.cap.isOpened():

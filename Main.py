@@ -5,6 +5,7 @@ from classes.game import Game
 from classes.mainmenu import MainMenu, ImageButton
 from classes.selectionScreen import SelectionScreen
 from settings import *
+import cv2
 
 # Khởi tạo Pygame
 pygame.init()
@@ -79,12 +80,24 @@ class Main:
                     selections = self.selection_screen.get_selections()
                     self.choice_background = selections["map"] # Chọn map từ select
                     self.choice_fish = selections["character"]   # Chọn fish từ select
+                    self.choice_control=selections["control"] # Chọn điều khiển số mấy từ trái sang phải
+                    print(self.choice_control)
                     # Sau khi chọn map và nhân vật xong xong update lun để lấy ảnh gán cho Game
                     self.image_background=update_background(self.choice_background) 
                     self.list_images_fish=update_images_fish(self.choice_fish)
                     self.game = Game(self.image_background,self.list_images_fish)
                     return GameState.GAME
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                if self.selection_screen.btn_back.draw(self.screen): ## Khi ấn back khởi động lại video
+                    if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
+                        self.menu.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
+                        self.menu.fps = self.menu.cap.get(cv2.CAP_PROP_FPS)
+                        self.menu.success, self.menu.video_frame = self.menu.cap.read()
+                    return GameState.MENU
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: ## Khi ấn esc khởi động lại video
+                if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
+                        self.menu.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
+                        self.menu.fps = self.menu.cap.get(cv2.CAP_PROP_FPS)
+                        self.menu.success, self.menu.video_frame = self.menu.cap.read()
                 return GameState.MENU
         
         return GameState.SELECTION

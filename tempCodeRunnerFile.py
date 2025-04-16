@@ -1,48 +1,147 @@
+
+import pygame
+import sys
+from classes.game import Game
+from classes.mainmenu import MainMenu, ImageButton
+from classes.selectionScreen import SelectionScreen
+from settings import *
 import cv2
 
-def rotate_image(image, angle):
-    """Xoay ảnh theo góc chỉ định."""
-    (h, w) = image.shape[:2]
-    center = (w // 2, h // 2)
+# Khởi tạo Pygame
+pygame.init()
+pygame.mixer.init()
+FPS=60
+class GameState:
+    MENU = "menu"
+    SELECTION = "selection"  # Thêm trạng thái mới cho giao diện chọn
+    GAME = "game"
+    EXIT = "exit"
 
-    # Tạo ma trận xoay và áp dụng
-    rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-    rotated_image = cv2.warpAffine(image, rotation_matrix, (w, h))
-    return rotated_image
+class Main:
+    def __init__(self):
+        self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+        pygame.display.set_caption("Fish Eat Fish")
+        self.clock = pygame.time.Clock()
+        self.running = True
+        self.state = GameState.MENU
+        self.menu = MainMenu()
+        self.selection_screen = None
+        self.game = None
 
-def flip_image(image):
-    """Lật ảnh theo chiều ngang."""
-    return cv2.flip(image, 1)
+    def run_menu(self):
+        # Chạy menu chính
+        self.menu.update()
+        self.menu.draw(self.screen)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return GameState.EXIT
+            if not self.menu.is_info_mode:
+                if self.menu.top_left_btn.draw(self.screen):
+                    return GameState.EXIT
+                if self.menu.bottom_right_btn.draw(self.screen):
+                    self.menu.sound_on = not self.menu.sound_on
+                    new_image_path = "assets/buttons/Sound-Two.png" if self.menu.sound_on else "assets/buttons/Sound-None.png"
+                    self.menu.bottom_right_btn = ImageButton(
+                        SCREEN_WIDTH-100 +24, SCREEN_HEIGHT-100 + 50, new_image_path)
+                if self.menu.bottom_right2_btn.draw(self.screen):
+                    self.menu.music_on = not self.menu.music_on
+                    new_image_path = "assets/buttons/Music-On.png" if self.menu.music_on else "assets/buttons/Music-Off.png"
+                    self.menu.bottom_right2_btn = ImageButton(
+                        SCREEN_WIDTH-100-53, SCREEN_HEIGHT-100 + 50, new_image_path)
+                if self.menu.bottom_left_btn.draw(self.screen):
+                    self.menu.is_info_mode = True
+                if self.menu.btnRanking.draw(self.screen):
+                    self.menu.is_info_mode = True
+                    self.menu.is_ranking_mode = True
+                if self.menu.play_btn.draw(self.screen):
+                    if hasattr(self.menu, 'cap') and self.menu.cap.isOpened():
+                        self.menu.cap.release()
+                    self.selection_screen = SelectionScreen(self.screen)
+                    return GameState.SELECTION  # Chuyển sang giao diện chọn
+            elif self.menu.is_info_mode and not self.menu.is_ranking_mode:
+                if self.menu.back_btn.draw(self.screen):
+                    self.menu.is_info_mode = False
+            elif self.menu.is_info_mode and self.menu.is_ranking_mode:
+                self.menu.frameRank.handle_event(event)  # Xử lý scroll bảng xếp hạng
+                if self.menu.back_btn.draw(self.screen):
+                    self.menu.is_info_mode = False
+                    self.menu.is_ranking_mode = False
+        return GameState.MENU
 
-# Đọc ảnh từ file
-image_path = "D:\WorkSpace\DoAn_Feeding_Frenzy\assets\images\fish1.png"  # Thay bằng đường dẫn ảnh của bạn
-image = cv2.imread(image_path)
+    def run_selection(self):
+        # Chạy giao diện chọn map, điều khiển, nhân vật
+        map_rects, control_rects, char_rects = self.selection_screen.draw()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return GameState.EXIT
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.selection_screen.handle_click(event.pos, map_rects, control_rects, char_rects):
+                    # Khi nhấn Confirm
+                    selections = self.selection_screen.get_selections()
+                    self.choice_background = selections["map"] # Chọn map từ select
+                    self.choice_fish = selections["character"]   # Chọn fish từ select
+                    self.choice_control=selections["control"] # Chọn điều khiển số mấy từ trái sang phải
+                    print(self.choice_control)
+                    # Sau khi chọn map và nhân vật xong xong update lun để lấy ảnh gán cho Game
+                    self.image_background=update_background(self.choice_background) 
+                    self.list_images_fish=update_images_fish(self.choice_fish)
+                    self.game = Game(self.image_background,self.list_images_fish)
+                    return GameState.GAME
+                if self.selection_screen.btn_back.draw(self.screen): ## Khi ấn back khởi động lại video
+                    if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
+                        self.menu.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
+                        self.menu.fps = self.menu.cap.get(cv2.CAP_PROP_FPS)
+                        self.menu.success, self.menu.video_frame = self.menu.cap.read()
+                    return GameState.MENU
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE: ## Khi ấn esc khởi động lại video
+                if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
+                        self.menu.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
+                        self.menu.fps = self.menu.cap.get(cv2.CAP_PROP_FPS)
+                        self.menu.success, self.menu.video_frame = self.menu.cap.read()
+                return GameState.MENU
+        
+        return GameState.SELECTION
 
-# Xoay ảnh ban đầu (hướng trái)
-angle_name_pairs_left = [
-    (90, "image_up.jpg"),
-    (45, "image_top_left.jpg"),
-    (0, "image_left.jpg"),
-    (315, "image_bottom_left.jpg"),
-]
+    def run_game(self):
+        # Chạy game
+        if self.game is None:
+            self.game = Game(self.image_background,self.list_images_fish)
+            print("main2 "+str(self.choice_background))
+        self.game.update()
+        self.game.draw()
+        self.game.handle_events()
+        self.game.running = self.game.handle_events()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                return GameState.EXIT
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return GameState.MENU
+        return GameState.GAME
 
-# Xoay ảnh lật lại (hướng phải)
-flipped_image = flip_image(image)
-angle_name_pairs_right = [
-    (0, "image_right.jpg"),
-    (45, "image_top_right.jpg"),
-    (315, "image_bottom_right.jpg"),
-    (90, "image_down.jpg"),
-]
+    def run(self):
+        while self.running:
+            if self.state == GameState.MENU:
+                next_state = self.run_menu()
+            elif self.state == GameState.SELECTION:
+                next_state = self.run_selection()
+            elif self.state == GameState.GAME:
+                next_state = self.run_game()
+            else:
+                next_state = GameState.EXIT
 
-# Xử lý và lưu ảnh xoay từ ảnh gốc (hướng trái)
-for angle, filename in angle_name_pairs_left:
-    rotated = rotate_image(image, angle)
-    cv2.imwrite(filename, rotated)
-    print(f"Đã lưu ảnh xoay {angle} độ vào tệp: {filename}")
+            if next_state == GameState.EXIT:
+                self.running = False
+            else:
+                self.state = next_state
+        
+            pygame.display.flip()
+            self.clock.tick(FPS)
 
-# Xử lý và lưu ảnh xoay từ ảnh lật (hướng phải)
-for angle, filename in angle_name_pairs_right:
-    rotated = rotate_image(flipped_image, angle)
-    cv2.imwrite(filename, rotated)
-    print(f"Đã lưu ảnh lật và xoay {angle} độ vào tệp: {filename}")
+        if hasattr(self.menu, 'cap') and self.menu.cap.isOpened():
+            self.menu.cap.release()
+        pygame.quit()
+        sys.exit()
+
+if __name__ == "__main__":
+    main = Main()
+    main.run()
