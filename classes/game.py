@@ -186,11 +186,12 @@ class Game:
             b.kick_enemy(self.enemy_fishes)
             b.kick_boss(self.list_boss)
             if b.kick_mainfish(self.player, self.screen):
-                self.player.data= self.scoreBar.data
-                self.player.game_over(self.screen)
                 if b.changed_when_mainkick():
+                    b.draw(self.screen)
                     print(b.time_create)
                     print(b.time_cham_Xoa)
+                    self.player.data= self.scoreBar.data
+                    self.player.game_over(self.screen)
             if b.remove_boom():
                 self.list_boom.remove(b)
 

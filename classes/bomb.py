@@ -77,6 +77,6 @@ class Boom:
         if self.time_cham_Xoa > self.time_create:
             return True
         return False
-                
+            
 
     
