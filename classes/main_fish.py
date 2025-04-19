@@ -131,7 +131,49 @@ class MainFish(DatabaseManager):
 
         # Cập nhật vị trí hình chữ nhật đại diện cá
         self.rect.topleft = (self.x, self.y)
+    def move2(self,keys):
+        """Di chuyển cá chính bằng phím WASD với hỗ trợ 8 hướng"""
+        current_direction = None
+        diagonal_speed = self.speed / math.sqrt(2)
+        if keys[pygame.K_a] and self.x > 0:
+            if keys[pygame.K_w] and self.y > 0:
+                self.x -= diagonal_speed
+                self.y -= diagonal_speed
+                current_direction = "left_up"
+            elif keys[pygame.K_s] and self.y < SCREEN_HEIGHT - self.height:
+                self.x -= diagonal_speed
+                self.y += diagonal_speed
+                current_direction = "left_down"
+            else:
+                self.x -= self.speed
+                current_direction = "left"
 
+        elif keys[pygame.K_d] and self.x < SCREEN_WIDTH - self.width:
+            if keys[pygame.K_w] and self.y > 0:
+                self.x += diagonal_speed
+                self.y -= diagonal_speed
+                current_direction = "right_up"
+            elif keys[pygame.K_s] and self.y < SCREEN_HEIGHT - self.height:
+                self.x += diagonal_speed
+                self.y += diagonal_speed
+                current_direction = "right_down"
+            else:
+                self.x += self.speed
+                current_direction = "right"
+
+        elif keys[pygame.K_w] and self.y > 0:
+            self.y -= self.speed
+            current_direction = "up"
+
+        elif keys[pygame.K_s] and self.y < SCREEN_HEIGHT - self.height:
+            self.y += self.speed
+            current_direction = "down"
+        # Cập nhật hình ảnh cá theo hướng di chuyển
+        if current_direction:
+            self.image = self.images[current_direction]
+        # Cập nhật vị trí hình chữ nhật đại diện cá
+        self.rect.topleft = (self.x, self.y)
+        
     def move(self, dx, dy):
         """Di chuyển cá chính bằng AI hoặc phím"""
         if dx < 0 and dy < 0:

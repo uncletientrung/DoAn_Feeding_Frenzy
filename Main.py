@@ -85,7 +85,7 @@ class Main:
                     # Sau khi chọn map và nhân vật xong xong update lun để lấy ảnh gán cho Game
                     self.image_background=update_background(self.choice_background) 
                     self.list_images_fish=update_images_fish(self.choice_fish)
-                    self.game = Game(self.image_background,self.list_images_fish)
+                    self.game = Game(self.image_background,self.list_images_fish,self.choice_control)
                     return GameState.GAME
                 if self.selection_screen.btn_back.draw(self.screen): ## Khi ấn back khởi động lại video
                     if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():

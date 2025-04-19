@@ -161,7 +161,7 @@ class EnemyFish:
                 self.speed = abs(self.speed)
             else:
                 self.speed = -abs(self.speed)
-        elif self.size > player.level and distance < 300 and y_distance < 50:
+        elif self.size > player.level and distance < 300 and y_distance < 40:
             if player.x < self.x:
                 self.speed = -abs(self.speed)
             else:

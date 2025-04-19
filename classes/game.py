@@ -14,7 +14,7 @@ from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
 
 class Game:
-    def __init__(self,image_background,list_images_fish):
+    def __init__(self,image_background,list_images_fish,choice_control):
         # Thiết lập môi trường Pygame
         os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
         pygame.init()
@@ -29,6 +29,7 @@ class Game:
         # Load background bằng ảnh gán từ Main ngay hàm selection
         self.background = image_background
         self.list_images_fish=list_images_fish
+        self.choice_control=choice_control
 
         # Tạo font chữ
         pygame.font.init()
@@ -137,7 +138,10 @@ class Game:
 
         # Di chuyển cá chính
         keys = pygame.key.get_pressed()
-        self.player.move1(keys)
+        if self.choice_control==1:
+            self.player.move1(keys)
+        elif self.choice_control==2:
+            self.player.move2(keys)
         self.player.check_collision(self.enemy_fishes, self.scoreBar.data,self.screen)
         # Sinh cá địch
         if self.player.eat_count == 0:
