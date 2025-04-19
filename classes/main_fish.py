@@ -314,9 +314,10 @@ class MainFish(DatabaseManager):
 
         # Resize tất cả hình ảnh theo kích thước ban đầu
         for direction in self.images:
-            self.images[direction] = pygame.transform.scale(
-                pygame.image.load(IMAGE_PATH + f"fish_{direction}.png"), (new_size, new_size)
-            )
+            if direction != "fish_number":
+                self.images[direction] = pygame.transform.scale(
+                    pygame.image.load(IMAGE_PATH + f"fish{self.fish_number}_{direction}.png"), (new_size, new_size)
+                )
 
         self.width, self.height = new_size, new_size
         self.image = self.images["right"]  # Đặt lại hướng mặc định là "right"

@@ -10,7 +10,7 @@ import cv2
 # Khởi tạo Pygame
 pygame.init()
 pygame.mixer.init()
-FPS=60
+FPS=120
 class GameState:
     MENU = "menu"
     SELECTION = "selection"  # Thêm trạng thái mới cho giao diện chọn
