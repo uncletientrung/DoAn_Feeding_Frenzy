@@ -254,15 +254,6 @@ class MainFish(DatabaseManager):
         pygame.quit()
         sys.exit()
 
-    def get_bombed(self):
-        pygame.mixer.Sound.play(sound_boom)
-        pygame.time.delay(600)
-        pygame.mixer.Sound.play(sound_game_over2)
-        print("💀 Game Over! Bạn đã bị bom nổ chết!")
-        pygame.time.delay(3000)
-        pygame.quit()
-        sys.exit()
-
     def restart_game(self):
         """Reset cá chính về trạng thái ban đầu với vị trí ngẫu nhiên và level mặc định là 9"""
         # Tạo vị trí ngẫu nhiên trong màn hình, đảm bảo không nằm quá gần biên

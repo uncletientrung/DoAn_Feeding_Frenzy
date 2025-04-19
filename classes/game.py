@@ -12,7 +12,6 @@ from classes.bomb import Boom
 from classes.bonuslv import BonusLv
 from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
-from classes.top_menu import TopMenu
 
 class Game:
     def __init__(self,image_background,list_images_fish):
@@ -41,7 +40,6 @@ class Game:
 
         # Khởi tạo các đối tượng game
         self.player = MainFish(400, 300,self.list_images_fish)
-        self.top_menu = TopMenu(self.player, self.screen,self.list_images_fish) # truyền list_image vào nhưng mà chưa hiểu sao phải tạo(Trung)
         self.scoreBar = ScoreBar(self.list_images_fish)
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
@@ -140,9 +138,7 @@ class Game:
         # Di chuyển cá chính
         keys = pygame.key.get_pressed()
         self.player.move1(keys)
-        self.player.check_collision(self.enemy_fishes, self.scoreBar.data,self.screen)  # Truyền self.screen vào
-        if self.player.score != self.top_menu.previous_score:
-            self.top_menu.update_frenzy(self.player.score)
+        self.player.check_collision(self.enemy_fishes, self.scoreBar.data,self.screen)
         # Sinh cá địch
         if self.player.eat_count == 0:
             for _ in range(2):
@@ -203,8 +199,6 @@ class Game:
         self.player.draw(self.screen)
         self.draw_fish_level(self.player)
         self.scoreBar.draw(self.screen, self.player)
-        self.top_menu.draw(self.player)
-
         for enemy in self.enemy_fishes:
             enemy.draw(self.screen)
             self.draw_enemy_level(enemy)
@@ -226,12 +220,7 @@ class Game:
             if event.type == pygame.QUIT:
                 self.running = False
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_f:
-                    self.top_menu.frenzy += 80
-                    self.top_menu.update_frenzy(self.player.score+10) 
-                    # Vì hàm update sẽ chỉ kích hoạt frenzy khi điểm số có sự thay đổi 
-                    # nên khi dùng để test, cộng thêm 10 điểm sẽ ngay lập tức kích hoạt frenzy
-                elif event.key == pygame.K_SPACE:
+                if event.key == pygame.K_SPACE:
                     self.player.dash()
                 elif event.key == pygame.K_b:
                     self.spawn_boom()
