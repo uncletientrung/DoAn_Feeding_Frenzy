@@ -1,3 +1,4 @@
+
 import math
 import pygame
 import sys
@@ -6,9 +7,12 @@ from settings import *
 from PDBCUtill import DatabaseManager
 import time
 import random
+import cv2
+import mediapipe as mp
+import numpy as np
 
 class MainFish(DatabaseManager):
-    def __init__(self, x, y,list_images_fish):
+    def __init__(self, x, y, list_images_fish):
         super().__init__()
         # Tạo từ điển chứa các hình ảnh của cá theo 8 hướng
         base_size = SCREEN_WIDTH // 25
@@ -16,7 +20,7 @@ class MainFish(DatabaseManager):
         # lấy danh sách các cá bên settings
         self.images = list_images_fish
         # kiểm tra list cá vừa lấy là list cá số mấy
-        self.fish_number=self.images["fish_number"]
+        self.fish_number = self.images["fish_number"]
 
         # Các thuộc tính ban đầu
         base_size = SCREEN_WIDTH // 25  # Tính toán kích thước cơ bản cho cá
@@ -41,6 +45,31 @@ class MainFish(DatabaseManager):
         self.is_frenzy = False
         self.dash_start_time = 0
         self.data = []
+        self.rect = self.image.get_rect(topleft=(self.x, self.y))
+
+        # Khởi tạo Mediapipe
+        self.cap = cv2.VideoCapture(0)
+        self.screen_width = SCREEN_WIDTH
+        self.screen_height = SCREEN_HEIGHT
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 320)  # Giảm độ phân giải
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 240)
+        self.camera_surface = pygame.Surface((160, 120))
+        self.last_camera_update_time = 0
+        self.camera_update_interval = 100
+
+        self.mp_hands = mp.solutions.hands
+        self.hands = self.mp_hands.Hands(
+            static_image_mode=False,
+            max_num_hands=1,
+            min_detection_confidence=0.6,
+            min_tracking_confidence=0.6
+        )
+        self.mp_draw = mp.solutions.drawing_utils
+
+        # Biến cho làm mượt di chuyển
+        self.positions = []  # Danh sách lưu vị trí trung bình
+        self.BUFFER_SIZE = 1  # Giảm để nhạy hơn
+        self.max_speed = 8  # Tốc độ tối đa của cá (pixel/frame)
 
     def check_collision(self, enemies, dataScore, screen=None):  # Thêm tham số screen với giá trị mặc định None
         player_mask = pygame.mask.from_surface(self.image)
@@ -57,7 +86,7 @@ class MainFish(DatabaseManager):
                 elif self.level < enemy.size:
                     self.data = dataScore  # gán điểm cuối khi va chạm
                     if screen:  # Nếu screen được truyền vào
-                        self.game_over(screen)  
+                        self.game_over(screen)
                     else:
                         self.game_over()  # Gọi với giá trị mặc định
                 else:
@@ -131,7 +160,8 @@ class MainFish(DatabaseManager):
 
         # Cập nhật vị trí hình chữ nhật đại diện cá
         self.rect.topleft = (self.x, self.y)
-    def move2(self,keys):
+
+    def move2(self, keys):
         """Di chuyển cá chính bằng phím WASD với hỗ trợ 8 hướng"""
         current_direction = None
         diagonal_speed = self.speed / math.sqrt(2)
@@ -173,35 +203,123 @@ class MainFish(DatabaseManager):
             self.image = self.images[current_direction]
         # Cập nhật vị trí hình chữ nhật đại diện cá
         self.rect.topleft = (self.x, self.y)
+
+    def move3(self):
         
-    def move(self, dx, dy):
-        """Di chuyển cá chính bằng AI hoặc phím"""
-        if dx < 0 and dy < 0:
-            current_direction = "left_up"
-        elif dx > 0 and dy < 0:
-            current_direction = "right_up"
-        elif dx < 0 and dy > 0:
-            current_direction = "left_down"
-        elif dx > 0 and dy > 0:
-            current_direction = "right_down"
-        elif dx < 0:
-            current_direction = "left"
-        elif dx > 0:
-            current_direction = "right"
-        elif dy < 0:
-            current_direction = "up"
-        else:  # dy > 0
-            current_direction = "down"
+        success, frame = self.cap.read()
+        direction = None
+        if not success:
+            return None
 
-        self.image = self.images[current_direction]
-        self.x += dx
-        self.y += dy
+        # Lật ảnh để giống gương
+        frame = cv2.flip(frame, 1)
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        result = self.hands.process(frame_rgb)
 
-        # Giới hạn phạm vi di chuyển trong màn hình
-        self.x = max(0, min(SCREEN_WIDTH - self.width, self.x))
-        self.y = max(0, min(SCREEN_HEIGHT - self.height, self.y))
+        # Chuẩn bị khung hình cho camera_surface
+        frame_resized = cv2.resize(frame, (160, 120))
+        frame_for_pygame = cv2.cvtColor(frame_resized, cv2.COLOR_BGR2RGB)
 
-        self.rect.topleft = (self.x, self.y)
+        if result.multi_hand_landmarks:
+            for hand_landmarks in result.multi_hand_landmarks:
+                # Lấy vị trí đầu ngón trỏ (landmark 8)
+                x_pos = hand_landmarks.landmark[8].x
+                y_pos = hand_landmarks.landmark[8].y
+
+                # Chuyển đổi sang tọa độ màn hình game
+                new_x = x_pos * self.screen_width
+                new_y = y_pos * self.screen_height
+
+                # Thêm vị trí vào bộ nhớ đệm
+                self.positions.append((new_x, new_y))
+                if len(self.positions) > self.BUFFER_SIZE:
+                    self.positions.pop(0)  # Giữ lại BUFFER_SIZE phần tử gần nhất
+
+                # Tính trung bình để làm mượt di chuyển
+                avg_x = sum(p[0] for p in self.positions) / len(self.positions)
+                avg_y = sum(p[1] for p in self.positions) / len(self.positions)
+
+                # Tính vector di chuyển
+                dx = avg_x - self.x
+                dy = avg_y - self.y
+                distance = math.sqrt(dx**2 + dy**2)
+
+                # Xác định hướng dựa trên dx, dy như hình vuông
+                threshold = 20  # Ngưỡng thay đổi hướng (pixel)
+                if distance > threshold:
+                    # Chuẩn hóa vector di chuyển
+                    if distance > 0:
+                        dx_norm = dx / distance
+                        dy_norm = dy / distance
+                    else:
+                        dx_norm, dy_norm = 0, 0
+
+                    # Giới hạn tốc độ di chuyển
+                    move_x = dx_norm * self.max_speed
+                    move_y = dy_norm * self.max_speed
+
+                    # Cập nhật vị trí cá
+                    self.x += move_x
+                    self.y += move_y
+                    self.x = max(0, min(self.x, self.screen_width - self.width))
+                    self.y = max(0, min(self.y, self.screen_height - self.height))
+
+                    # Xác định hướng dựa trên dx, dy
+                    if abs(dx) > abs(dy):
+                        if dx > 0:
+                            direction = "right"
+                            if dy > threshold:
+                                direction = "right_down"
+                            elif dy < -threshold:
+                                direction = "right_up"
+                        else:
+                            direction = "left"
+                            if dy > threshold:
+                                direction = "left_down"
+                            elif dy < -threshold:
+                                direction = "left_up"
+                    else:
+                        if dy > 0:
+                            direction = "down"
+                            if dx > threshold:
+                                direction = "right_down"
+                            elif dx < -threshold:
+                                direction = "left_down"
+                        else:
+                            direction = "up"
+                            if dx > threshold:
+                                direction = "right_up"
+                            elif dx < -threshold:
+                                direction = "left_up"
+
+                    if direction in self.images:
+                        self.image = self.images[direction]
+
+                # Cập nhật rect
+                self.rect.topleft = (self.x, self.y)
+
+                # Vẽ khung xương tay lên khung hình
+                frame_for_pygame = np.copy(frame_resized)  # Sao chép để vẽ khung xương
+                frame_for_pygame = cv2.cvtColor(frame_for_pygame, cv2.COLOR_BGR2RGB)
+                self.mp_draw.draw_landmarks(
+                    frame_for_pygame,
+                    hand_landmarks,
+                    self.mp_hands.HAND_CONNECTIONS
+                )
+
+        # Cập nhật camera_surface
+        pygame_frame = pygame.image.frombuffer(frame_for_pygame.tobytes(), (160, 120), "RGB")
+        self.camera_surface.blit(pygame_frame, (0, 0))
+
+        return direction
+
+    def update_camera_frame(self):
+        # Không cần hàm này nữa vì move3 đã xử lý camera_surface
+        pass
+
+    def get_camera_surface(self, width=160, height=120):
+        # Trả về camera_surface trực tiếp vì đã được cập nhật trong move3
+        return self.camera_surface
 
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))

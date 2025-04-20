@@ -1,7 +1,9 @@
+
 from turtle import Screen
 import pygame
 import random
 import cv2
+import mediapipe as mp
 import numpy as np
 import os
 import time
@@ -14,9 +16,9 @@ from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
 
 class Game:
-    def __init__(self,image_background,list_images_fish,choice_control):
+    def __init__(self, image_background, list_images_fish, choice_control):
         # Thiết lập môi trường Pygame
-        os.environ['SDL_VIDEO_WINDOW_POS'] = "10,30"
+        os.environ['SDL_VIDEO_WINDOW_POS'] = "50,50"
         pygame.init()
         pygame.mixer.init()
         self.SCREEN_WIDTH = 1100
@@ -28,8 +30,8 @@ class Game:
 
         # Load background bằng ảnh gán từ Main ngay hàm selection
         self.background = image_background
-        self.list_images_fish=list_images_fish
-        self.choice_control=choice_control
+        self.list_images_fish = list_images_fish
+        self.choice_control = choice_control
 
         # Tạo font chữ
         pygame.font.init()
@@ -40,7 +42,7 @@ class Game:
         self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")  # Giả định có file bubble.wav
 
         # Khởi tạo các đối tượng game
-        self.player = MainFish(400, 300,self.list_images_fish)
+        self.player = MainFish(400, 300, self.list_images_fish)
         self.scoreBar = ScoreBar(self.list_images_fish)
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
@@ -138,11 +140,16 @@ class Game:
 
         # Di chuyển cá chính
         keys = pygame.key.get_pressed()
-        if self.choice_control==1:
+        if self.choice_control == 1:
             self.player.move1(keys)
-        elif self.choice_control==2:
+        elif self.choice_control == 2:
             self.player.move2(keys)
-        self.player.check_collision(self.enemy_fishes, self.scoreBar.data,self.screen)
+        elif self.choice_control == 3:
+            direction = self.player.move3()
+            if direction:
+                self.player.image = self.player.images[direction]
+
+        self.player.check_collision(self.enemy_fishes, self.scoreBar.data, self.screen)
         # Sinh cá địch
         if self.player.eat_count == 0:
             for _ in range(2):
@@ -163,7 +170,7 @@ class Game:
 
         # Sinh boss
         self.create_boss()
-    # Cập nhật cá địch
+        # Cập nhật cá địch
         for enemy in self.enemy_fishes[:]:
             enemy.move(self.player)
         # Cập nhật bonus
@@ -175,8 +182,8 @@ class Game:
         for boss in self.list_boss[:]:
             boss.move_boss()
             if boss.check_collision_mainfish(self.player):
-                self.player.data= self.scoreBar.data
-                self.player.game_over(self.screen)  # Đã được sửa ở câu trả lời trước 
+                self.player.data = self.scoreBar.data
+                self.player.game_over(self.screen)  # Đã được sửa ở câu trả lời trước
             boss.check_colistion_enemy(self.enemy_fishes)
             if boss.remove_boss():
                 self.list_boss.remove(boss)
@@ -190,12 +197,12 @@ class Game:
                     b.draw(self.screen)
                     print(b.time_create)
                     print(b.time_cham_Xoa)
-                    self.player.data= self.scoreBar.data
+                    self.player.data = self.scoreBar.data
                     self.player.game_over(self.screen)
             if b.remove_boom():
                 self.list_boom.remove(b)
 
-        if self.player.dash_start_time and time.time() - self.player.dash_start_time >= 0.2: # Dash kéo dài 0.2s
+        if self.player.dash_start_time and time.time() - self.player.dash_start_time >= 0.2:  # Dash kéo dài 0.2s
             self.player.end_dash()
 
     def draw(self):
@@ -204,6 +211,7 @@ class Game:
         self.player.draw(self.screen)
         self.draw_fish_level(self.player)
         self.scoreBar.draw(self.screen, self.player)
+        
         for enemy in self.enemy_fishes:
             enemy.draw(self.screen)
             self.draw_enemy_level(enemy)
@@ -217,6 +225,10 @@ class Game:
         for b in self.list_boom:
             b.draw(self.screen)
 
+        # Vẽ camera surface trực tiếp
+        if self.choice_control ==3:
+            self.screen.blit(self.player.get_camera_surface(), (1, self.SCREEN_HEIGHT - 115))
+        
         pygame.display.update()
 
     def handle_events(self):
@@ -233,10 +245,9 @@ class Game:
                     self.create_boss()
             elif event.type == pygame.QUIT:
                 self.running = False
-            return self.running
-            
-        self.player.end_dash()
+        
         self.player.start_cooldown()
+        return self.running
 
     def run(self):
         """Chạy vòng lặp chính của game"""
@@ -246,6 +257,8 @@ class Game:
             self.running = self.handle_events()
             self.clock.tick(self.FPS)
         pygame.quit()
+        self.player.cap.release()
+        cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     game = Game()

@@ -161,11 +161,11 @@ class EnemyFish:
                 self.speed = abs(self.speed)
             else:
                 self.speed = -abs(self.speed)
-        elif self.size > player.level and distance < 300 and y_distance < 40:
-            if player.x < self.x:
-                self.speed = -abs(self.speed)
-            else:
-                self.speed = abs(self.speed)
+        # elif self.size > player.level and distance < 300 and y_distance < 40:
+        #     if player.x < self.x:
+        #         self.speed = -abs(self.speed)
+        #     else:
+        #         self.speed = abs(self.speed)
 
         self.x += self.speed
         self.y += self.wave_amplitude * math.sin(self.wave_offset)
