@@ -68,8 +68,8 @@ class MainFish(DatabaseManager):
 
         # Biến cho làm mượt di chuyển
         self.positions = []  # Danh sách lưu vị trí trung bình
-        self.BUFFER_SIZE = 1  # Giảm để nhạy hơn
-        self.max_speed = 8  # Tốc độ tối đa của cá (pixel/frame)
+        self.BUFFER_SIZE = 2  # Giảm để nhạy hơn
+        self.max_speed = 6  # Tốc độ tối đa của cá (pixel/frame)
 
     def check_collision(self, enemies, dataScore, screen=None):  # Thêm tham số screen với giá trị mặc định None
         player_mask = pygame.mask.from_surface(self.image)
