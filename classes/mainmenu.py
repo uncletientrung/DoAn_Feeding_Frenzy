@@ -91,26 +91,35 @@ class FrameBXH(DatabaseManager):
 
 class ImageButton:
     def __init__(self, x, y, image_path, scale=1):
-        self.image = pygame.image.load(image_path).convert_alpha()
-        width = int(self.image.get_width() * scale)
-        height = int(self.image.get_height() * scale)
-        self.image = pygame.transform.scale(self.image, (width, height))
+        self.image_default = pygame.image.load(image_path).convert_alpha()  # Lưu hình ảnh gốc
+        self.width = int(self.image_default.get_width() * scale)
+        self.height = int(self.image_default.get_height() * scale)
+        self.image = pygame.transform.scale(self.image_default, (self.width, self.height))
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
-        
+
     def draw(self, surface):
         action = False
         mouse_pos = pygame.mouse.get_pos()
-        
+
         if self.rect.collidepoint(mouse_pos):
-            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-                self.clicked = True
-                action = True
+            scaled_width = int(self.width * 0.9) # Giảm kích thước
+            scaled_height = int(self.height * 0.9)
+            scaled_image = pygame.transform.scale(self.image_default, (scaled_width, scaled_height))
+            offset_x = (self.width - scaled_width) // 2
+            offset_y = (self.height - scaled_height) // 2
+            surface.blit(scaled_image, (self.rect.x + offset_x, self.rect.y + offset_y))
+        else:
+            surface.blit(self.image, self.rect.topleft) # di ra là trả vị trí ban đầu
+
+        # Kiểm tra nếu nút được nhấn
+        if pygame.mouse.get_pressed()[0] == 1 and not self.clicked and self.rect.collidepoint(mouse_pos):
+            self.clicked = True
+            action = True
         if pygame.mouse.get_pressed()[0] == 0:
             self.clicked = False
-            
-        surface.blit(self.image, (self.rect.x, self.rect.y))
+
         return action
 
 class MainMenu:

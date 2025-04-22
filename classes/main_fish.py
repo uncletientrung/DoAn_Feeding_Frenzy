@@ -14,7 +14,7 @@ import queue
 
 class MainFish(DatabaseManager):
    
-    def __init__(self, x, y, list_images_fish):
+    def __init__(self, x, y, list_images_fish,sound):
         super().__init__()
         base_size = SCREEN_WIDTH // 25
         self.images = list_images_fish
@@ -40,6 +40,7 @@ class MainFish(DatabaseManager):
         self.dash_start_time = 0
         self.data = []
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
+        self.sound= sound
 
         self.cap = cv2.VideoCapture(0)
         self.screen_width = SCREEN_WIDTH
@@ -89,8 +90,6 @@ class MainFish(DatabaseManager):
                 elif self.level < enemy.size:
                     self.data = dataScore
                     return True  # Signal game over
-                else:
-                    print(f" Cá cùng cấp, không thể ăn!")
         return False
 
     def grow(self, enemy_level):
@@ -98,7 +97,8 @@ class MainFish(DatabaseManager):
         if self.size >= self.size_old + 1:
             self.size_old = int(self.size) + self.size * 0.1
             self.level += 1
-            pygame.mixer.Sound.play(sound_level_up)
+            if self.sound: # Nếu sound là True thì chạy
+                pygame.mixer.Sound.play(sound_level_up)
 
         base_size = SCREEN_WIDTH // 25
         new_size = int(base_size * (1 + self.size * 0.07))
@@ -339,7 +339,8 @@ class MainFish(DatabaseManager):
         screen.blit(self.image, (self.x, self.y))
 
     def eat_fish(self, enemy):
-        self.eat_sound.play()
+        if self.sound: # Nếu sound là True thì chạy
+            self.eat_sound.play()
         self.grow(enemy.fish_level)
         print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
 

@@ -15,7 +15,9 @@ from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
 
 class Game:
-    def __init__(self, image_background, list_images_fish, choice_control,choice_fish):
+    def __init__(self, image_background, list_images_fish, choice_control,choice_fish,music,sound):
+        self.music = music  # Âm thanh nhạc
+        self.sound = sound # # Âm thanh hiệu ứng
         os.environ['SDL_VIDEO_WINDOW_POS'] = "50,50"
         pygame.init()
         pygame.mixer.init()
@@ -48,12 +50,15 @@ class Game:
         pygame.font.init()
         self.font = pygame.font.SysFont('Comic Sans MS', 15)
 
-        pygame.mixer.music.load(SOUND_PATH + "feeding-frenzy.wav")
+        # pygame.mixer.music.load(SOUND_PATH + "feeding-frenzy.wav")
         self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")
         self.sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
         self.sound_game_over2 = pygame.mixer.Sound(SOUND_PATH + "GameOver2.wav")
+        self.sound_music_game = pygame.mixer.Sound(SOUND_PATH + "music_game.wav")
+        if self.music: # Nếu music là True thì bật
+            self.sound_music_game.play(-1)
 
-        self.player = MainFish(400, 300, self.list_images_fish)
+        self.player = MainFish(400, 300, self.list_images_fish,self.sound)
         self.scoreBar = ScoreBar(self.list_images_fish)
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
@@ -114,13 +119,13 @@ class Game:
     def spawn_boom(self):
         if len(self.list_boom) < self.MAX_BOOM:
             x_position = random.randint(100, self.SCREEN_WIDTH - 100)
-            new_boom = Boom(x_position, -30)
+            new_boom = Boom(x_position, -30,self.sound)
             self.list_boom.append(new_boom)
 
     def create_bonus(self):
         if len(self.list_bonus) < self.MAX_BONUS:
             x_position = random.randint(100, self.SCREEN_WIDTH - 100)
-            new_bonus = BonusLv(x_position, -30)
+            new_bonus = BonusLv(x_position, -30,self.sound)
             self.list_bonus.append(new_bonus)
 
     def create_boss(self):
@@ -138,9 +143,14 @@ class Game:
         return self.show_game_over()
 
     def show_game_over(self):
-        self.sound_death.play()
-        pygame.time.delay(600)
-        self.sound_game_over2.play()
+        
+        if self.music: # Nếu music là True
+            # Tắt âm thanh nhạc nền
+            self.sound_music_game.stop()
+            self.sound_death.play()
+            pygame.time.delay(600)
+            self.sound_game_over2.play()
+            
 
         try:
             game_over_image = pygame.image.load("assets/buttons/bar.png")
@@ -223,12 +233,14 @@ class Game:
         return "menu"
 
     def update(self):
+        
         if not self.running or self.game_over:
             return
 
         current_time = time.time()
         if current_time - self.last_bubble_time >= 7:
-            self.sound_bubble.play()
+            if self.sound: # Nếu sound là True thì bật
+                self.sound_bubble.play()
             self.last_bubble_time = current_time
 
         keys = pygame.key.get_pressed()
@@ -237,7 +249,7 @@ class Game:
         elif self.choice_control == 2:
             self.player.move2(keys)
         elif self.choice_control == 3:
-            self.FPS=60;
+            self.FPS=60
             direction = self.player.move3()
             if direction:
                 self.player.image = self.player.images[direction]

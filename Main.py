@@ -57,9 +57,8 @@ class Main:
                         new_image = pygame.image.load(new_image_path).convert_alpha()
                         width = int(new_image.get_width() * self.menu.bottom_right_btn.rect.width / new_image.get_width())
                         height = int(new_image.get_height() * self.menu.bottom_right_btn.rect.height / new_image.get_height())
+                        self.menu.bottom_right_btn.image_default = pygame.image.load(new_image_path).convert_alpha()
                         self.menu.bottom_right_btn.image = pygame.transform.scale(new_image, (width, height))
-
-
 
                     if self.menu.bottom_right2_btn.draw(self.screen):
                         self.menu.music_on = not self.menu.music_on
@@ -67,8 +66,8 @@ class Main:
                         new_image = pygame.image.load(new_image_path).convert_alpha()
                         width = int(new_image.get_width() * self.menu.bottom_right2_btn.rect.width / new_image.get_width())
                         height = int(new_image.get_height() * self.menu.bottom_right2_btn.rect.height / new_image.get_height())
+                        self.menu.bottom_right2_btn.image_default=pygame.image.load(new_image_path).convert_alpha()
                         self.menu.bottom_right2_btn.image = pygame.transform.scale(new_image, (width, height))
-
 
 
                     if self.menu.bottom_left_btn.rect.collidepoint(event.pos):
@@ -113,7 +112,8 @@ class Main:
                     self.choice_control = selections["control"]
                     self.image_background = update_background(self.choice_background)
                     self.list_images_fish = update_images_fish(self.choice_fish)
-                    self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish)
+                    self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish,
+                                    self.menu.music_on, self.menu.sound_on)
                     return GameState.GAME
                 if self.selection_screen.btn_back.draw(self.screen):
                     if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
@@ -132,10 +132,12 @@ class Main:
 
     def run_game(self):
         if self.game is None:
-            self.game = Game(self.image_background, self.list_images_fish, self.choice_control)
+            self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish,
+                             self.menu.music_on, self.menu.sound_on)
         result = self.game.run()
         if result == "restart":
-            self.game = Game(self.image_background, self.list_images_fish, self.choice_control)
+            self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish,
+                             self.menu.music_on, self.menu.sound_on)
             return GameState.GAME
         elif result == "menu":
             if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():

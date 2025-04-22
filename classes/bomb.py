@@ -7,7 +7,8 @@ from classes.boss_fish import *
 
 
 class Boom:
-    def __init__(self, x, y):
+    def __init__(self, x, y,sound):
+        self.sound=sound
         self.x=x
         self.y=y
         self.image=pygame.image.load(IMAGE_PATH+"boom.png")
@@ -24,7 +25,7 @@ class Boom:
     def change_when_kick(self): # Đổi hình ảnh sau khi chạm cá
             new_image = pygame.image.load(IMAGE_PATH + "kick_boom.png")
             self.image = pygame.transform.scale(new_image, (self.base_size, self.base_size))
-    def draw(self,screen):# Vẽ cá lên màn hình
+    def draw(self,screen):# Vẽ boom lên màn hình
         if self.image:
             screen.blit(self.image,(self.x,self.y))
 
@@ -40,7 +41,8 @@ class Boom:
             enemy_offset=(enemy.x-self.x, enemy.y-self.y)
             if boom_mask.overlap(enemy_mask,enemy_offset):
                 enemies.remove(enemy)
-                sound_boom.play()
+                if self.sound: # nếu sound là True
+                    sound_boom.play()
                 self.change_when_kick()
                 self.exploded = True
                 self.time = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới xóa boom
@@ -50,7 +52,9 @@ class Boom:
         player_mask=pygame.mask.from_surface(player.image)
         player_offset=(player.x - self.x,player.y -self.y )
         if boom_mask.overlap(player_mask,player_offset):
-            sound_boom.play()
+            if self.sound: # nếu sound là True
+                sound_boom.play()
+            
             if not self.exploded:
                 self.change_when_kick()
                 self.exploded = True
@@ -68,7 +72,8 @@ class Boom:
             boss_offset=(boss.x-self.x, boss.y-self.y)
             if boom_mask.overlap(boss_mask,boss_offset):
                 list_boom.remove(boss)
-                sound_boom.play()
+                if self.sound: # nếu sound là True
+                    sound_boom.play()
                 self.change_when_kick()
                 self.exploded = True
                 self.time = pygame.time.get_ticks() # Thời gian này cập nhập mục đích để cho nó chuyển ảnh rồi mới xóa boom

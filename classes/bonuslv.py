@@ -4,7 +4,8 @@ from classes.main_fish import *
 
 
 class BonusLv:
-    def __init__(self,x,y):
+    def __init__(self,x,y,sound):
+        self.sound=sound
         self.x=x
         self.y=y
         self.image=pygame.image.load(IMAGE_PATH+"kimcuong.png")
@@ -24,7 +25,8 @@ class BonusLv:
         player_mask=pygame.mask.from_surface((player.image))
         player_offset=(player.x - self.x,player.y-self.y)
         if bonus_mask.overlap(player_mask,player_offset):
-            self.sound.play()
+            if self.sound: # nếu sound là True
+                self.sound.play()
             player.level+=1
             return True
         return False
