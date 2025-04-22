@@ -54,6 +54,7 @@ class SelectionScreen:
                 "y": 470 + self.offset_y,  # Vị trí y của section chọn nhân vật
                 "options": self.load_images(["fish1.png", "fish2.png", "fish3.png"], self.box_width, self.box_height, scale_factor=0.5)
             },
+            
         }
 
         # Tạo nút Confirm để xác nhận lựa chọn (updated position and style)
@@ -61,7 +62,9 @@ class SelectionScreen:
         self.confirm_button_text = self.button_font.render("CONFIRM", True, self.text_color)
 
         # Back button with updated position
-        self.btn_back = mainmenu.ImageButton(0, 0, "assets/buttons/Exit.png")
+        SCALE = 0.5
+        
+        self.btn_back = mainmenu.ImageButton(10, 10, "assets/button2/Exit.png",scale=SCALE)
 
     def load_images(self, filenames, width, height, scale_factor=1):
         # Hàm tải và xử lý các hình ảnh cho ô lựa chọn

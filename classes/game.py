@@ -21,13 +21,28 @@ class Game:
         pygame.mixer.init()
         self.SCREEN_WIDTH = 1100
         self.SCREEN_HEIGHT = 680
-        self.FPS = 120
+        self.FPS = 90
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         pygame.display.set_caption("Feeding Frenzy")
         self.clock = pygame.time.Clock()
 
         self.background = image_background
+        
         self.list_images_fish = list_images_fish
+
+        
+        self.choice_fish = choice_control  # Lưu ý: Trong mã hiện tại, tham số được truyền là choice_control, cần sửa thành choice_fish
+        # Định nghĩa ánh xạ từ choice_fish sang hình ảnh hiển thị
+        self.display_images = {
+            1: "assets/images/fish1_hp.png",  # Hình ảnh hiển thị cho cá 1
+            2: "assets/images/fish2_hp.png",  # Hình ảnh hiển thị cho cá 2
+            3: "assets/images/fish3_hp.png"   # Hình ảnh hiển thị cho cá 3
+        }
+        # Lấy đường dẫn hình ảnh dựa trên choice_fish, nếu không có thì dùng mặc định
+        self.display_image_path = self.display_images.get(self.choice_fish, "assets/images/fish1_hp.png")
+        # Tải và điều chỉnh kích thước hình ảnh
+        self.display_image = pygame.image.load(self.display_image_path).convert_alpha()
+        self.display_image = pygame.transform.scale(self.display_image, (208, 76.7))  # Kích thước ví dụ: 100x100
         self.choice_control = choice_control
 
         pygame.font.init()
@@ -141,16 +156,27 @@ class Game:
 
         try:
             repeat_button_image = pygame.image.load("assets/button2/button_restart-sheet1.png")
-            home_button_image = pygame.image.load("assets/buttons/Home.png")
+            home_button_image = pygame.image.load("assets/button2/button_fullscreen-sheet1.png")
         except FileNotFoundError:
             print(f"Không tìm thấy file Repeat-Right.png hoặc Home.png trong assets/buttons!")
             self.player.release_camera()
             return "menu"
 
-        button_width, button_height = 100, 50
-        repeat_button_image = pygame.transform.scale(repeat_button_image, (button_width, button_height))
-        home_button_image = pygame.transform.scale(home_button_image, (button_width, button_height))
+        # Kích thước mục tiêu cho nút (giữ hình tròn)
+        target_size = 80  # Kích thước cạnh của hình vuông (vì hình tròn có tỷ lệ 1:1)
 
+        # Scale giữ tỷ lệ khung hình
+        def scale_keep_aspect(image, target_size):
+            orig_width, orig_height = image.get_size()
+            scale_ratio = min(target_size / orig_width, target_size / orig_height)  # Giữ tỷ lệ nhỏ nhất
+            new_width = int(orig_width * scale_ratio)
+            new_height = int(orig_height * scale_ratio)
+            return pygame.transform.scale(image, (new_width, new_height))
+
+        repeat_button_image = scale_keep_aspect(repeat_button_image, target_size)
+        home_button_image = scale_keep_aspect(home_button_image, target_size)
+
+        # Đặt vị trí cho các nút
         repeat_button_rect = repeat_button_image.get_rect(center=(self.SCREEN_WIDTH // 2 - 60, game_over_rect.bottom + 60))
         home_button_rect = home_button_image.get_rect(center=(self.SCREEN_WIDTH // 2 + 60, game_over_rect.bottom + 60))
 
@@ -211,6 +237,7 @@ class Game:
         elif self.choice_control == 2:
             self.player.move2(keys)
         elif self.choice_control == 3:
+            self.FPS=60;
             direction = self.player.move3()
             if direction:
                 self.player.image = self.player.images[direction]
@@ -265,8 +292,35 @@ class Game:
         if self.player.dash_start_time and time.time() - self.player.dash_start_time >= 0.2:
             self.player.end_dash()
 
+    # def draw(self):
+    #     self.screen.blit(self.background, (0, 0))
+    #     self.player.draw(self.screen)
+    #     self.draw_fish_level(self.player)
+    #     self.scoreBar.draw(self.screen, self.player)
+
+    #     for enemy in self.enemy_fishes:
+    #         enemy.draw(self.screen)
+    #         self.draw_enemy_level(enemy)
+
+    #     for bonus in self.list_bonus:
+    #         bonus.draw_bonus(self.screen)
+
+    #     for boss in self.list_boss:
+    #         boss.draw(self.screen)
+
+    #     for b in self.list_boom:
+    #         b.draw(self.screen)
+
+    #     if self.choice_control == 3:
+            
+    #         camera_surface = self.player.get_camera_surface()
+    #         self.screen.blit(camera_surface, (1, self.SCREEN_HEIGHT - 115))
+
+    #     pygame.display.update()
     def draw(self):
         self.screen.blit(self.background, (0, 0))
+        # Vẽ hình ảnh hiển thị ở góc trên trái
+        self.screen.blit(self.display_image, (10, 10))  # Vị trí (10, 10) là ví dụ
         self.player.draw(self.screen)
         self.draw_fish_level(self.player)
         self.scoreBar.draw(self.screen, self.player)
@@ -285,10 +339,10 @@ class Game:
             b.draw(self.screen)
 
         if self.choice_control == 3:
-            self.screen.blit(self.player.get_camera_surface(), (1, self.SCREEN_HEIGHT - 115))
+            camera_surface = self.player.get_camera_surface()
+            self.screen.blit(camera_surface, (1, self.SCREEN_HEIGHT - 115))
 
         pygame.display.update()
-
     def handle_events(self):
         if self.game_over:
             return self.show_game_over()
@@ -319,4 +373,5 @@ class Game:
             if result in ["restart", "menu", "exit"]:
                 return result
             self.clock.tick(self.FPS)
+            
         return "menu"
