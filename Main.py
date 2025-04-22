@@ -113,7 +113,7 @@ class Main:
                     self.choice_control = selections["control"]
                     self.image_background = update_background(self.choice_background)
                     self.list_images_fish = update_images_fish(self.choice_fish)
-                    self.game = Game(self.image_background, self.list_images_fish, self.choice_control)
+                    self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish)
                     return GameState.GAME
                 if self.selection_screen.btn_back.draw(self.screen):
                     if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():

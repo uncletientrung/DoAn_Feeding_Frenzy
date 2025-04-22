@@ -15,7 +15,7 @@ from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
 
 class Game:
-    def __init__(self, image_background, list_images_fish, choice_control):
+    def __init__(self, image_background, list_images_fish, choice_control,choice_fish):
         os.environ['SDL_VIDEO_WINDOW_POS'] = "50,50"
         pygame.init()
         pygame.mixer.init()
@@ -31,7 +31,7 @@ class Game:
         self.list_images_fish = list_images_fish
 
         
-        self.choice_fish = choice_control  # Lưu ý: Trong mã hiện tại, tham số được truyền là choice_control, cần sửa thành choice_fish
+        self.choice_fish = choice_fish  # Lưu ý: Trong mã hiện tại, tham số được truyền là choice_control, cần sửa thành choice_fish
         # Định nghĩa ánh xạ từ choice_fish sang hình ảnh hiển thị
         self.display_images = {
             1: "assets/images/fish1_hp.png",  # Hình ảnh hiển thị cho cá 1

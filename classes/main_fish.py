@@ -67,7 +67,7 @@ class MainFish(DatabaseManager):
         self.mp_draw = mp.solutions.drawing_utils
 
         self.positions = []
-        self.BUFFER_SIZE = 8  # Tăng buffer để làm mượt hơn
+        self.BUFFER_SIZE = 10  # Tăng buffer để làm mượt hơn
         self.max_speed = 8  # Tăng tốc độ tối đa
         self.last_direction = "right"  # Lưu hướng cuối cùng để giữ liên tục
        
@@ -285,12 +285,12 @@ class MainFish(DatabaseManager):
             dy = avg_y - self.y
             distance = math.sqrt(dx**2 + dy**2)
 
-            threshold = 13  # Giảm ngưỡng để nhạy hơn
+            threshold = 10  # Giảm ngưỡng để nhạy hơn
             if distance > threshold:
                 dx_norm = dx / distance if distance > 0 else 0
                 dy_norm = dy / distance if distance > 0 else 0
 
-                lerp_factor = 0.2  # Tăng lerp_factor để di chuyển nhanh hơn
+                lerp_factor = 0.3  # Tăng lerp_factor để di chuyển nhanh hơn
                 self.x += (avg_x - self.x) * lerp_factor
                 self.y += (avg_y - self.y) * lerp_factor
                 self.x = max(0, min(self.x, self.screen_width - self.width))
