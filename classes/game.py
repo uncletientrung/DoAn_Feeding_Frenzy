@@ -59,7 +59,8 @@ class Game:
             self.sound_music_game.play(-1)
 
         self.player = MainFish(400, 300, self.list_images_fish,self.sound)
-        self.scoreBar = ScoreBar(self.list_images_fish)
+
+        self.scoreBar = ScoreBar(self.display_image)
         self.enemy_fishes = []
         self.MAX_ENEMIES = 10
         self.list_boom = []

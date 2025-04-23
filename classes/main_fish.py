@@ -31,7 +31,7 @@ class MainFish(DatabaseManager):
         self.size = 1
         self.size_old = 1
         self.eat_count = 0
-        self.level = 9
+        self.level = 60
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.can_dash = True

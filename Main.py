@@ -35,11 +35,8 @@ class Main:
         self.menu.update()
         self.menu.draw(self.screen) 
         # Kích thước nút
-        # Đặt tỉ lệ scale phù hợp với ảnh 117x118
-        SCALE = 0.5
-        BTN_WIDTH = int(117 * SCALE)
-        BTN_HEIGHT = int(118 * SCALE)
-        PADDING = 10
+        
+       
 
         # chỉ vẽ 1 lần ở đây — duy nhất
 
