@@ -95,14 +95,14 @@ class ScoreBar:
         # Vẽ đồng hồ
         clock_x = SCREEN_WIDTH - 220
         clock_y = bar_y
-        screen.blit(self.clock_icon, (clock_x, clock_y))
+        screen.blit(self.clock_icon, (clock_x-70, clock_y)) # trừ 100
 
         # Vẽ chuỗi thời gian vào đồng hồ
         seconds_text = self.time_font.render(time_str, True, WHITE)
         icon_w, icon_h = self.clock_icon.get_size()
         text_x = clock_x + icon_w // 2
         text_y = clock_y + (icon_h - seconds_text.get_height() - 4) // 2
-        screen.blit(seconds_text, (text_x, text_y))
+        screen.blit(seconds_text, (text_x-70, text_y)) # trừ 70
 
         # Cập nhật data
         self.data = ["Player", int(self.level), int(self.score), time_str]

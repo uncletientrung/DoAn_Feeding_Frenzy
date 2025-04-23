@@ -146,6 +146,7 @@ class Main:
         return GameState.GAME
 
     def run(self):
+        
         while self.running:
             if self.state == GameState.MENU:
                 next_state = self.run_menu()
@@ -160,8 +161,6 @@ class Main:
                 self.running = False
             else:
                 self.state = next_state
-
-            
 
             pygame.display.flip()
             self.clock.tick(FPS)

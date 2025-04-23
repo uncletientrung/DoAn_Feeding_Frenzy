@@ -64,7 +64,7 @@ class SelectionScreen:
         self.btn_back = mainmenu.ImageButton(10, 10, "assets/button2/Exit.png", scale=SCALE)
         # Play button
         self.btn_play = mainmenu.ImageButton(SCREEN_WIDTH - 10 - self.btn_back.rect.width, 10, "assets/button2/Play2.png", scale=SCALE)
-        #BackGround
+        #BackGround 
         self.background = pygame.image.load("assets/images/bgSelection1.png").convert()
         self.background = pygame.transform.scale(self.background, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
