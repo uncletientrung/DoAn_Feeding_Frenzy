@@ -23,9 +23,9 @@ sound_boom = pygame.mixer.Sound(SOUND_PATH + "soundboom.wav")
     # (ảnh nhỏ, ảnh to, size, min_level_required, max_level_appear, điểm)
 ENEMY_FISH_TYPES = [
     ("Fishright10.png", "Fishleft10.png", 1, 0, 10, 5),
-    ("Fishright2.png", "Fishleft2.png", 2, 0, 11, 10),
-    ("Fishright1.png", "Fishleft1.png", 5, 0, 15, 15),
-    ("Fishright3.png", "Fishleft3.png", 8, 0, 99, 20),
+    ("Fishright2.png", "Fishleft2.png", 1, 0, 11, 10),
+    ("Fishright1.png", "Fishleft1.png", 1, 0, 15, 15),
+    ("Fishright3.png", "Fishleft3.png", 1, 0, 99, 20),
     ("Fishright4.png", "Fishleft4.png", 11, 6, 99, 30),
     ("Fishright5.png", "Fishleft5.png", 13, 9, 99, 50),
     ("Fishright6.png", "Fishleft6.png", 15, 12, 99, 60),
