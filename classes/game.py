@@ -13,6 +13,7 @@ from classes.bomb import Boom
 from classes.bonuslv import BonusLv
 from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
+from classes.gameover import GameOver
 
 class Game:
     def __init__(self, image_background, list_images_fish, choice_control,choice_fish,music,sound):
@@ -80,6 +81,8 @@ class Game:
 
         self.running = True
         self.game_over = False
+        self.image_game_over = pygame.image.load("assets/images/GameOver.png") # Chữ GAME OVER
+        # self.image_game_over = pygame.transform.scale(self.image_game_over, (self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
     def draw_fish_level(self, fish):
         text_surface = self.font.render(f"Lv {fish.level}", True, (255, 255, 255))
@@ -133,111 +136,58 @@ class Game:
         current_time = time.time()
         if current_time - self.last_time_spawn >= self.min_spawn_interval:
             if self.player.level > 7 and BossFish.should_spawn() and len(self.list_boss) <= self.MAX_BOSS:
-                new_boss = BossFish(x=0, y=random.randint(50, self.SCREEN_HEIGHT - 50))
+                new_boss = BossFish(x=0, y=random.randint(150, self.SCREEN_HEIGHT - 150))
                 self.list_boss.append(new_boss)
                 self.last_time_spawn = current_time
+
 
     def trigger_game_over(self):
         self.running = False
         self.game_over = True
         self.player.data = self.scoreBar.data
-        return self.show_game_over()
-
-    def show_game_over(self):
-        
-        if self.music: # Nếu music là True
-            # Tắt âm thanh nhạc nền
-            self.sound_music_game.stop()
-            self.sound_death.play()
-            pygame.time.delay(600)
-            self.sound_game_over2.play()
-            
-
-        try:
-            game_over_image = pygame.image.load("assets/buttons/bar.png")
-        except FileNotFoundError:
-            print(f"Không tìm thấy file bar.png trong assets/buttons!")
-            self.player.release_camera()
-            return "menu"
-
-        target_width = 400
-        target_height = 300
-        game_over_image = pygame.transform.scale(game_over_image, (target_width, target_height))
-        game_over_rect = game_over_image.get_rect(center=(self.SCREEN_WIDTH // 2, self.SCREEN_HEIGHT // 2))
-
-        try:
-            repeat_button_image = pygame.image.load("assets/button2/button_restart-sheet1.png")
-            home_button_image = pygame.image.load("assets/button2/button_fullscreen-sheet1.png")
-        except FileNotFoundError:
-            print(f"Không tìm thấy file Repeat-Right.png hoặc Home.png trong assets/buttons!")
-            self.player.release_camera()
-            return "menu"
-
-        # Kích thước mục tiêu cho nút (giữ hình tròn)
-        target_size = 80  # Kích thước cạnh của hình vuông (vì hình tròn có tỷ lệ 1:1)
-
-        # Scale giữ tỷ lệ khung hình
-        def scale_keep_aspect(image, target_size):
-            orig_width, orig_height = image.get_size()
-            scale_ratio = min(target_size / orig_width, target_size / orig_height)  # Giữ tỷ lệ nhỏ nhất
-            new_width = int(orig_width * scale_ratio)
-            new_height = int(orig_height * scale_ratio)
-            return pygame.transform.scale(image, (new_width, new_height))
-
-        repeat_button_image = scale_keep_aspect(repeat_button_image, target_size)
-        home_button_image = scale_keep_aspect(home_button_image, target_size)
-
-        # Đặt vị trí cho các nút
-        repeat_button_rect = repeat_button_image.get_rect(center=(self.SCREEN_WIDTH // 2 - 60, game_over_rect.bottom + 60))
-        home_button_rect = home_button_image.get_rect(center=(self.SCREEN_WIDTH // 2 + 60, game_over_rect.bottom + 60))
-
-        font = pygame.font.Font(None, 48)
-        small_font = pygame.font.Font(None, 36)
-
-        top_scores = [
-            {"name": "Player1", "score": 1000},
-            {"name": "Player2", "score": 800},
-            {"name": "Player3", "score": 600}
-        ]
-
+        return self.show_text_GameOver()
+    
+    def run_game_over(self):
+        self.game_over_screen = GameOver(self.screen, self.player.score)
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.player.release_camera()
+                    running = False
                     return "exit"
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if repeat_button_rect.collidepoint(event.pos):
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
                         self.player.release_camera()
-                        return "restart"
-                    if home_button_rect.collidepoint(event.pos):
-                        self.player.release_camera()
+                        running = False
                         return "menu"
-
-            self.screen.blit(game_over_image, game_over_rect)
-            your_score_text = font.render(f"Your Score: {self.player.score}", True, (255, 255, 255))
-            your_score_rect = your_score_text.get_rect(center=(self.SCREEN_WIDTH // 2, game_over_rect.top - 30))
-            self.screen.blit(your_score_text, your_score_rect)
-
-            colors = [(0, 0, 0), (128, 0, 128), (0, 0, 255)]
-            for i, player in enumerate(top_scores):
-                top_text = small_font.render(f"{i+1}. {player['name']}: {player['score']}", True, colors[i])
-                top_rect = top_text.get_rect(center=(self.SCREEN_WIDTH // 2, game_over_rect.centery + (i - 1) * 40))
-                self.screen.blit(top_text, top_rect)
-
-            self.screen.blit(repeat_button_image, repeat_button_rect)
-            self.screen.blit(home_button_image, home_button_rect)
-
+                result = self.game_over_screen.handle_event(event)
+                if result in ["restart", "menu", "exit"]:
+                    self.player.release_camera()
+                    running = False
+                    self.tham_so_game_over = result # Nhận kết quả chuyển đổi của menu game Over
+                    return result
+            self.game_over_screen.draw()
             pygame.display.flip()
+            self.clock.tick(self.FPS)
 
-        self.player.release_camera()
-        return "menu"
-
-    def update(self):
+    def show_text_GameOver(self):
+        self.screen.blit(self.image_game_over, (self.SCREEN_WIDTH // 2 - 500, self.SCREEN_HEIGHT // 2-200))
+        pygame.display.flip()
         
+        if self.music:
+            self.sound_music_game.stop()
+            self.sound_death.play()
+            pygame.time.delay(1000)
+            self.sound_game_over2.play()        
+            self.clock.tick(self.FPS)
+            print(111)
+        return self.run_game_over()
+
+    def update(self):        
         if not self.running or self.game_over:
             return
-
+        
         current_time = time.time()
         if current_time - self.last_bubble_time >= 7:
             if self.sound: # Nếu sound là True thì bật
@@ -256,6 +206,7 @@ class Game:
                 self.player.image = self.player.images[direction]
 
         if self.player.check_collision(self.enemy_fishes, self.scoreBar.data):
+            
             return self.trigger_game_over()
 
         if self.player.eat_count == 0:
@@ -285,8 +236,9 @@ class Game:
 
         for boss in self.list_boss[:]:
             boss.move_boss()
-            if boss.check_collision_mainfish(self.player):
+            if boss.check_collision_mainfish(self.player):                
                 return self.trigger_game_over()
+            
             boss.check_colistion_enemy(self.enemy_fishes)
             if boss.remove_boss():
                 self.list_boss.remove(boss)
@@ -298,6 +250,7 @@ class Game:
             if b.kick_mainfish(self.player, self.screen):
                 if b.changed_when_mainkick():
                     b.draw(self.screen)
+                
                     return self.trigger_game_over()
             if b.remove_boom():
                 self.list_boom.remove(b)
@@ -305,32 +258,9 @@ class Game:
         if self.player.dash_start_time and time.time() - self.player.dash_start_time >= 0.2:
             self.player.end_dash()
 
-    # def draw(self):
-    #     self.screen.blit(self.background, (0, 0))
-    #     self.player.draw(self.screen)
-    #     self.draw_fish_level(self.player)
-    #     self.scoreBar.draw(self.screen, self.player)
-
-    #     for enemy in self.enemy_fishes:
-    #         enemy.draw(self.screen)
-    #         self.draw_enemy_level(enemy)
-
-    #     for bonus in self.list_bonus:
-    #         bonus.draw_bonus(self.screen)
-
-    #     for boss in self.list_boss:
-    #         boss.draw(self.screen)
-
-    #     for b in self.list_boom:
-    #         b.draw(self.screen)
-
-    #     if self.choice_control == 3:
-            
-    #         camera_surface = self.player.get_camera_surface()
-    #         self.screen.blit(camera_surface, (1, self.SCREEN_HEIGHT - 115))
-
-    #     pygame.display.update()
     def draw(self):
+        if self.game_over: # Viết vầy để khi nó chạy ở game over thì nó không vẽ lại game
+            return
         self.screen.blit(self.background, (0, 0))
         # Vẽ hình ảnh hiển thị ở góc trên trái
         self.screen.blit(self.display_image, (10, 10))  # Vị trí (10, 10) là ví dụ
@@ -356,35 +286,52 @@ class Game:
             self.screen.blit(camera_surface, (1, self.SCREEN_HEIGHT - 115))
 
         pygame.display.update()
-    def handle_events(self):
-        if self.game_over:
-            return self.show_game_over()
+    # def handle_events(self):
+    #     if self.game_over:
+    #         return self.show_text_GameOver()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-                self.player.release_camera()
-                return "exit"
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    self.player.dash()
-                elif event.key == pygame.K_b:
-                    self.spawn_boom()
-                elif event.key == pygame.K_c:
-                    self.create_boss()
+    #     for event in pygame.event.get():
+    #         if event.type == pygame.QUIT:
+    #             self.running = False
+    #             self.player.release_camera()
+    #             return "exit"
+    #         if event.type == pygame.KEYDOWN:
+    #             if event.key == pygame.K_SPACE:
+    #                 self.player.dash()
+    #             elif event.key == pygame.K_b:
+    #                 self.spawn_boom()
+    #             elif event.key == pygame.K_c:
+    #                 self.create_boss()
 
-        self.player.start_cooldown()
-        return self.running
+        # self.player.start_cooldown()
+        # return self.running
 
     def run(self):
         while self.running:
-            result = self.update()
-            if result in ["restart", "menu", "exit"]:
+            if self.game_over:
+                result = self.show_text_GameOver()            
                 return result
-            self.draw()
-            result = self.handle_events()
-            if result in ["restart", "menu", "exit"]:
-                return result
+                            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                    self.player.release_camera()
+                    return "exit"
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.player.dash()
+                    elif event.key == pygame.K_b:
+                        self.spawn_boom()
+                    elif event.key == pygame.K_c:
+                        self.create_boss()
+                    elif event.key == pygame.K_ESCAPE:
+                        self.running = False
+                        self.player.release_camera()
+                        return "menu"
+            if not self.game_over:           
+                self.update()
+                self.draw()
             self.clock.tick(self.FPS)
             
-        return "menu"
+        
+        return self.tham_so_game_over # Trả về kết quả game over

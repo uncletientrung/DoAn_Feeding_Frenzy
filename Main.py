@@ -36,7 +36,6 @@ class Main:
         self.menu.draw(self.screen) 
         # Kích thước nút
         
-       
 
         # chỉ vẽ 1 lần ở đây — duy nhất
 
@@ -144,16 +143,6 @@ class Main:
             return GameState.MENU
         elif result == "exit":
             return GameState.EXIT
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return GameState.EXIT
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                self.game.player.release_camera()
-                if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
-                    self.menu.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
-                    self.menu.fps = self.menu.cap.get(cv2.CAP_PROP_FPS)
-                    self.menu.success, self.menu.video_frame = self.menu.cap.read()
-                return GameState.MENU
         return GameState.GAME
 
     def run(self):
@@ -171,6 +160,8 @@ class Main:
                 self.running = False
             else:
                 self.state = next_state
+
+            
 
             pygame.display.flip()
             self.clock.tick(FPS)
