@@ -13,6 +13,7 @@ from classes.bomb import Boom
 from classes.bonuslv import BonusLv
 from classes.boss_fish import BossFish
 from classes.ScoreBar import ScoreBar
+from classes.Bubble import Bubble
 
 class Game:
     def __init__(self, image_background, list_images_fish, choice_control,choice_fish,music,sound):
@@ -77,6 +78,11 @@ class Game:
         self.spawn_timer = 0
         self.spawn_boom_timer = 0
         self.last_bubble_time = time.time()
+
+
+        self.bubble_image = pygame.image.load("assets/images/bubble.png").convert_alpha()
+        self.bubbles = []
+        self.last_spawn_time = time.time()
 
         self.running = True
         self.game_over = False
@@ -337,6 +343,20 @@ class Game:
         self.player.draw(self.screen)
         self.draw_fish_level(self.player)
         self.scoreBar.draw(self.screen, self.player)
+        current_time = time.time()
+        if current_time - self.last_spawn_time >= 3:
+            num_bubbles = random.randint(1, 4)  # từ 1 đến 5 bong bóng mỗi lần
+            for _ in range(num_bubbles):
+                self.bubbles.append(Bubble(self.bubble_image, SCREEN_WIDTH, SCREEN_HEIGHT))
+            self.last_spawn_time = current_time
+
+        for bubble in self.bubbles[:]:
+            bubble.update()
+            bubble.draw(self.screen)
+            if bubble.is_off_screen():
+                self.bubbles.remove(bubble)
+
+
 
         for enemy in self.enemy_fishes:
             enemy.draw(self.screen)
