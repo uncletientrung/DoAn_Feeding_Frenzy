@@ -31,12 +31,18 @@ class MainFish(DatabaseManager):
         self.size = 1
         self.size_old = 1
         self.eat_count = 0
-        self.level = 9
+        self.level = 1
+        self.xp = 0#tinh level
+        self.max_xp = 100#tinh level
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.can_dash = True
         self.dash_cooldown = 1.5
+        self.dash_cooldown_start = None
+        self.is_dashing = False
+
         self.is_frenzy = False
+        
         self.dash_start_time = 0
         self.data = []
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
@@ -113,6 +119,47 @@ class MainFish(DatabaseManager):
                 print(f"fish{self.fish_number}_{direction}.png")
 
         self.width, self.height = new_size, new_size
+
+    def gain_xp(self, enemy_level):
+        if enemy_level > self.level:
+            return  # Không được ăn cá mạnh hơn
+
+        level_diff = self.level - enemy_level
+        base_xp = 10
+
+        # Càng chênh lệch thì XP càng giảm, tối đa giảm còn 30%
+        multiplier = max(0.3, 1 - 0.2 * level_diff)
+        gained = base_xp * multiplier
+
+        self.xp += gained
+        print(f"Gained {gained:.2f} XP, Total XP: {self.xp:.2f}/{self.max_xp}")
+
+        while self.xp >= self.max_xp:
+            self.xp -= self.max_xp
+            self.level += 1
+            self.max_xp = int(self.max_xp * 1.15)  # Càng lên cấp càng khó
+
+            if self.sound:
+                pygame.mixer.Sound.play(sound_level_up)
+
+            print(f"LEVEL UP! Now level {self.level}, next max_xp: {self.max_xp}")
+
+            # Tăng kích thước cá mỗi lần lên cấp
+            self.size += 0.5
+            base_size = SCREEN_WIDTH // 25
+            new_size = int(base_size * (1 + self.size * 0.07))
+            max_size = SCREEN_WIDTH // 3
+            new_size = min(new_size, max_size)
+
+            for direction in self.images:
+                if direction != "fish_number":
+                    self.images[direction] = pygame.transform.scale(
+                        pygame.image.load(IMAGE_PATH + f"fish{self.fish_number}_{direction}.png"),
+                        (new_size, new_size)
+                    )
+
+            self.width, self.height = new_size, new_size
+
 
     def move1(self, keys):
         current_direction = None
@@ -341,25 +388,46 @@ class MainFish(DatabaseManager):
     def eat_fish(self, enemy):
         if self.sound: # Nếu sound là True thì chạy
             self.eat_sound.play()
-        self.grow(enemy.fish_level)
+        self.gain_xp(enemy.fish_level)
+        # self.grow(enemy.fish_level)
         print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
 
+    # def dash(self):
+    #     if not self.is_frenzy and self.can_dash:
+    #         self.speed *= 2
+    #         self.can_dash = False
+    #         self.dash_start_time = time.time()
     def dash(self):
         if not self.is_frenzy and self.can_dash:
             self.speed *= 2
             self.can_dash = False
+            self.is_dashing = True
             self.dash_start_time = time.time()
 
+
+
+    # def end_dash(self):
+    #     if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:
+    #         self.speed /= 2
+    #         self.dash_start_time = None
+    #         self.start_cooldown()
     def end_dash(self):
         if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:
             self.speed /= 2
             self.dash_start_time = None
-            self.start_cooldown()
+            self.is_dashing = False
+            self.dash_cooldown_start = time.time()
 
+
+
+    # def start_cooldown(self):
+    #     if not self.is_frenzy:
+    #         if not self.dash_cooldown:
+    #             self.dash_cooldown = time.time()
+    #         elif time.time() - self.dash_cooldown >= 1.5:
+    #             self.can_dash = True
+    #             self.dash_cooldown = None
+    
     def start_cooldown(self):
-        if not self.is_frenzy:
-            if not self.dash_cooldown:
-                self.dash_cooldown = time.time()
-            elif time.time() - self.dash_cooldown >= 1.5:
-                self.can_dash = True
-                self.dash_cooldown = None
+        pass  # Không xài nữa
+

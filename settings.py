@@ -25,10 +25,10 @@ sound_menu = pygame.mixer.Sound(SOUND_PATH + "songgio.mp3")
 ENEMY_FISH_TYPES = [
     ("Fishright10.png", "Fishleft10.png", 1, 0, 10, 5),
     ("Fishright2.png", "Fishleft2.png", 1, 0, 11, 10),
-    ("Fishright1.png", "Fishleft1.png", 1, 0, 15, 15),
-    ("Fishright3.png", "Fishleft3.png", 1, 0, 99, 20),
-    ("Fishright4.png", "Fishleft4.png", 11, 6, 99, 30),
-    ("Fishright5.png", "Fishleft5.png", 13, 9, 99, 50),
+    ("Fishright1.png", "Fishleft1.png", 2, 0, 15, 15),
+    ("Fishright3.png", "Fishleft3.png", 4, 0, 99, 20),
+    ("Fishright4.png", "Fishleft4.png", 5, 6, 99, 30),
+    ("Fishright5.png", "Fishleft5.png", 6, 9, 99, 50),
     ("Fishright6.png", "Fishleft6.png", 15, 12, 99, 60),
     ("Fishright7.png", "Fishleft7.png", 17, 14, 99, 80),
     ("Fishright8.png", "Fishleft8.png", 19, 16, 99, 100),
@@ -54,6 +54,28 @@ ENEMY_FISH_TYPES_2 = [
     ("Fishright13.png", "Fishleft13.png",15,13,99, 75),
     ("Fishright14.png", "Fishleft14.png",15,15,99, 75),
 ]
+# (ảnh phải, ảnh trái, size, min_level_required, max_level_appear, điểm)
+ENEMY_FISH_TYPES_3 = [
+    ("f0r.png", "f0l.png", 1, 0, 5, 5),
+    ("f1r.png", "f1l.png", 2, 1, 6, 8),
+    ("f2r.png", "f2l.png", 3, 2, 7, 10),
+    ("f3r.png", "f3l.png", 4, 3, 8, 12),
+    ("f4r.png", "f4l.png", 5, 4, 9, 14),
+    ("f5r.png", "f5l.png", 6, 5, 10, 16),
+    ("f6r.png", "f6l.png", 7, 6, 11, 18),
+    ("f7r.png", "f7l.png", 8, 7, 12, 20),
+    ("f8r.png", "f8l.png", 9, 8, 13, 24),
+    ("f9r.png", "f9l.png", 10, 9, 14, 28),
+    ("f10r.png", "f10l.png", 11, 10, 15, 32),
+    ("f11r.png", "f11l.png", 12, 11, 16, 36),
+    ("f12r.png", "f12l.png", 13, 12, 17, 40),
+    ("f13r.png", "f13l.png", 14, 13, 18, 45),
+    ("f14r.png", "f14l.png", 15, 14, 19, 50),
+    ("f16r.png", "f16l.png", 16, 15, 20, 60),
+    ("f17r.png", "f17l.png", 17, 16, 20, 70),
+    ("f18r.png", "f18l.png", 18, 17, 20, 90),
+]
+
 
 
 def update_images_fish(choice_fish):

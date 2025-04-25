@@ -177,16 +177,8 @@ class MainMenu:
             "assets/button2/Play.png",
             scale=SCALE
         )
-        # âm thanh
-        # pygame.mixer.init()
-        # sound_menu2 = "assets/sounds/songgio.mp3"
-        try:
-            pygame.mixer.music.load(sound_menu2)
-            pygame.mixer.music.set_volume(1)  # Âm lượng 0.0 đến 1.0
-            if self.music_on:
-                pygame.mixer.music.play(-1)  # Lặp vô hạn
-        except Exception as e:
-            print("Không thể phát nhạc:", e)
+       
+        
         # Nút back
         self.back_btn = ImageButton(10, 10, "assets/button2/Exit.png", scale=0.5)
 

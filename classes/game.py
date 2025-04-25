@@ -30,6 +30,7 @@ class Game:
         self.FPS = 90
         self.screen = pygame.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         pygame.display.set_caption("Feeding Frenzy")
+        pygame.display.set_icon(pygame.image.load("assets/images2/game_icon-sheet0.png"))
         self.clock = pygame.time.Clock()
 
         self.background = image_background
@@ -300,6 +301,13 @@ class Game:
 
         if self.player.dash_start_time and time.time() - self.player.dash_start_time >= 0.2:
             self.player.end_dash()
+            if not self.player.can_dash and not self.player.is_dashing and self.player.dash_cooldown_start:
+                if time.time() - self.player.dash_cooldown_start >= 1.5:
+                    self.player.can_dash = True
+                    self.player.dash_cooldown_start = None
+
+
+
 
     def draw(self):
         if self.game_over: # Viết vầy để khi nó chạy ở game over thì nó không vẽ lại game

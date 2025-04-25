@@ -114,10 +114,10 @@ class EnemyFish:
         if fish_type:
             fish_right, fish_left, self.size, self.fish_level, _, self.score_enemy = fish_type
         else:
-            valid_fish = [fish for fish in ENEMY_FISH_TYPES 
+            valid_fish = [fish for fish in ENEMY_FISH_TYPES_3 
                           if fish[3] <= self.player_level and fish[4] > self.player_level]
             if not valid_fish:
-                valid_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= self.player_level]
+                valid_fish = [fish for fish in ENEMY_FISH_TYPES_3 if fish[3] <= self.player_level]
             fish_right, fish_left, self.size, self.fish_level, _, self.score_enemy = random.choice(valid_fish)
 
         self.image_right = pygame.image.load(IMAGE_PATH + fish_right)
@@ -132,24 +132,24 @@ class EnemyFish:
 
         self.image = self.image_right
         self.x, self.y = x, y
-        base_speed = 2
+        base_speed = 1
         if x < 0:
-            self.speed = base_speed + 0.5 * self.fish_level
+            self.speed = base_speed + 0.2 * (self.fish_level)*0.5
         else:
-            self.speed = -(base_speed + 0.5 * self.fish_level)
+            self.speed = -(base_speed + 0.2 * ((self.fish_level)*0.5))
         # Tăng tốc độ cho cá nhỏ hơn người chơi
         if self.size < player_level:
             self.speed *= 2  # Tăng 50% tốc độ cho cá nhỏ
         # Giữ nguyên tốc độ cho cá mạnh hoặc bằng cấp
         elif self.size > player_level:
-            self.speed *= 1.0  # Không tăng tốc cho cá mạnh
+            self.speed *= 1  # Không tăng tốc cho cá mạnh
         self.width, self.height = self.image.get_size()
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
 
         self.wave_amplitude = random.uniform(0.5, 0.75)
         self.wave_speed = random.uniform(0.05, 0.1)
         self.wave_offset = random.uniform(0, math.pi * 2)
-        self.khoangcach_quaydau_bo_chay = 60
+        self.khoangcach_quaydau_bo_chay = 70
 
     def move(self, player):
         """Di chuyển cá địch và kiểm tra nếu cần bỏ chạy hoặc đuổi theo"""
