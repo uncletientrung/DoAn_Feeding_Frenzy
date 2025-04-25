@@ -392,42 +392,30 @@ class MainFish(DatabaseManager):
         # self.grow(enemy.fish_level)
         print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
 
-    # def dash(self):
-    #     if not self.is_frenzy and self.can_dash:
-    #         self.speed *= 2
-    #         self.can_dash = False
-    #         self.dash_start_time = time.time()
     def dash(self):
         if not self.is_frenzy and self.can_dash:
             self.speed *= 2
             self.can_dash = False
-            self.is_dashing = True
             self.dash_start_time = time.time()
+   
 
 
 
-    # def end_dash(self):
-    #     if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:
-    #         self.speed /= 2
-    #         self.dash_start_time = None
-    #         self.start_cooldown()
     def end_dash(self):
         if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:
             self.speed /= 2
             self.dash_start_time = None
-            self.is_dashing = False
-            self.dash_cooldown_start = time.time()
-
-
-
-    # def start_cooldown(self):
-    #     if not self.is_frenzy:
-    #         if not self.dash_cooldown:
-    #             self.dash_cooldown = time.time()
-    #         elif time.time() - self.dash_cooldown >= 1.5:
-    #             self.can_dash = True
-    #             self.dash_cooldown = None
+            self.start_cooldown()
     
-    def start_cooldown(self):
-        pass  # Không xài nữa
 
+
+
+    def start_cooldown(self):
+        if not self.is_frenzy:
+            if not self.dash_cooldown:
+                self.dash_cooldown = time.time()
+            elif time.time() - self.dash_cooldown >= 1.5:
+                self.can_dash = True
+                self.dash_cooldown = None
+    
+  

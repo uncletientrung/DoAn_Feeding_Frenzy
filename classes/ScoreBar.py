@@ -6,7 +6,7 @@ from classes import main_fish
 import time
 
 WHITE = (255, 255, 255)
-WHITE_GLOW = (0, 255, 240)
+WHITE_GLOW = (173, 216, 230)
 
 class ScoreBar:
     def __init__(self, energy_bar_image):
