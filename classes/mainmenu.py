@@ -11,6 +11,7 @@ class FrameBXH(DatabaseManager):
         self.x = x
         self.y = y
         self.image = pygame.image.load(IMAGE_PATH + "bxh.png")
+       
         self.image = pygame.transform.scale(self.image, (SCREEN_WIDTH - 200, SCREEN_HEIGHT - 100))
         self.dataset = self.SelectAll()
         self.topScore = self.SelectTopScore()
@@ -29,7 +30,8 @@ class FrameBXH(DatabaseManager):
         self.max_scroll = max(0, len(self.dataset) * self.row_height - (SCREEN_HEIGHT - 200)) 
         self.scrollbar_width = 10
         self.scrollbar_color = (100, 149, 237)
-        self.scrollbar_hover_color = (65, 105, 225)  
+        self.scrollbar_hover_color = (65, 105, 225) 
+        
 
     def draw(self, screen):
         # Vẽ nền bảng xếp hạng
@@ -175,12 +177,21 @@ class MainMenu:
             "assets/button2/Play.png",
             scale=SCALE
         )
-
+        # âm thanh
+        # pygame.mixer.init()
+        # sound_menu2 = "assets/sounds/songgio.mp3"
+        try:
+            pygame.mixer.music.load(sound_menu2)
+            pygame.mixer.music.set_volume(1)  # Âm lượng 0.0 đến 1.0
+            if self.music_on:
+                pygame.mixer.music.play(-1)  # Lặp vô hạn
+        except Exception as e:
+            print("Không thể phát nhạc:", e)
         # Nút back
         self.back_btn = ImageButton(10, 10, "assets/button2/Exit.png", scale=0.5)
 
         try:
-            self.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
+            self.cap = cv2.VideoCapture("assets/images/mainmenu2.mp4")
             self.fps = self.cap.get(cv2.CAP_PROP_FPS)
             self.success, self.video_frame = self.cap.read()
         except Exception as e:
@@ -236,6 +247,8 @@ class MainMenu:
                 self.video_frame = cv2.cvtColor(self.video_frame, cv2.COLOR_BGR2RGB)
                 self.video_surface = pygame.image.frombuffer(self.video_frame.tobytes(), 
                                                              self.video_frame.shape[1::-1], "RGB")
+   
+
 
     def draw(self, screen):
         if self.success and self.video_frame is not None:

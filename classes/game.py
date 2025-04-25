@@ -96,7 +96,7 @@ class Game:
         self.image_text_pause = pygame.transform.scale(self.image_text_pause, (int(self.image_text_pause.get_width() *0.7),
                                                                                 int(self.image_text_pause.get_height()* 0.7))) 
                                                                               # Ép kiểu int mới chạy
-        self.btn_pause=ImageButton(self.SCREEN_WIDTH - 10 - 40, 10, "assets/button2/Pause.png", SCALE)
+        self.btn_pause=ImageButton(self.SCREEN_WIDTH - 10 - 55, 15, "assets/button2/Pause.png", SCALE)
         self.pause_btn_status=False  # trạng thái nút dần
         self.btn_continue=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 + space_btn*6 -180),
                                        self.SCREEN_HEIGHT // 2-50,"assets/button2/Play2.png",SCALE)

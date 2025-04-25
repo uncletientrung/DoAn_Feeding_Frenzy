@@ -12,7 +12,7 @@ class GameOver():
         self.title_font=pygame.font.SysFont("comicsansms", 80, bold=True)
         self.info_font = pygame.font.SysFont("comicsansms", 80)
         self.score_font = pygame.font.SysFont("comicsansms", 36,bold=True)
-        self.image_background = pygame.image.load("assets/images/bgSelection1.png").convert()
+        self.image_background = pygame.image.load("assets/images/bgSelection2.png").convert()
         self.image_background = pygame.transform.scale(self.image_background, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.image_YourScore = pygame.image.load("assets/images/YourScore.png").convert_alpha()
         self.image_YourScore = pygame.transform.scale(self.image_YourScore,

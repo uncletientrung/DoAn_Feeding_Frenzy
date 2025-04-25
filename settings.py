@@ -20,6 +20,7 @@ sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
 sound_level_up = pygame.mixer.Sound(SOUND_PATH + "levelUp.wav")
 sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")
 sound_boom = pygame.mixer.Sound(SOUND_PATH + "soundboom.wav")
+sound_menu = pygame.mixer.Sound(SOUND_PATH + "songgio.mp3")
     # (ảnh nhỏ, ảnh to, size, min_level_required, max_level_appear, điểm)
 ENEMY_FISH_TYPES = [
     ("Fishright10.png", "Fishleft10.png", 1, 0, 10, 5),
