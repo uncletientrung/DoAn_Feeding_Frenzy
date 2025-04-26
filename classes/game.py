@@ -419,7 +419,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     self.running = False
                     self.player.release_camera()
-                    return "exit"
+                    return "exit", self.sound, self.music
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         self.player.dash()
@@ -436,10 +436,10 @@ class Game:
                         elif result == "menu":
                             self.music
                             self.player.release_camera()
-                            return "menu"
+                            return "menu", self.sound, self.music
                         elif result == "exit":
                             self.player.release_camera()
-                            return "exit"
+                            return "exit", self.sound, self.music
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if self.btn_pause.draw(self.screen):
                         self.pause_btn_status = True
@@ -450,11 +450,11 @@ class Game:
                         elif result == "menu":
                             self.sound_music_game.stop()
                             self.player.release_camera()
-                            return "menu"
+                            return "menu", self.sound, self.music
                         elif result == "exit":
                             self.sound_music_game.stop()
                             self.player.release_camera()
-                            return "exit"
+                            return "exit", self.sound, self.music
 
             if not self.game_over and not self.pause_btn_status:
                 self.update()
@@ -462,4 +462,4 @@ class Game:
 
             self.clock.tick(self.FPS)
 
-        return self.tham_so_game_over # Trả về kết quả  của hàm  game over
+        return self.tham_so_game_over, self.sound, self.music # Trả về kết quả  của hàm  game over

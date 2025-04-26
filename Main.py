@@ -36,7 +36,7 @@ class Main:
         self.menu.update()
         self.menu.draw(self.screen) 
         # Kích thước nút
-        
+
 
         # chỉ vẽ 1 lần ở đây — duy nhất
 
@@ -132,7 +132,25 @@ class Main:
         if self.game is None:
             self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish,
                              self.menu.music_on, self.menu.sound_on)
-        result = self.game.run()
+        result,sound_bentrong,music_bentrong = self.game.run()
+        # Update lại ảnh sound và music sau khi update từ bên trong ra ngoài
+        self.menu.sound_on = sound_bentrong
+        self.menu.music_on = music_bentrong
+        # Ảnh Sound
+        new_image_path = "assets/button2/Sound-One.png" if self.menu.sound_on else "assets/button2/Sound-None.png"
+        new_image = pygame.image.load(new_image_path).convert_alpha()
+        width = int(new_image.get_width() * self.menu.bottom_right_btn.rect.width / new_image.get_width())
+        height = int(new_image.get_height() * self.menu.bottom_right_btn.rect.height / new_image.get_height())
+        self.menu.bottom_right_btn.image_default = pygame.image.load(new_image_path).convert_alpha()
+        self.menu.bottom_right_btn.image = pygame.transform.scale(new_image, (width, height))
+        # Ảnh music
+        new_image_path = "assets/button2/Music-On.png" if self.menu.music_on else "assets/button2/Music-Off.png"
+        new_image = pygame.image.load(new_image_path).convert_alpha()
+        width = int(new_image.get_width() * self.menu.bottom_right2_btn.rect.width / new_image.get_width())
+        height = int(new_image.get_height() * self.menu.bottom_right2_btn.rect.height / new_image.get_height())
+        self.menu.bottom_right2_btn.image_default=pygame.image.load(new_image_path).convert_alpha()
+        self.menu.bottom_right2_btn.image = pygame.transform.scale(new_image, (width, height))
+
         if result == "restart":
             self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish,
                              self.menu.music_on, self.menu.sound_on)
@@ -148,7 +166,6 @@ class Main:
         return GameState.GAME
 
     def run(self):
-        
         while self.running:
             if self.state == GameState.MENU:
                 next_state = self.run_menu()
