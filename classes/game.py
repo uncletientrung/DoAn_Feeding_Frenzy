@@ -102,11 +102,18 @@ class Game:
         self.btn_continue=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 + space_btn*6 -180),
                                        self.SCREEN_HEIGHT // 2-50,"assets/button2/Play2.png",SCALE)
                                                              
-        self.btn_music=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 +space_btn*3-180),
+        if self.music:
+            self.btn_music=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 +space_btn*3-180),
                                     self.SCREEN_HEIGHT // 2-50, "assets/button2/Music-On.png",SCALE)
-                                                             
-        self.btn_sound=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 + space_btn*4.5-180),
+        else:
+            self.btn_music=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 +space_btn*3-180),
+                                    self.SCREEN_HEIGHT // 2-50, "assets/button2/Music-Off.png",SCALE)
+        if self.sound:                                                     
+            self.btn_sound=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 + space_btn*4.5-180),
                                     self.SCREEN_HEIGHT // 2-50, "assets/button2/Sound-One.png",SCALE)
+        else:
+            self.btn_sound=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 + space_btn*4.5-180),
+                                    self.SCREEN_HEIGHT // 2-50, "assets/button2/Sound-None.png",SCALE)
                                                              
         self.btn_menu=ImageButton(int(self.SCREEN_WIDTH // 2 - self.btn_pause.width//2 +space_btn*1.5-180), 
                                   self.SCREEN_HEIGHT // 2-50, "assets/button2/Exit.png",SCALE)
