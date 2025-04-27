@@ -92,7 +92,7 @@ class FrameBXH(DatabaseManager):
             self.scroll_y = max(0, min(self.max_scroll, self.scroll_y - event.y * 10))  # Cuộn 10px mỗi lần
 
 class ImageButton:
-    def __init__(self, x, y, image_path, sound,scale=1):
+    def __init__(self, x, y, image_path,scale=1):
         self.image_default = pygame.image.load(image_path).convert_alpha()  # Lưu hình ảnh gốc
         self.width = int(self.image_default.get_width() * scale)
         self.height = int(self.image_default.get_height() * scale)
@@ -100,7 +100,7 @@ class ImageButton:
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
-        self.sound=sound
+        # self.sound=sound
 
     def draw(self, surface):
         action = False
