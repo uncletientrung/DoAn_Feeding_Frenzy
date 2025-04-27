@@ -27,17 +27,19 @@ class Main:
         self.menu = MainMenu()
         self.selection_screen = None
         self.game = None
+        # Chơi nhạc
+        self.menu.play_music.play(-1)
+        
     def update_button_image(button, image_path):
         new_image = pygame.image.load(image_path).convert_alpha()
         new_image = pygame.transform.scale(new_image, (button.rect.width, button.rect.height))
         button.image = new_image
 
     def run_menu(self):
+        
         self.menu.update()
         self.menu.draw(self.screen) 
         # Kích thước nút
-
-
         # chỉ vẽ 1 lần ở đây — duy nhất
 
         for event in pygame.event.get():
@@ -65,7 +67,11 @@ class Main:
                         height = int(new_image.get_height() * self.menu.bottom_right2_btn.rect.height / new_image.get_height())
                         self.menu.bottom_right2_btn.image_default=pygame.image.load(new_image_path).convert_alpha()
                         self.menu.bottom_right2_btn.image = pygame.transform.scale(new_image, (width, height))
-
+                        # Tắt nhạc liền khi ấn
+                        if self.menu.music_on:
+                            self.menu.play_music.play(-1)
+                        else:
+                            self.menu.play_music.stop()
 
                     if self.menu.bottom_left_btn.rect.collidepoint(event.pos):
                         self.menu.is_info_mode = True
@@ -129,6 +135,7 @@ class Main:
     
 
     def run_game(self):
+        self.menu.play_music.stop()
         if self.game is None:
             self.game = Game(self.image_background, self.list_images_fish, self.choice_control,self.choice_fish,
                              self.menu.music_on, self.menu.sound_on)
@@ -173,6 +180,7 @@ class Main:
                 next_state = self.run_selection()
             elif self.state == GameState.GAME:
                 next_state = self.run_game()
+
             else:
                 next_state = GameState.EXIT
 

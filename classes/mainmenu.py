@@ -92,7 +92,7 @@ class FrameBXH(DatabaseManager):
             self.scroll_y = max(0, min(self.max_scroll, self.scroll_y - event.y * 10))  # Cuộn 10px mỗi lần
 
 class ImageButton:
-    def __init__(self, x, y, image_path, scale=1):
+    def __init__(self, x, y, image_path, sound,scale=1):
         self.image_default = pygame.image.load(image_path).convert_alpha()  # Lưu hình ảnh gốc
         self.width = int(self.image_default.get_width() * scale)
         self.height = int(self.image_default.get_height() * scale)
@@ -100,6 +100,7 @@ class ImageButton:
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
+        self.sound=sound
 
     def draw(self, surface):
         action = False
@@ -141,6 +142,8 @@ class MainMenu:
         # Trạng thái âm thanh
         self.sound_on = True
         self.music_on = True
+        # Nhạc chạy
+        self.play_music=pygame.mixer.Sound(SOUND_PATH+"game_music.mp3")
         # Nút Sound 
         # Đặt tỉ lệ scale phù hợp với ảnh 117x118
        
@@ -226,7 +229,7 @@ class MainMenu:
         self.frameRank=FrameBXH(120,70)
         self.top_score = self.frameRank.topScore
         self.score_text = self.score_font.render(f"Top Scored: {self.top_score}", True, YELLOW_COLOR)
-
+        
 
     def update(self):
         if hasattr(self, 'cap') and self.cap.isOpened():

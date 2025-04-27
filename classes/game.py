@@ -59,7 +59,8 @@ class Game:
         self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")
         self.sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
         self.sound_game_over2 = pygame.mixer.Sound(SOUND_PATH + "GameOver2.wav")
-        self.sound_music_game = pygame.mixer.Sound(SOUND_PATH + "music_game.wav")
+        # self.sound_music_game = pygame.mixer.Sound(SOUND_PATH + "music_game.wav") # Nhạc chính
+        self.sound_music_game=pygame.mixer.Sound(SOUND_PATH + "diadang.mp3") 
         if self.music: # Nếu music là True thì bật
             self.sound_music_game.play(-1)
 
@@ -71,7 +72,7 @@ class Game:
         self.list_boom = []
         self.MAX_BOOM = 50
         self.list_bonus = []
-        self.MAX_BONUS = 1
+        self.MAX_BONUS = 3
         self.list_boss = []
         self.MAX_BOSS = 2
 
@@ -396,6 +397,11 @@ class Game:
                             self.sound_music_game.stop()
                     if self.btn_sound.draw(self.screen):  # Đã sửa lỗi từ draw thành kiểm tra va chạm
                         self.sound = not self.sound
+                        self.player.sound= self.sound # Chuyển đổi các trạng thái sound
+                        for boom in self.list_boom:
+                            boom.sound=self.sound
+                        for bonus in self.list_bonus:
+                            bonus.sound=self.sound
                         new_image_path = "assets/button2/Sound-One.png" if self.sound else "assets/button2/Sound-None.png"
                         self.btn_sound.image_default = pygame.image.load(new_image_path).convert_alpha()
                         self.btn_sound.image = pygame.transform.scale(self.btn_sound.image_default, 
@@ -426,6 +432,10 @@ class Game:
                         self.spawn_boom()
                     elif event.key == pygame.K_c:
                         self.create_boss() 
+                    elif event.key == pygame.K_v:
+                        self.create_bonus()
+                    elif event.key == pygame.K_n:
+                        self.spawn_enemy()
                     elif event.key == pygame.K_ESCAPE:
                         self.pause_btn_status = True
                         result = self.run_menu_pause()

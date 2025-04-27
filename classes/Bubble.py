@@ -17,7 +17,7 @@ class Bubble:
     def draw(self, screen):
         screen.blit(self.image, (self.x, self.y))
 
-    def is_off_screen(self):
+    def is_off_screen(self): # Kiểm tra out khỏi screen
         return self.y + self.image.get_height() < 0
 
 

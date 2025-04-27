@@ -11,7 +11,7 @@ class BonusLv:
         self.image=pygame.image.load(IMAGE_PATH+"kimcuong.png")
         self.size_base=SCREEN_WIDTH//25
         self.image=pygame.transform.scale(self.image,(self.size_base,self.size_base))
-        self.sound=pygame.mixer.Sound(SOUND_PATH+"bonus1.wav")
+        self.sound_effect=pygame.mixer.Sound(SOUND_PATH+"bonus1.wav")
         self.speed=4
     
     def move_bonus(self):
@@ -26,7 +26,7 @@ class BonusLv:
         player_offset=(player.x - self.x,player.y-self.y)
         if bonus_mask.overlap(player_mask,player_offset):
             if self.sound: # nếu sound là True
-                self.sound.play()
+                self.sound_effect.play()
             player.level+=1
             return True
         return False
