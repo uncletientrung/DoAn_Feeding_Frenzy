@@ -183,10 +183,10 @@ class Game:
 
         self.screen.blit(self.image_text_pause, (int(self.SCREEN_WIDTH // 2 - self.image_text_pause.get_width()//2),
                                                  self.SCREEN_HEIGHT // 2-200))
-        self.btn_continue.draw(self.screen)
-        self.btn_menu.draw(self.screen)
-        self.btn_music.draw(self.screen) 
-        self.btn_sound.draw(self.screen) 
+        self.btn_continue.draw(self.screen,self.sound)
+        self.btn_menu.draw(self.screen,self.sound)
+        self.btn_music.draw(self.screen,self.sound) 
+        self.btn_sound.draw(self.screen,self.sound) 
 
 
     def trigger_game_over(self):
@@ -211,7 +211,7 @@ class Game:
         return self.run_game_over()
     
     def run_game_over(self):
-        self.game_over_screen = GameOver(self.screen, self.player.score)
+        self.game_over_screen = GameOver(self.screen, self.player.score,self.sound)
         running = True
         while running:
             for event in pygame.event.get():
@@ -315,7 +315,7 @@ class Game:
 
         # Vẽ hình ảnh hiển thị ở góc trên trái
         self.screen.blit(self.display_image, (10, 10))  # Vị trí (10, 10) là ví dụ
-        self.btn_pause.draw(self.screen) # Vẽ nút pause ở góc trên bên phải
+        self.btn_pause.draw(self.screen,self.sound) # Vẽ nút pause ở góc trên bên phải
         self.player.draw(self.screen)
         self.draw_fish_level(self.player)
         self.scoreBar.draw(self.screen, self.player)
@@ -370,14 +370,14 @@ class Game:
                         self.pause_surface = None  # Xóa surface tạm khi tiếp tục
                         return "continue"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.btn_continue.draw(self.screen):
+                    if self.btn_continue.draw(self.screen,self.sound):
                         self.pause_btn_status = False
                         self.pause_surface = None  # Xóa surface tạm khi tiếp tục
                         return "continue"
-                    if self.btn_menu.draw(self.screen):
+                    if self.btn_menu.draw(self.screen,self.sound):
                         self.pause_surface = None  # Xóa surface tạm khi về menu
                         return "menu"
-                    if self.btn_music.draw(self.screen):
+                    if self.btn_music.draw(self.screen,self.sound):
                         self.music = not self.music
                         new_image_path = "assets/button2/Music-On.png" if self.music else "assets/button2/Music-Off.png"
                         self.btn_music.image_default = pygame.image.load(new_image_path).convert_alpha()
@@ -387,7 +387,7 @@ class Game:
                             self.sound_music_game.play(-1)
                         else:
                             self.sound_music_game.stop()
-                    if self.btn_sound.draw(self.screen):  # Đã sửa lỗi từ draw thành kiểm tra va chạm
+                    if self.btn_sound.draw(self.screen,self.sound):  # Đã sửa lỗi từ draw thành kiểm tra va chạm
                         self.sound = not self.sound
                         self.player.sound= self.sound # Chuyển đổi các trạng thái sound
                         for boom in self.list_boom:
@@ -442,7 +442,7 @@ class Game:
                             self.player.release_camera()
                             return "exit", self.sound, self.music
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.btn_pause.draw(self.screen):
+                    if self.btn_pause.draw(self.screen,self.sound):
                         self.pause_btn_status = True
                         result = self.run_menu_pause()
                         if result == "continue":

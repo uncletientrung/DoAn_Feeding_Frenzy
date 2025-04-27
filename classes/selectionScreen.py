@@ -4,10 +4,10 @@ from settings import *
 from classes import mainmenu
 
 class SelectionScreen:
-    def __init__(self, screen):
+    def __init__(self, screen,sound):
         # Gán màn hình Pygame được truyền vào để vẽ giao diện
         self.screen = screen
-        
+        self.sound = sound  # Gán âm thanh cho đối tượng
         # Khởi tạo các font chữ cho giao diện
         self.title_font = pygame.font.SysFont("Arial", 48, bold=True)  # Font cho tiêu đề chính
         self.section_font = pygame.font.SysFont("Arial", 32, bold=True)  # Font cho tiêu đề các section
@@ -128,8 +128,8 @@ class SelectionScreen:
             if rect.collidepoint(mouse_pos):
                 self.selected["character"] = i
                 return False
-        if self.btn_play.draw(self.screen):
-            return True  # Nhấn Confirm, thoát màn hình chọn
+        if self.btn_play.draw(self.screen,self.sound):
+            return True  # Nhấn play, thoát màn hình chọn
         return False
 
     def draw(self):
@@ -160,9 +160,9 @@ class SelectionScreen:
         )
 
         # Vẽ icon back ở góc trên trái
-        self.btn_back.draw(self.screen)
+        self.btn_back.draw(self.screen,self.sound)
         # Vẽ icon play ở góc trên phải
-        self.btn_play.draw(self.screen)
+        self.btn_play.draw(self.screen,self.sound)
 
         # Trả về các hình chữ nhật để xử lý click
         return map_rects, control_rects, char_rects

@@ -7,8 +7,9 @@ BTN_HEIGHT = int(118 * SCALE-0.1)
 PADDING = 10
 
 class GameOver():
-    def __init__(self,screen,score):
+    def __init__(self,screen,score,sound):
         self.screen=screen
+        self.sound=sound
         self.title_font=pygame.font.SysFont("comicsansms", 80, bold=True)
         self.info_font = pygame.font.SysFont("comicsansms", 80)
         self.score_font = pygame.font.SysFont("comicsansms", 36,bold=True)
@@ -35,9 +36,9 @@ class GameOver():
         self.screen.blit(title_shadow, (SCREEN_WIDTH//2 - title_text.get_width()//2 + 3, 30 + 3))
         self.screen.blit(title_text, (SCREEN_WIDTH//2 - title_text.get_width()//2, 30))
 
-        self.btn_restart.draw(self.screen)
-        self.btn_exit.draw(self.screen)
-        self.btn_menu.draw(self.screen) 
+        self.btn_restart.draw(self.screen,self.sound)
+        self.btn_exit.draw(self.screen,self.sound)
+        self.btn_menu.draw(self.screen,self.sound) 
         # Vẽ điểm
         score_text = self.title_font.render(f"{self.score}", True, (255, 215, 0))
         score_shadow = self.title_font.render(f"{self.score}", True, (139, 0, 0, 150))
@@ -52,11 +53,11 @@ class GameOver():
     def handle_event(self, event):
         if event.type == pygame.QUIT:
             return False
-        if self.btn_restart.draw(self.screen):
+        if self.btn_restart.draw(self.screen,self.sound):
             return "restart"
-        if self.btn_exit.draw(self.screen):
+        if self.btn_exit.draw(self.screen,self.sound):
             return "exit"
-        if self.btn_menu.draw(self.screen):
+        if self.btn_menu.draw(self.screen,self.sound):
             return "menu"
         return True
     

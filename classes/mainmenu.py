@@ -100,9 +100,11 @@ class ImageButton:
         self.rect = self.image.get_rect()
         self.rect.topleft = (x, y)
         self.clicked = False
-        # self.sound=sound
+        self.btn_hover_out=False
+        self.btn_sound=pygame.mixer.Sound(SOUND_PATH+"mouseDown.wav")
+        
 
-    def draw(self, surface):
+    def draw(self, screen,sound):
         action = False
         mouse_pos = pygame.mouse.get_pos()
 
@@ -112,10 +114,14 @@ class ImageButton:
             scaled_image = pygame.transform.scale(self.image_default, (scaled_width, scaled_height))
             offset_x = (self.width - scaled_width) // 2
             offset_y = (self.height - scaled_height) // 2
-            surface.blit(scaled_image, (self.rect.x + offset_x, self.rect.y + offset_y))
+            screen.blit(scaled_image, (self.rect.x + offset_x, self.rect.y + offset_y))
+            if sound and not self.btn_hover_out:
+                self.btn_sound.play()
+                self.btn_hover_out=True
         else:
-            surface.blit(self.image, self.rect.topleft) # di ra là trả vị trí ban đầu
-
+            self.btn_hover_out=False
+            screen.blit(self.image, self.rect.topleft) # di ra là trả vị trí ban đầu
+            
         # Kiểm tra nếu nút được nhấn
         if pygame.mouse.get_pressed()[0] == 1 and not self.clicked and self.rect.collidepoint(mouse_pos):
             self.clicked = True
@@ -256,12 +262,12 @@ class MainMenu:
             title_y = (self.SCREEN_HEIGHT - self.play_btn_height) // 2 - 150
             screen.blit(self.title_shadow, (title_x + 5, title_y + 5))
             screen.blit(self.title_text, (title_x, title_y))
-            self.top_left_btn.draw(screen)
-            self.bottom_left_btn.draw(screen)
-            self.bottom_right_btn.draw(screen)
-            self.bottom_right2_btn.draw(screen)
-            self.btnRanking.draw(screen)
-            self.play_btn.draw(screen)
+            self.top_left_btn.draw(screen,self.sound_on)
+            self.bottom_left_btn.draw(screen,self.sound_on)
+            self.bottom_right_btn.draw(screen,self.sound_on)
+            self.bottom_right2_btn.draw(screen,self.sound_on)
+            self.btnRanking.draw(screen,self.sound_on)
+            self.play_btn.draw(screen,self.sound_on)
             score_x = (self.SCREEN_WIDTH - self.score_text.get_width()) // 2 
             score_y = (self.SCREEN_HEIGHT - self.play_btn_height) // 2 + 30 + self.play_btn_height + 5
             screen.blit(self.score_text, (score_x, score_y))
@@ -271,10 +277,10 @@ class MainMenu:
                 text_rect = text.get_rect(center=(self.SCREEN_WIDTH // 2, y_offset))
                 screen.blit(text, text_rect)
                 y_offset += text.get_height() + 10
-            self.back_btn.draw(screen)
+            self.back_btn.draw(screen,self.sound_on)
         elif self.is_info_mode and  self.is_ranking_mode:
             self.frameRank.draw(screen)
-            self.back_btn.draw(screen)
+            self.back_btn.draw(screen,self.sound_on)
 
 
     def update_top_score(self, new_score):

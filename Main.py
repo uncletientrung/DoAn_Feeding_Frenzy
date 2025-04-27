@@ -50,7 +50,7 @@ class Main:
                     if self.menu.top_left_btn.rect.collidepoint(event.pos):
                         return GameState.EXIT
 
-                    if self.menu.bottom_right_btn.draw(self.screen):
+                    if self.menu.bottom_right_btn.draw(self.screen,self.menu.sound_on):
                         self.menu.sound_on = not self.menu.sound_on
                         new_image_path = "assets/button2/Sound-One.png" if self.menu.sound_on else "assets/button2/Sound-None.png"
                         new_image = pygame.image.load(new_image_path).convert_alpha()
@@ -59,7 +59,7 @@ class Main:
                         self.menu.bottom_right_btn.image_default = pygame.image.load(new_image_path).convert_alpha()
                         self.menu.bottom_right_btn.image = pygame.transform.scale(new_image, (width, height))
 
-                    if self.menu.bottom_right2_btn.draw(self.screen):
+                    if self.menu.bottom_right2_btn.draw(self.screen,self.menu.sound_on):
                         self.menu.music_on = not self.menu.music_on
                         new_image_path = "assets/button2/Music-On.png" if self.menu.music_on else "assets/button2/Music-Off.png"
                         new_image = pygame.image.load(new_image_path).convert_alpha()
@@ -83,7 +83,7 @@ class Main:
                     if self.menu.play_btn.rect.collidepoint(event.pos):
                         if hasattr(self.menu, 'cap') and self.menu.cap.isOpened():
                             self.menu.cap.release()
-                        self.selection_screen = SelectionScreen(self.screen)
+                        self.selection_screen = SelectionScreen(self.screen,self.menu.sound_on)
                         return GameState.SELECTION
 
             elif self.menu.is_info_mode and not self.menu.is_ranking_mode:
@@ -120,7 +120,7 @@ class Main:
                                     self.menu.music_on, self.menu.sound_on)
                     
                     return GameState.GAME
-                if self.selection_screen.btn_back.draw(self.screen):
+                if self.selection_screen.btn_back.draw(self.screen,self.menu.sound_on):
                     if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
                         self.menu.cap = cv2.VideoCapture("assets/images/mainmenu.mp4")
                         self.menu.fps = self.menu.cap.get(cv2.CAP_PROP_FPS)
