@@ -234,13 +234,13 @@ class Game:
             self.clock.tick(self.FPS)
 
 
-    def update(self):        
+    def update(self):
         if not self.running or self.game_over:
             return
-        
+
         current_time = time.time()
         if current_time - self.last_bubble_time >= 7:
-            if self.sound: # Nếu sound là True thì bật
+            if self.sound:
                 self.sound_bubble.play()
             self.last_bubble_time = current_time
 
@@ -250,13 +250,12 @@ class Game:
         elif self.choice_control == 2:
             self.player.move2(keys)
         elif self.choice_control == 3:
-            self.FPS=60
+            self.FPS = 60
             direction = self.player.move3()
             if direction:
                 self.player.image = self.player.images[direction]
 
         if self.player.check_collision(self.enemy_fishes, self.scoreBar.data):
-            
             return self.trigger_game_over()
 
         if self.player.eat_count == 0:
@@ -276,6 +275,8 @@ class Game:
 
         self.create_boss()
 
+        self.player.update()  # Cập nhật trạng thái player (dash, cooldown)
+
         for enemy in self.enemy_fishes[:]:
             enemy.move(self.player)
 
@@ -286,9 +287,8 @@ class Game:
 
         for boss in self.list_boss[:]:
             boss.move_boss()
-            if boss.check_collision_mainfish(self.player):                
+            if boss.check_collision_mainfish(self.player):
                 return self.trigger_game_over()
-            
             boss.check_colistion_enemy(self.enemy_fishes)
             if boss.remove_boss():
                 self.list_boss.remove(boss)
@@ -300,17 +300,9 @@ class Game:
             if b.kick_mainfish(self.player, self.screen):
                 if b.changed_when_mainkick():
                     b.draw(self.screen)
-                
                     return self.trigger_game_over()
             if b.remove_boom():
                 self.list_boom.remove(b)
-
-        if self.player.dash_start_time and time.time() - self.player.dash_start_time >= 0.2:
-            self.player.end_dash()
-            if not self.player.can_dash and not self.player.is_dashing and self.player.dash_cooldown_start:
-                if time.time() - self.player.dash_cooldown_start >= 1.5:
-                    self.player.can_dash = True
-                    self.player.dash_cooldown_start = None
 
 
 
