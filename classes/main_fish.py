@@ -37,8 +37,8 @@ class MainFish(DatabaseManager):
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.can_dash = True
-        self.dash_cooldown = 1.5
-        self.dash_cooldown_start = None
+        self.dash_cooldown = None  # Sử dụng self.dash_cooldown, không cần dash_cooldown_start
+        self.dash_start_time = None  # Đặt None thay vì 0
         self.is_dashing = False
 
         self.is_frenzy = False
@@ -395,27 +395,32 @@ class MainFish(DatabaseManager):
     def dash(self):
         if not self.is_frenzy and self.can_dash:
             self.speed *= 2
+            self.is_dashing = True  # Cập nhật trạng thái dash
             self.can_dash = False
             self.dash_start_time = time.time()
-   
-
-
+            print("Dash started!")  # Log để debug
 
     def end_dash(self):
         if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:
             self.speed /= 2
+            self.is_dashing = False  # Kết thúc trạng thái dash
             self.dash_start_time = None
             self.start_cooldown()
-    
-
-
+            print("Dash ended!")  # Log để debug
 
     def start_cooldown(self):
         if not self.is_frenzy:
-            if not self.dash_cooldown:
-                self.dash_cooldown = time.time()
-            elif time.time() - self.dash_cooldown >= 1.5:
-                self.can_dash = True
-                self.dash_cooldown = None
-    
+            self.dash_cooldown = time.time()  # Bắt đầu cooldown
+            print("Cooldown started!")  # Log để debug
+
+    def update_cooldown(self):
+        if self.dash_cooldown and time.time() - self.dash_cooldown >= 1.5:
+            self.can_dash = True
+            self.dash_cooldown = None
+            print("Cooldown ended, can dash again!")  # Log để debug
+
+    def update(self):
+        # Gọi trong vòng lặp chính để cập nhật cooldown
+        self.update_cooldown()
+        self.end_dash()  # Kiểm tra kết thúc dash
   
