@@ -37,22 +37,31 @@ ENEMY_FISH_TYPES = [
 ]
 ENEMY_FISH_TYPES_2 = [
     # (ảnh phải, ảnh trái, size, min_level_required, max_level_appear, điểm)
-
-    ("Fishright0.png",  "Fishleft0.png",  1, 1, 9, 5),
-    ("Fishright1.png",  "Fishleft1.png",  1, 1, 9, 5),
-    ("Fishright2.png",  "Fishleft2.png",  3, 1, 12, 15),
-    ("Fishright3.png",  "Fishleft3.png",  4, 1, 12, 20),
-    ("Fishright4.png",  "Fishleft4.png",  5, 1, 14, 25),
-    ("Fishright5.png",  "Fishleft5.png",  7, 3, 17, 35),
-    ("Fishright6.png",  "Fishleft6.png",  7, 5, 17, 35),
-    ("Fishright7.png",  "Fishleft7.png",  8, 5, 99, 40),
-    ("Fishright8.png",  "Fishleft8.png",  9, 7, 99, 45),
-    ("Fishright9.png",  "Fishleft9.png", 9,7,99, 45),
-    ("Fishright10.png", "Fishleft10.png",11,8,99, 55),
-    ("Fishright11.png", "Fishleft11.png",13,10,99, 65),
-    ("Fishright12.png", "Fishleft12.png",13,10,99, 65),
-    ("Fishright13.png", "Fishleft13.png",15,13,99, 75),
-    ("Fishright14.png", "Fishleft14.png",15,15,99, 75),
+    ("sharkleft1.png", "shark1.png", 15, 12, 99, 355),  
+    ("Fishright1.png",  "Fishleft1.png",  1, 1, 6, 15),
+    ("f1r.png", "f1l.png", 2, 1, 6, 30),
+    ("f2r.png", "f2l.png", 2, 1, 6, 30),
+    ("Fishright2.png",  "Fishleft2.png",  3, 1, 8, 45),
+    ("f3r.png", "f3l.png", 3, 2, 8, 45),
+    ("Fishright3.png",  "Fishleft3.png",  4, 2, 11, 60),
+    ("f4r.png", "f4l.png", 4, 3, 11, 60),
+    ("f6r.png", "f6l.png", 5, 3, 11, 98),
+    ("Fishright4.png",  "Fishleft4.png",  5, 2, 14, 98),
+    ("Fishright5.png",  "Fishleft5.png",  6, 3, 17, 135),
+     ("f7r.png", "f7l.png", 6, 5, 12, 130),
+    ("f9r.png", "f9l.png", 7, 5, 14, 198),
+    ("Fishright6.png",  "Fishleft6.png",  8, 6, 17, 235),
+    ("Fishright7.png",  "Fishleft7.png",  9, 6, 99, 280),
+    ("f10r.png", "f10l.png", 10, 7, 15, 232),
+    ("f11r.png", "f11l.png", 12, 9, 16, 276),
+    ("f12r.png", "f12l.png", 13, 10, 17, 290),
+    ("Fishright8.png",  "Fishleft8.png",  11, 8, 55, 305),
+     ("f14r.png", "f14l.png", 14, 11, 19, 320),
+    ("Fishright9.png",  "Fishleft9.png", 9,6,43, 345),
+    ("Fishright10.png", "Fishleft10.png",1,1,7, 15),
+    ("Fishright11.png", "Fishleft11.png",16,13,99, 365),
+     ("f18r.png", "f18l.png", 17, 14, 99, 490),
+    
 ]
 # (ảnh phải, ảnh trái, size, min_level_required, max_level_appear, điểm)
 ENEMY_FISH_TYPES_3 = [

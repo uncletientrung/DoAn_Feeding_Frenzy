@@ -33,7 +33,7 @@ class MainFish(DatabaseManager):
         self.eat_count = 0
         self.level = 1
         self.xp = 0#tinh level
-        self.max_xp = 100#tinh level
+        self.max_xp = 80#tinh level
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
         self.can_dash = True
@@ -99,9 +99,9 @@ class MainFish(DatabaseManager):
         return False
 
     def grow(self, enemy_level):
-        self.size += 0.1 * (1 + enemy_level * 0.1)
-        if self.size >= self.size_old + 1:
-            self.size_old = int(self.size) + self.size * 0.1
+        self.size += 0.15 * (1 + enemy_level * 0.1)
+        if self.size >= self.size_old + 1.2:
+            self.size_old = int(self.size) + self.size * 0.15
             self.level += 1
             if self.sound: # Nếu sound là True thì chạy
                 pygame.mixer.Sound.play(sound_level_up)
@@ -128,7 +128,7 @@ class MainFish(DatabaseManager):
         base_xp = 10
 
         # Càng chênh lệch thì XP càng giảm, tối đa giảm còn 30%
-        multiplier = max(0.3, 1 - 0.2 * level_diff)
+        multiplier = max(0.5, 1 - 0.2 * level_diff)
         gained = base_xp * multiplier
 
         self.xp += gained
@@ -137,7 +137,7 @@ class MainFish(DatabaseManager):
         while self.xp >= self.max_xp:
             self.xp -= self.max_xp
             self.level += 1
-            self.max_xp = int(self.max_xp * 1.15)  # Càng lên cấp càng khó
+            self.max_xp = int(self.max_xp * 1.05)  # Càng lên cấp càng khó
 
             if self.sound:
                 pygame.mixer.Sound.play(sound_level_up)
@@ -147,7 +147,7 @@ class MainFish(DatabaseManager):
             # Tăng kích thước cá mỗi lần lên cấp
             self.size += 0.5
             base_size = SCREEN_WIDTH // 25
-            new_size = int(base_size * (1 + self.size * 0.07))
+            new_size = int(base_size * (1 + self.size * 0.08))
             max_size = SCREEN_WIDTH // 3
             new_size = min(new_size, max_size)
 

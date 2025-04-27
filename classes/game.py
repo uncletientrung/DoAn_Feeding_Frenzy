@@ -139,16 +139,15 @@ class Game:
             x_position = random.choice([-50, self.SCREEN_WIDTH])
             y_position = random.randint(50, self.SCREEN_HEIGHT - 50)
 
-            available_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] <= self.player.level <= fish[4]]
-            is_strong_fish = random.randint(1, 1000) <= 10
-            if is_strong_fish:
-                strong_fish = [fish for fish in ENEMY_FISH_TYPES if fish[3] > self.player.level]
-                if strong_fish:
-                    fish_type = random.choice(strong_fish)
-                else:
-                    fish_type = random.choice(available_fish)
+            # Lấy danh sách cá phù hợp với level hiện tại
+            available_fish = [fish for fish in ENEMY_FISH_TYPES_2 if fish[3] <= self.player.level <= fish[4]]
+            
+            # Ưu tiên cá nhỏ (size <= player.level) với xác suất 70%
+            small_fish = [fish for fish in available_fish if fish[2] <= self.player.level]
+            if small_fish and random.random() < 0.7:  # 70% chọn cá nhỏ
+                fish_type = random.choice(small_fish)
             else:
-                fish_type = random.choice(available_fish)
+                fish_type = random.choice(available_fish)  # 30% chọn ngẫu nhiên
 
             new_enemy = EnemyFish(x_position, y_position, self.player.level, fish_type)
             self.enemy_fishes.append(new_enemy)
@@ -267,7 +266,7 @@ class Game:
             self.spawn_enemy()
             self.spawn_timer = pygame.time.get_ticks()
 
-        if random.randint(1, 2000) == 3 and self.player.level >= 7:
+        if random.randint(1, 2000) == 3 and self.player.level >= 6:
             self.create_bonus()
 
         if self.player.level >= 7:
