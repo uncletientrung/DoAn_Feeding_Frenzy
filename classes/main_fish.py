@@ -107,7 +107,7 @@ class MainFish(DatabaseManager):
                 pygame.mixer.Sound.play(sound_level_up)
 
         base_size = SCREEN_WIDTH // 25
-        new_size = int(base_size * (1 + self.size * 0.07))
+        new_size = int(base_size * (1 + self.size * 0.2))
         max_size = SCREEN_WIDTH // 3
         new_size = min(new_size, max_size)
 
@@ -116,7 +116,7 @@ class MainFish(DatabaseManager):
                 self.images[direction] = pygame.transform.scale(
                     pygame.image.load(IMAGE_PATH + f"fish{self.fish_number}_{direction}.png"), (new_size, new_size)
                 )
-                print(f"fish{self.fish_number}_{direction}.png")
+                
 
         self.width, self.height = new_size, new_size
 

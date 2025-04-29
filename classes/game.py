@@ -16,10 +16,12 @@ from classes.ScoreBar import ScoreBar
 from classes.Bubble import Bubble
 from classes.gameover import GameOver
 from classes.mainmenu import ImageButton
+from PDBCUtill import DatabaseManager
 SCALE = 0.5
 
-class Game:
+class Game(DatabaseManager):
     def __init__(self, image_background, list_images_fish, choice_control,choice_fish,music,sound):
+        super().__init__()
         self.music = music  # Âm thanh nhạc
         self.sound = sound # # Âm thanh hiệu ứng
         os.environ['SDL_VIDEO_WINDOW_POS'] = "50,50"
@@ -193,6 +195,7 @@ class Game:
         self.running = False
         self.game_over = True
         self.player.data = self.scoreBar.data
+        self.Insert(self.player.data)
         return self.show_text_GameOver()
     
     def show_text_GameOver(self):

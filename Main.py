@@ -4,6 +4,7 @@ from classes.game import Game
 from classes.mainmenu import MainMenu, ImageButton
 from classes.selectionScreen import SelectionScreen
 from settings import *
+from PDBCUtill import DatabaseManager
 import cv2
 
 pygame.init()
@@ -27,6 +28,7 @@ class Main:
         self.menu = MainMenu()
         self.selection_screen = None
         self.game = None
+        self.database= DatabaseManager()
         # Chơi nhạc
         self.menu.play_music.play(-1)
         
@@ -163,6 +165,11 @@ class Main:
                              self.menu.music_on, self.menu.sound_on)
             return GameState.GAME
         elif result == "menu":
+            self.Database = DatabaseManager()
+            self.menu.frameRank.topScore=self.Database.SelectTopScore() # Cập nhật lại database
+            self.menu.frameRank.dataset=self.Database.SelectAll()
+            self.menu.update_top_score(self.menu.frameRank.topScore)
+            
             if hasattr(self.menu, 'cap') and not self.menu.cap.isOpened():
                 if self.menu.music_on:
                     self.menu.play_music.play(-1)
