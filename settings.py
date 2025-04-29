@@ -129,7 +129,7 @@ def update_images_fish(choice_fish):
 def update_background(choice_background):
     try:
         if choice_background == 1:
-            images_background = pygame.image.load(IMAGE_PATH + "bg11.jpg")
+            images_background = pygame.image.load(IMAGE_PATH + "bgbien1.jpg")
             print("A")
         elif choice_background == 2:
             images_background = pygame.image.load(IMAGE_PATH + "bg12.jpg")

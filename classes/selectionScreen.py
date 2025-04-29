@@ -42,7 +42,7 @@ class SelectionScreen:
         self.sections = {
             "map": {
                 "y": 70 + self.offset_y,
-                "options": self.load_images(["bg11.jpg", "bg12.jpg", "bg13.jpg"], self.map_box_width, self.map_box_height)
+                "options": self.load_images(["bgbien1.jpg", "bg12.jpg", "bg13.jpg"], self.map_box_width, self.map_box_height)
             },
             "control": {
                 "y": 270 + self.offset_y,
