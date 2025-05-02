@@ -31,7 +31,7 @@ class MainFish(DatabaseManager):
         self.size = 1
         self.size_old = 1
         self.eat_count = 0
-        self.level = 7
+        self.level = 1
         self.xp = 0#tinh level
         self.max_xp = 80#tinh level
         self.eat_sound = pygame.mixer.Sound(SOUND_PATH + "eat.wav")

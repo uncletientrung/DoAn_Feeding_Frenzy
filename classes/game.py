@@ -80,6 +80,7 @@ class Game(DatabaseManager):
 
         self.last_time_spawn = 0
         self.min_spawn_interval = 30 if self.player.level <= 4 else 15 if self.player.level <= 8 else 10
+        
         self.thoi_gian_cuoi_cung_spawn = 0
         self.thoi_gian_cho_doi_spawn = random.uniform(1000, 2500)
         self.spawn_timer = 0
@@ -177,6 +178,12 @@ class Game(DatabaseManager):
                 new_boss = BossFish(x=0, y=random.randint(150, self.SCREEN_HEIGHT - 150))
                 self.list_boss.append(new_boss)
                 self.last_time_spawn = current_time
+
+    def bat_buot_sinhra_boss(self):
+        
+        new_boss = BossFish(x=0, y=random.randint(150, SCREEN_HEIGHT - 150))
+        self.list_boss.append(new_boss)
+        
     
     def show_menu_pause(self):
         ocean_bg = pygame.Surface((self.screen.get_width(), self.screen.get_height()), pygame.SRCALPHA)
@@ -426,7 +433,7 @@ class Game(DatabaseManager):
                     elif event.key == pygame.K_b:
                         self.spawn_boom()
                     elif event.key == pygame.K_c:
-                        self.create_boss() 
+                        self.bat_buot_sinhra_boss(); 
                     elif event.key == pygame.K_v:
                         self.create_bonus()
                     elif event.key == pygame.K_n:
