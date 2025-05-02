@@ -61,8 +61,8 @@ class Game(DatabaseManager):
         self.sound_bubble = pygame.mixer.Sound(SOUND_PATH + "underWater.wav")
         self.sound_death = pygame.mixer.Sound(SOUND_PATH + "die.wav")
         self.sound_game_over2 = pygame.mixer.Sound(SOUND_PATH + "GameOver2.wav")
-        # self.sound_music_game = pygame.mixer.Sound(SOUND_PATH + "music_game.wav") # Nhạc chính
-        self.sound_music_game=pygame.mixer.Sound(SOUND_PATH + "diadang.mp3") 
+        self.sound_music_game = pygame.mixer.Sound(SOUND_PATH + "music_game.wav") # Nhạc chính
+        # self.sound_music_game=pygame.mixer.Sound(SOUND_PATH + "diadang.mp3") 
         if self.music: # Nếu music là True thì bật
             self.sound_music_game.play(-1)
 
