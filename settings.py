@@ -63,6 +63,34 @@ ENEMY_FISH_TYPES_2 = [
      ("f18r.png", "f18l.png", 17, 14, 99, 490),
     
 ]
+# ENEMY_FISH_TYPES_2 = [
+#     # (ảnh phải, ảnh trái, size, min_level_required, max_level_appear, điểm)
+#     ("sharkleft1.png", "shark1.png", 15, 12, 99, 355),  
+#     ("sharkleft1.png",  "shark1.png",  1, 1, 6, 15),
+#     ("sharkleft1.png", "shark1.png", 2, 1, 6, 30),
+#     ("sharkleft1.png", "shark1.png", 2, 1, 6, 30),
+#     ("sharkleft1.png",  "shark1.png",  3, 1, 8, 45),
+#     ("sharkleft1.png", "shark1.png", 3, 2, 8, 45),
+#     ("sharkleft1.png",  "shark1.png",  4, 2, 11, 60),
+#     ("sharkleft1.png", "shark1.png", 4, 3, 11, 60),
+#     ("sharkleft1.png", "shark1.png", 5, 3, 11, 98),
+#     ("sharkleft1.png",  "shark1.png",  5, 2, 14, 98),
+#     ("sharkleft1.png",  "shark1.png",  6, 3, 17, 135),
+#      ("sharkleft1.png", "shark1.png", 6, 5, 12, 130),
+#     ("sharkleft1.png", "shark1.png", 7, 5, 14, 198),
+#     ("sharkleft1.png",  "shark1.png",  8, 6, 17, 235),
+#     ("sharkleft1.png",  "shark1.png",  9, 6, 99, 280),
+#     ("sharkleft1.png", "shark1.png", 10, 7, 15, 232),
+#     ("sharkleft1.png", "shark1.png", 12, 9, 16, 276),
+#     ("sharkleft1.png", "shark1.png", 13, 10, 17, 290),
+#     ("sharkleft1.png",  "shark1.png",  11, 8, 55, 305),
+#      ("sharkleft1.png", "shark1.png", 14, 11, 19, 320),
+#     ("sharkleft1.png",  "shark1.png", 9,6,43, 345),
+#     ("sharkleft1.png", "shark1.png",1,1,7, 15),
+#     ("sharkleft1.png", "shark1.png",16,13,99, 365),
+#      ("sharkleft1.png", "shark1.png", 17, 14, 99, 490),
+    
+# ]
 # (ảnh phải, ảnh trái, size, min_level_required, max_level_appear, điểm)
 ENEMY_FISH_TYPES_3 = [
     ("f0r.png", "f0l.png", 1, 0, 5, 5),

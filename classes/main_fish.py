@@ -132,7 +132,7 @@ class MainFish(DatabaseManager):
         gained = base_xp * multiplier
 
         self.xp += gained
-        print(f"Gained {gained:.2f} XP, Total XP: {self.xp:.2f}/{self.max_xp}")
+        print(f"XP: {self.xp:.2f}/{self.max_xp}")
 
         while self.xp >= self.max_xp:
             self.xp -= self.max_xp
@@ -141,8 +141,6 @@ class MainFish(DatabaseManager):
 
             if self.sound:
                 pygame.mixer.Sound.play(sound_level_up)
-
-            print(f"LEVEL UP! Now level {self.level}, next max_xp: {self.max_xp}")
 
             # Tăng kích thước cá mỗi lần lên cấp
             self.size += 0.5
@@ -390,7 +388,6 @@ class MainFish(DatabaseManager):
             self.eat_sound.play()
         self.gain_xp(enemy.fish_level)
         # self.grow(enemy.fish_level)
-        print(f"🍽️ Đã ăn cá! Player Level: {self.level} - Enemy Level: {enemy.fish_level}")
 
     def dash(self):
         if not self.is_frenzy and self.can_dash:
@@ -398,7 +395,6 @@ class MainFish(DatabaseManager):
             self.is_dashing = True  # Cập nhật trạng thái dash
             self.can_dash = False
             self.dash_start_time = time.time()
-            print("Dash started!")  # Log để debug
 
     def end_dash(self):
         if self.dash_start_time and time.time() - self.dash_start_time >= 0.2:
@@ -406,18 +402,16 @@ class MainFish(DatabaseManager):
             self.is_dashing = False  # Kết thúc trạng thái dash
             self.dash_start_time = None
             self.start_cooldown()
-            print("Dash ended!")  # Log để debug
+
 
     def start_cooldown(self):
         if not self.is_frenzy:
             self.dash_cooldown = time.time()  # Bắt đầu cooldown
-            print("Cooldown started!")  # Log để debug
 
     def update_cooldown(self):
         if self.dash_cooldown and time.time() - self.dash_cooldown >= 1.5:
             self.can_dash = True
             self.dash_cooldown = None
-            print("Cooldown ended, can dash again!")  # Log để debug
 
     def update(self):
         # Gọi trong vòng lặp chính để cập nhật cooldown
