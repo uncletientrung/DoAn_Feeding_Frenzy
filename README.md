@@ -1,5 +1,5 @@
 <!-- author: uncletientrung -->
-# Đồ án môn Lập trình Java  ![](./img/fish.gif)
+# Đồ án môn Lập trình Java  <img src="./img/fish.gif" width="100">
 ## Đề tài: Mô phỏng trò chơi Cá lớn nuốt cá bé bằng Python
 ### Thành viên nhóm
 <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Nguyễn Tiến Trung (L) - 3123410396  <br>
@@ -22,7 +22,7 @@
 
 3. Sử dụng Visual Studio Code với môi trường 3.10.x (hoặc thấp hơn) để chạy source code.
 
-4. Chạy code trong folder classes -> file Main.py
+4. Chạy code trong file Main.py
 
 ### Các đối tượng 
 
