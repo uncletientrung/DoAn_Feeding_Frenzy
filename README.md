@@ -1,40 +1,70 @@
-# DoAn_Feeding_Frenzy
-# Tạo ra 1 con cá main:
-+ Cá có 2 hình lấy trong Folder trung gửi
-+ Cá di chuyển được bằng phím up dow left right (di chuyển là khi đè phím sẽ phải di chuyển sao cho mượt)
-+ Cá di chuyển right hoặc left sẽ chuyển đổi hình ảnh
-+ Cá không thể di chuyển ra ngoài tọa độ của màn hình được
-+ biến point lưu điểm 
-+ Cá có thể phóng mỗi 1.5s
-+ Cá sẽ làm đầy thanh frenzy mỗi khi ghi điểm, khi đầy, cá main sẽ được tăng 50% tốc độ di chuyển cho tới khi thanh frenzy cạn
+<!-- author: uncletientrung -->
+# Đồ án môn Lập trình Java  ![](./img/fish.gif)
+## Đề tài: Mô phỏng trò chơi Cá lớn nuốt cá bé bằng Python
+### Thành viên nhóm
+<img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Nguyễn Tiến Trung (L) - 3123410396  <br>
+<img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Nguyễn Minh Thuận - 3123410365  <br>
+<img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Phan Hoàng Vũ - 3123410436       <br>
+<img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Nguyễn Phước Hòa Lâm - 3123410193 
 
+## File báo cáo và slide PowerPoint nằm trong thư mục BaoCao
+## Link chạy canva thuyết trình
+    https://www.canva.com/design/DAGmxHrKwQg/Gh8c_tlZnxZBGoBDVIP4Wg/view?utm_content=DAGmxHrKwQg&utm_campaign=designshare&utm_medium=link2&utm_source=uniquelinks&utlId=h5c21c9e626#1
 
-# Tạo ra các con cá địch:
-+ Vị trí cá sẽ là random 
-+ Cá sẽ di chuyển lên xuống giống code trong folder để tạo hiệu ứng animation
-+ Các con cá xuất hiện cùng phía không để nó chồng lên nhau
+## Getting Started
+1. Tải source code về:
 
-# Tạo ra 1 con cá vô địch:
-+ vị trí là random ( trước khi xuất hiện có cảnh báo)
-+ cá có point max
-+ Cá sẽ tiêu diệt tất cả con cá khác mà nó đi qua
+    ```bash
+   git clone https://github.com/uncletientrung/DoAn_Feeding_Frenzy.git
+   ```
 
-# Tạo ra 1 cái boom:
-+ Vị trí xuất hiện là từ trên xuống dưới random ( nhưng vị trí xuất hiện 3/5 center)
-+ Nếu ăn cá sẽ chết
+2. Mở xampp và vào trang http://localhost/phpmyadmin/ tạo 1 database mới có tên là feedingfrenzy và import cơ sở dữ liệu trong folder Database -> file feedingfrenzy.sql trong source code.
 
-# Tạo ra kim cương:
-+ vị trí xuất hiện là từ trên xuống dưới random
-+ Nếu ăn sẽ được sẽ thêm .. điểm
+3. Sử dụng Visual Studio Code với môi trường 3.10.x (hoặc thấp hơn) để chạy source code.
 
-# Chức năng :
-+ Cá nào lớn sẽ ăn cá bé ( tham chiểu điểm point để ăn)
+4. Chạy code trong folder classes -> file Main.py
 
-# Thêm background
-# Thêm Âm thanh
+### Các đối tượng 
 
-# AI siêu cấp
-+ sử dụng ngón trỏ để điều khiển cá
-+ yêu cầu sài python 3.10.x
-+ sử dụng vòng lặp while trong game.py , chọn 1 trong 2 vòng lặp để chơi camera hoặc phím
-+ nếu có bug thì lên chatgpt tải thư viện OPEN CV và ... về
+ ![Đối tượng chính](./img/object.jpg)
+ 
+ <h4 align="center">Các đối tượng chính</h4>
+
+ ![Đối tượng bên ngoài](./img/object1.jpg)
+ 
+ <h4 align="center">Các đối tượng khác</h4>
+
+  ![Đối tượng enemy](./img/object2.jpg)
+ 
+ <h4 align="center">Các đối tượng cá địch</h4>
+
+### Giao diện
+ ![Giao diện menu game](./img/giaodiengame.jpg)
+ 
+ <h4 align="center">Giao diện MENU GAME</h4>
+
+  ![Giao diện giới thiệu](./img/gioithieu.jpg)
+ 
+ <h4 align="center">Giao diện giới thiệu</h4>
+
+  ![Giao diện bảng xếp hạng](./img/topscore.jpg)
+ 
+ <h4 align="center">Giao diện bảng xếp hạng</h4>
+
+  ![Giao diện chọn nhân vật](./img/select.jpg)
+ 
+ <h4 align="center">Giao diện chọn nhân vật</h4>
+
+  ![Giao diện chơi](./img/play.jpg)
+ 
+ <h4 align="center">Giao diện chơi</h4>
+
+![Giao diện GAMEOVER](./img/gameover.jpg)
+ 
+ <h4 align="center">Giao diện GAMEOVER</h4>
+
+![Giao diện PAUSE](./img/pause.jpg)
+ 
+ <h4 align="center">Giao diện dừng</h4>
+ 
+ 
