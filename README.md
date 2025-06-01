@@ -1,6 +1,6 @@
 <!-- author: uncletientrung -->
-# Đồ án môn Lập trình Java  <img src="./img/fish.gif" width="50">
-## Đề tài: Mô phỏng trò chơi Cá lớn nuốt cá bé bằng Python
+# Đồ án môn Lập trình Python  <img src="./img/fish.gif" width="50">
+# Đề tài: Mô phỏng trò chơi Cá lớn nuốt cá bé bằng Python
 ### Thành viên nhóm
 <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Nguyễn Tiến Trung (L) - 3123410396  <br>
 <img src="https://media.giphy.com/media/WUlplcMpOCEmTGBtBW/giphy.gif" width="30"> Nguyễn Minh Thuận - 3123410365  <br>
